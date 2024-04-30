@@ -14,5 +14,6 @@ func Init() *gorm.DB {
     if err != nil {
         log.Fatalln(err)
     }
+	
     return db
 }

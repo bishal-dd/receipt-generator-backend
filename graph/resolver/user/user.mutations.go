@@ -6,11 +6,22 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
 
 func (r *UserResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	db := db.Init()
+	newUser := &model.User{
+		ID: input.ID,
+	}
+	if err := db.Create(newUser).Error; err != nil {
+		// Return any error encountered during user creation
+		return nil, err
+	}
+
+
+	// Return the created user object
+	return newUser, nil
 }
