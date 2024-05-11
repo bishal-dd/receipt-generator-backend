@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/receipt"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/user"
 )
 
@@ -10,4 +11,5 @@ import (
 
 type Resolver struct{
 	*user.UserResolver
+	*receipt.ReceiptResolver
 }

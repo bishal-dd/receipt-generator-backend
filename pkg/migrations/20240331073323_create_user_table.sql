@@ -1,7 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY
+    id VARCHAR(36) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 -- +goose StatementEnd
 

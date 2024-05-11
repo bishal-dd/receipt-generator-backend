@@ -32,11 +32,11 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 func main() {
-	 db.Init()
 	 err := godotenv.Load()
 	 if err != nil {
 	   log.Fatal("Error loading .env file")
 	 }
+	 db.Init()
 	// Setting up Gin
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()

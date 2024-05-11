@@ -2,17 +2,58 @@
 
 package model
 
-type Mutation struct {
+type CreateReceipt struct {
+	ID             string   `json:"id"`
+	ReceiptName    string   `json:"receipt_name"`
+	RecipientName  string   `json:"recipient_name"`
+	RecipientPhone int      `json:"recipient_phone"`
+	Amount         float64  `json:"amount"`
+	TransactionNo  *int     `json:"transaction_no,omitempty"`
+	UserID         string   `json:"user_id"`
+	Date           string   `json:"date"`
+	TotalAmount    *float64 `json:"total_amount,omitempty"`
 }
 
-type NewUser struct {
+type CreateUser struct {
 	ID string `json:"id"`
+}
+
+type Mutation struct {
 }
 
 type Query struct {
 }
 
+type Receipt struct {
+	ID             string   `json:"id"`
+	ReceiptName    string   `json:"receipt_name"`
+	RecipientName  string   `json:"recipient_name"`
+	RecipientPhone int      `json:"recipient_phone"`
+	Amount         float64  `json:"amount"`
+	TransactionNo  *int     `json:"transaction_no,omitempty"`
+	UserID         string   `json:"user_id"`
+	Date           string   `json:"date"`
+	TotalAmount    *float64 `json:"total_amount,omitempty"`
+	CreatedAt      string   `json:"created_at"`
+	UpdatedAt      *string  `json:"updated_at,omitempty"`
+	DeletedAt      *string  `json:"deleted_at,omitempty"`
+}
+
+type UpdateReceipt struct {
+	ID             string   `json:"id"`
+	ReceiptName    *string  `json:"receipt_name,omitempty"`
+	RecipientName  *string  `json:"recipient_name,omitempty"`
+	RecipientPhone *int     `json:"recipient_phone,omitempty"`
+	Amount         *float64 `json:"amount,omitempty"`
+	TransactionNo  *int     `json:"transaction_no,omitempty"`
+	UserID         *string  `json:"user_id,omitempty"`
+	Date           *string  `json:"date,omitempty"`
+	TotalAmount    *float64 `json:"total_amount,omitempty"`
+}
+
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string  `json:"id"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt *string `json:"updated_at,omitempty"`
+	DeletedAt *string `json:"deleted_at,omitempty"`
 }

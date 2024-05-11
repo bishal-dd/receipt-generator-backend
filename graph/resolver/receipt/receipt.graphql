@@ -1,0 +1,42 @@
+scalar Date
+scalar DateTime
+scalar UUID
+
+type Receipt {
+  id: UUID!
+  receipt_name: String!
+  recipient_name: String!
+  recipient_phone: Int!
+  amount: Float!
+  transaction_no: Int
+  user_id: ID!
+  date: Date!
+  total_amount: Float
+  created_at: DateTime!
+  updated_at: DateTime
+  deleted_at: DateTime
+}
+
+input CreateReceipt {
+  id: UUID!
+  receipt_name: String!
+  recipient_name: String!
+  recipient_phone: Int!
+  amount: Float!
+  transaction_no: Int
+  user_id: ID!
+  date: Date!
+  total_amount: Float
+}
+
+input UpdateReceipt {
+  id: UUID!
+  receipt_name: String
+  recipient_name: String
+  recipient_phone: Int
+  amount: Float
+  transaction_no: Int
+  user_id: ID
+  date: Date
+  total_amount: Float
+}

@@ -1,8 +1,13 @@
 type Query {
   users: [User!]!
   user(id: ID!): User
+  receipts: [Receipt!]!
+  receipt(id: ID!): Receipt
 }
 
 type Mutation {
-  createUser(input: NewUser!): User!
+  createUser(input: CreateUser!): User!
+  deleteUser(id: ID!): Boolean!
+  createReceipt(input: CreateReceipt!): Receipt!
+  deleteReceipt(id: ID!): Boolean!
 }

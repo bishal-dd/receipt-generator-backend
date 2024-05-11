@@ -6,22 +6,34 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
 
-func (r *UserResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
 	db := db.Init()
 	newUser := &model.User{
 		ID: input.ID,
+		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 	if err := db.Create(newUser).Error; err != nil {
-		// Return any error encountered during user creation
 		return nil, err
 	}
 
-
-	// Return the created user object
 	return newUser, nil
+}
+
+
+func (r *UserResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+    db := db.Init()
+    user := &model.User{
+        ID: id,
+    }
+    if err := db.Delete(user).Error; err != nil {
+        return false, err
+    }
+
+    return true, nil
 }
