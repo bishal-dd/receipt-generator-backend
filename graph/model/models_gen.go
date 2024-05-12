@@ -3,7 +3,6 @@
 package model
 
 type CreateReceipt struct {
-	ID             string   `json:"id"`
 	ReceiptName    string   `json:"receipt_name"`
 	RecipientName  string   `json:"recipient_name"`
 	RecipientPhone int      `json:"recipient_phone"`

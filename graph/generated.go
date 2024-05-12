@@ -3701,20 +3701,13 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "receipt_name", "recipient_name", "recipient_phone", "amount", "transaction_no", "user_id", "date", "total_amount"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "amount", "transaction_no", "user_id", "date", "total_amount"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNUUID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
 		case "receipt_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
 			data, err := ec.unmarshalNString2string(ctx, v)

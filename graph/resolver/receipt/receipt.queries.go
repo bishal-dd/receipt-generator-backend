@@ -8,14 +8,26 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
 
 type ReceiptResolver struct{}
 
 func (r *ReceiptResolver) Receipts(ctx context.Context) ([]*model.Receipt, error) {
-	return []*model.Receipt{}, nil
+	db := db.Init()
+	var receipts []*model.Receipt
+	if err := db.Find(&receipts).Error; err != nil {
+		return nil, err
+	}
+
+	return receipts, nil
 }
 
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	return &model.Receipt{}, nil
+	db := db.Init()
+	var receipt model.Receipt
+	if err := db.Where("id = ?", id).First(&receipt).Error; err != nil {
+		return nil, err
+	}
+	return &receipt, nil
 }

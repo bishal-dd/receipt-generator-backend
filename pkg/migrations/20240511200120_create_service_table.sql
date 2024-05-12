@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE service (
+CREATE TABLE services (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     description VARCHAR(5000) NOT NULL,
     rate FLOAT NOT NULL,
@@ -10,11 +10,11 @@ CREATE TABLE service (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    FOREIGN KEY (receipt_id) REFERENCES receipt(id)
+    FOREIGN KEY (receipt_id) REFERENCES receipts(id)
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE service;
+DROP TABLE services;
 -- +goose StatementEnd

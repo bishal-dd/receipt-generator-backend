@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE receipt (
+CREATE TABLE receipts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     receipt_name VARCHAR(100) NOT NULL,
     recipient_name VARCHAR(100) NOT NULL,
@@ -19,5 +19,5 @@ CREATE TABLE receipt (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE receipt;
+DROP TABLE receipts;
 -- +goose StatementEnd

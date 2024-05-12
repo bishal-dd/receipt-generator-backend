@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE profile (
+CREATE TABLE profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_name VARCHAR(255),
     logo_image TEXT,
@@ -22,5 +22,5 @@ CREATE TABLE profile (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE profile;
+DROP TABLE profiles;
 -- +goose StatementEnd

@@ -18,7 +18,6 @@ type Receipt {
 }
 
 input CreateReceipt {
-  id: UUID!
   receipt_name: String!
   recipient_name: String!
   recipient_phone: Int!

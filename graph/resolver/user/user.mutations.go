@@ -6,23 +6,23 @@ package user
 
 import (
 	"context"
-	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/helper"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
 
 func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
 	db := db.Init()
-	newUser := &model.User{
+	me := &model.User{
 		ID: input.ID,
-		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+		CreatedAt: helper.CurrentTime(),
 	}
-	if err := db.Create(newUser).Error; err != nil {
+	if err := db.Create(me).Error; err != nil {
 		return nil, err
 	}
 
-	return newUser, nil
+	return me, nil
 }
 
 
