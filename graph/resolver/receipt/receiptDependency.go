@@ -17,4 +17,5 @@ func InitializeReceiptResolver(redis *redis.Client, db *gorm.DB) *ReceiptResolve
 	}
 }
 
-const Key = "receipts"
+const ReceiptsKey = "receipts"
+const ReceiptKey = "receipt:"

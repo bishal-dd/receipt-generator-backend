@@ -15,14 +15,14 @@ import (
 
 func (r *ReceiptResolver) Receipts(ctx context.Context) ([]*model.Receipt, error) {
     // Check if the receipts are cached in Redis
-    receiptsJSON, err := r.redis.Get(ctx, Key).Result()
+    receiptsJSON, err := r.redis.Get(ctx, ReceiptsKey).Result()
 	var receipts []*model.Receipt
 
     if err == redis.Nil {
         if err := r.db.Find(&receipts).Error; err != nil {
             return nil, err
         }
-		if err = helper.CacheResult(r.redis, ctx, Key, receipts, 10); err != nil {
+		if err = helper.CacheResult(r.redis, ctx, ReceiptsKey, receipts, 10); err != nil {
 			return nil, err
 		}
         return receipts, nil
@@ -39,10 +39,25 @@ func (r *ReceiptResolver) Receipts(ctx context.Context) ([]*model.Receipt, error
 
 
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	db := r.db
-	var receipt model.Receipt
-	if err := db.Where("id = ?", id).First(&receipt).Error; err != nil {
+	 // Check if the receipt exists in the Redis cache
+	 cacheKey := ReceiptKey + id
+	 receiptJSON, err := r.redis.Get(ctx, cacheKey).Result()
+	 var receipt *model.Receipt
+	 if err == redis.Nil {
+		if err := r.db.Where("id = ?", id).First(&receipt).Error; err != nil {
+			return nil, err
+		}
+		if err = helper.CacheResult(r.redis, ctx, cacheKey, receipt, 10); err != nil {
+			return nil, err
+		}
+        return receipt, nil
+    } else if err != nil {
+        return nil, err
+    }
+	
+	if err := helper.Unmarshal([]byte(receiptJSON), &receipt); err != nil {
 		return nil, err
-	}
-	return &receipt, nil
+	}	 
+ 
+	 return receipt, nil
 }
