@@ -8,12 +8,11 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
-type UserResolver struct{}
+
 
 func (r *UserResolver) Users(ctx context.Context) ([]*model.User, error) {
-	db := db.Init()
+	db := r.db
 	var users []*model.User
 	if err := db.Find(&users).Error; err != nil {
 		return nil, err
@@ -22,7 +21,7 @@ func (r *UserResolver) Users(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *UserResolver) User(ctx context.Context, id string) (*model.User, error) {
-	db := db.Init()
+	db := r.db
 	var user model.User
 	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err

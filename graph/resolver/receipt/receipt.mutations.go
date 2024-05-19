@@ -5,12 +5,11 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper"
-	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
+	"github.com/redis/go-redis/v9"
 )
 
 
 func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateReceipt) (*model.Receipt, error) {
-    db := db.Init()
     newReceipt := &model.Receipt{
         ID: helper.UUID(),
         ReceiptName:    input.ReceiptName,
@@ -23,8 +22,26 @@ func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateR
         TotalAmount: input.TotalAmount,
 		CreatedAt: helper.CurrentTime(),
     }
-    if err := db.Create(newReceipt).Error; err != nil {
+    if err := r.db.Create(newReceipt).Error; err != nil {
         return nil, err
+    }
+
+    receiptsJSON, err := r.redis.Get(ctx, Key).Result()
+    var cachedReceipts []*model.Receipt
+  
+    if err != nil && err != redis.Nil {  // Handle errors other than cache miss
+      return nil, err
+    }
+    if err == redis.Nil {
+      cachedReceipts = []*model.Receipt{}  // Empty slice if no cache exists
+    } else {
+      if err := helper.Unmarshal([]byte(receiptsJSON), &cachedReceipts); err != nil {
+        return nil, err
+      }
+    }
+    cachedReceipts = append(cachedReceipts, newReceipt)
+    if err := helper.CacheResult(r.redis, ctx, Key, cachedReceipts, 10); err != nil {
+      return nil, err
     }
 
     return newReceipt, nil
@@ -33,7 +50,7 @@ func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateR
 
 
 func (r *ReceiptResolver) DeleteReceipt(ctx context.Context, id string) (bool, error) {
-    db := db.Init()
+    db := r.db
     receipt := &model.Receipt{
         ID: id,
     }

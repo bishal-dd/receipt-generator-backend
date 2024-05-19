@@ -6,10 +6,13 @@ require (
 	github.com/99designs/gqlgen v0.17.45
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
+	github.com/redis/go-redis/v9 v9.5.1
 	github.com/vektah/gqlparser/v2 v2.5.11
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
@@ -26,7 +29,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

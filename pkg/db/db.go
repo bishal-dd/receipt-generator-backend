@@ -14,6 +14,8 @@ func Init() *gorm.DB {
     if err != nil {
         log.Fatalln(err)
     }
+
+	log.Println("Successfully connected to the database")
 	
     return db
 }

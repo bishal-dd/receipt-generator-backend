@@ -9,11 +9,10 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper"
-	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 )
 
 func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
-	db := db.Init()
+	db := r.db
 	me := &model.User{
 		ID: input.ID,
 		CreatedAt: helper.CurrentTime(),
@@ -27,7 +26,7 @@ func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (
 
 
 func (r *UserResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
-    db := db.Init()
+    db := r.db
     user := &model.User{
         ID: id,
     }

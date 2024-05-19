@@ -8,23 +8,38 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
+	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/redis/go-redis/v9"
 )
 
-type ReceiptResolver struct{}
 
 func (r *ReceiptResolver) Receipts(ctx context.Context) ([]*model.Receipt, error) {
-	db := db.Init()
+    // Check if the receipts are cached in Redis
+    receiptsJSON, err := r.redis.Get(ctx, Key).Result()
 	var receipts []*model.Receipt
-	if err := db.Find(&receipts).Error; err != nil {
-		return nil, err
-	}
 
-	return receipts, nil
+    if err == redis.Nil {
+        if err := r.db.Find(&receipts).Error; err != nil {
+            return nil, err
+        }
+		if err = helper.CacheResult(r.redis, ctx, Key, receipts, 10); err != nil {
+			return nil, err
+		}
+        return receipts, nil
+    } else if err != nil {
+        return nil, err
+    }
+   // Unmarshal the JSON string into a slice of *model.Receipt
+   if err := helper.Unmarshal([]byte(receiptsJSON), &receipts); err != nil {
+	   return nil, err
+   }
+
+    return receipts, nil
 }
 
+
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	db := db.Init()
+	db := r.db
 	var receipt model.Receipt
 	if err := db.Where("id = ?", id).First(&receipt).Error; err != nil {
 		return nil, err
