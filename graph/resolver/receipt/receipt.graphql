@@ -39,3 +39,21 @@ input UpdateReceipt {
   date: Date
   total_amount: Float
 }
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type ReceiptEdge {
+  cursor: String!
+  node: Receipt!
+}
+
+type ReceiptConnection {
+  edges: [ReceiptEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}

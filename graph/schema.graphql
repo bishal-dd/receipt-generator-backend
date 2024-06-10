@@ -1,7 +1,7 @@
 type Query {
   users: [User!]!
   user(id: ID!): User
-  receipts: [Receipt!]!
+  receipts(first: Int, after: String): ReceiptConnection!
   receipt(id: ID!): Receipt
 }
 

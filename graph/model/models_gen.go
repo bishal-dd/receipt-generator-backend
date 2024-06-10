@@ -20,6 +20,13 @@ type CreateUser struct {
 type Mutation struct {
 }
 
+type PageInfo struct {
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor,omitempty"`
+	EndCursor       *string `json:"endCursor,omitempty"`
+}
+
 type Query struct {
 }
 
@@ -36,6 +43,17 @@ type Receipt struct {
 	CreatedAt      string   `json:"created_at"`
 	UpdatedAt      *string  `json:"updated_at,omitempty"`
 	DeletedAt      *string  `json:"deleted_at,omitempty"`
+}
+
+type ReceiptConnection struct {
+	Edges      []*ReceiptEdge `json:"edges"`
+	PageInfo   *PageInfo      `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+type ReceiptEdge struct {
+	Cursor string   `json:"cursor"`
+	Node   *Receipt `json:"node"`
 }
 
 type UpdateReceipt struct {
