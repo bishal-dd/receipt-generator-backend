@@ -6,25 +6,70 @@ package user
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/pagination"
+	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
+	"github.com/redis/go-redis/v9"
 )
 
 
-func (r *UserResolver) Users(ctx context.Context) ([]*model.User, error) {
-	db := r.db
+func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*model.UserConnection, error) {
 	var users []*model.User
-	if err := db.Find(&users).Error; err != nil {
-		return nil, err
-	}
-	return users, nil
+    var totalUsers int64
+    limit := pagination.Limit(first)
+	offset, err := pagination.Offset(after)
+	if err != nil {
+		return nil, err 
+	} 
+    if err := r.db.Model(&model.User{}).Count(&totalUsers).Error; err != nil {
+        return nil, err
+    }
+
+    pageCacheKey := fmt.Sprintf("%s:%d:%d", UsersKey, offset, limit)
+    usersJSON, err := r.redis.Get(ctx, pageCacheKey).Result()
+    if err == redis.Nil {
+        if err := r.db.Offset(offset).Limit(limit).Find(&users).Error; err != nil {
+            return nil, err
+        }
+        if err = r.redis.SAdd(ctx, UsersPageGroupKey, pageCacheKey).Err(); err != nil {
+            return nil, err
+        }
+        if err := r.redis.Expire(ctx, UsersPageGroupKey, 600*time.Second).Err(); err != nil {
+            return nil, err
+        }
+        if err = redisUtil.CacheResult(r.redis, ctx, pageCacheKey, users, 10); err != nil {
+            return nil, err
+        }
+    } else if err != nil {
+        return nil, err
+    } else {
+        if err := helper.Unmarshal([]byte(usersJSON), &users); err != nil {
+            return nil, err
+        }
+    }
+    if users == nil {
+        users = []*model.User{}
+    }
+    
+    edges, end := Edges(offset, limit, users)
+    pageInfo := PageInfo(edges, totalUsers, end, offset )
+    return &model.UserConnection{
+        Edges:      edges,
+        PageInfo:   pageInfo,
+        TotalCount: int(totalUsers),
+    }, nil
 }
 
 func (r *UserResolver) User(ctx context.Context, id string) (*model.User, error) {
-	db := r.db
-	var user model.User
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
+	loaders := loaders.For(ctx)
+    user, err := loaders.UserLoader.Load(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+    return user, nil
 }

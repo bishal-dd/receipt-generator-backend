@@ -3,8 +3,20 @@ type User {
   created_at: DateTime!
   updated_at: DateTime
   deleted_at: DateTime
+  Receipts: [Receipt]
 }
 
 input CreateUser {
   id: ID!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }

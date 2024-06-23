@@ -1,5 +1,5 @@
 type Query {
-  users: [User!]!
+  users(first: Int, after: String): UserConnection!
   user(id: ID!): User
   receipts(first: Int, after: String): ReceiptConnection!
   receipt(id: ID!): Receipt
@@ -10,4 +10,11 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   createReceipt(input: CreateReceipt!): Receipt!
   deleteReceipt(id: ID!): Boolean!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }

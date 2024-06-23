@@ -23,8 +23,8 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
     limit := pagination.Limit(first)
 	offset, err := pagination.Offset(after)
 	if err != nil {
-		return nil, err
-	}
+		return nil, err 
+	} 
     if err := r.db.Model(&model.Receipt{}).Count(&totalReceipts).Error; err != nil {
         return nil, err
     }
@@ -32,7 +32,6 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
     pageCacheKey := fmt.Sprintf("%s:%d:%d", ReceiptsKey, offset, limit)
     receiptsJSON, err := r.redis.Get(ctx, pageCacheKey).Result()
     if err == redis.Nil {
-        // If not in cache, fetch from the database
         if err := r.db.Offset(offset).Limit(limit).Find(&receipts).Error; err != nil {
             return nil, err
         }
@@ -42,25 +41,20 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
         if err := r.redis.Expire(ctx, ReceiptsPageGroupKey, 600*time.Second).Err(); err != nil {
             return nil, err
         }
-        // Cache the result and add the page key to the group
         if err = redisUtil.CacheResult(r.redis, ctx, pageCacheKey, receipts, 10); err != nil {
             return nil, err
         }
-
-    
-        
     } else if err != nil {
         return nil, err
     } else {
-        // Unmarshal the JSON string into a slice of *model.Receipt
         if err := helper.Unmarshal([]byte(receiptsJSON), &receipts); err != nil {
             return nil, err
         }
     }
-    // Ensure the receipts slice is not nil
     if receipts == nil {
         receipts = []*model.Receipt{}
     }
+    
     edges, end := Edges(offset, limit, receipts)
     pageInfo := PageInfo(edges, totalReceipts, end, offset )
     return &model.ReceiptConnection{
@@ -71,9 +65,7 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
 }
 
 
-
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	 // Check if the receipt exists in the Redis cache
 	 cacheKey := ReceiptKey + id
 	 receiptJSON, err := r.redis.Get(ctx, cacheKey).Result()
 	 var receipt *model.Receipt
@@ -92,6 +84,6 @@ func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receip
 	if err := helper.Unmarshal([]byte(receiptJSON), &receipt); err != nil {
 		return nil, err
 	}	 
- 
+    
 	 return receipt, nil
 }

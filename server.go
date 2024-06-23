@@ -6,6 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/bishal-dd/receipt-generator-backend/graph"
+	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
 	resolver "github.com/bishal-dd/receipt-generator-backend/graph/resolver"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/redis"
@@ -45,6 +46,7 @@ func main() {
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()
 	r.Use(GinContextToContextMiddleware())
+	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", graphqlHandler(dependencyResolver))
 	r.GET("/graphql", playgroundHandler())
 	r.Run()

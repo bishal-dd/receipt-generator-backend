@@ -69,8 +69,20 @@ type UpdateReceipt struct {
 }
 
 type User struct {
-	ID        string  `json:"id"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt *string `json:"updated_at,omitempty"`
-	DeletedAt *string `json:"deleted_at,omitempty"`
+	ID        string     `json:"id"`
+	CreatedAt string     `json:"created_at"`
+	UpdatedAt *string    `json:"updated_at,omitempty"`
+	DeletedAt *string    `json:"deleted_at,omitempty"`
+	Receipts  []*Receipt `json:"Receipts,omitempty"`
+}
+
+type UserConnection struct {
+	Edges      []*UserEdge `json:"edges"`
+	PageInfo   *PageInfo   `json:"pageInfo"`
+	TotalCount int         `json:"totalCount"`
+}
+
+type UserEdge struct {
+	Cursor string `json:"cursor"`
+	Node   *User  `json:"node"`
 }
