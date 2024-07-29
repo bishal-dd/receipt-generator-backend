@@ -9,6 +9,7 @@ type Mutation {
   createUser(input: CreateUser!): User!
   deleteUser(id: ID!): Boolean!
   createReceipt(input: CreateReceipt!): Receipt!
+  updateReceipt(input: UpdateReceipt!): Receipt!
   deleteReceipt(id: ID!): Boolean!
 }
 
