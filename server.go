@@ -45,10 +45,10 @@ func main() {
 	// Setting up Gin
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()
+	r.GET("/graphql", playgroundHandler())
 	r.Use(GinContextToContextMiddleware())
 	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", graphqlHandler(dependencyResolver))
-	r.GET("/graphql", playgroundHandler())
 	r.Run()
 	
 }
