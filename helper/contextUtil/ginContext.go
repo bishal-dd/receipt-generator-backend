@@ -1,20 +1,18 @@
-package helper
+package contextUtil
 
 import (
 	"context"
 	"fmt"
-
-	"github.com/gin-gonic/gin"
 )
 
-func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
-	ginContext := ctx.Value("GinContextKey")
+func GinContextFromContext(ctx context.Context) (context.Context, error) {
+	ginContext := ctx.Value(GinContextKey)
 	if ginContext == nil {
 		err := fmt.Errorf("could not retrieve gin.Context")
 		return nil, err
 	}
 
-	gc, ok := ginContext.(*gin.Context)
+	gc, ok := ginContext.(context.Context)
 	if !ok {
 		err := fmt.Errorf("gin.Context has wrong type")
 		return nil, err

@@ -21,7 +21,7 @@ func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateR
         UserID: input.UserID,
         Date: input.Date,
         TotalAmount: input.TotalAmount,
-		    CreatedAt: helper.CurrentTime(),
+		CreatedAt: helper.CurrentTime(),
     }
     if err := r.db.Create(newReceipt).Error; err != nil {
         return nil, err
@@ -103,23 +103,23 @@ func (r *ReceiptResolver) DeleteReceipt(ctx context.Context, id string) (bool, e
         return false, err
     }
        // Get all page cache keys from the Redis set
-       pageKeys, err := r.redis.SMembers(ctx, ReceiptsPageGroupKey).Result()
-       if err != nil && err != redis.Nil {
-           return false, err
-       }
-       // Delete all cached pages
-       if len(pageKeys) > 0 {
-           if err := r.redis.Del(ctx, pageKeys...).Err(); err != nil {
-               return false, err
-           }
-           if err := r.redis.Del(ctx, ReceiptsPageGroupKey).Err(); err != nil {
+    pageKeys, err := r.redis.SMembers(ctx, ReceiptsPageGroupKey).Result()
+    if err != nil && err != redis.Nil {
+        return false, err
+    }
+    // Delete all cached pages
+    if len(pageKeys) > 0 {
+        if err := r.redis.Del(ctx, pageKeys...).Err(); err != nil {
             return false, err
         }
-    
-       }
-       // Clear the set of page keys
-       if err := r.redis.Del(ctx, ReceiptsPageGroupKey).Err(); err != nil {
-           return false, err
-       }
+        if err := r.redis.Del(ctx, ReceiptsPageGroupKey).Err(); err != nil {
+        return false, err
+    }
+
+    }
+    // Clear the set of page keys
+    if err := r.redis.Del(ctx, ReceiptsPageGroupKey).Err(); err != nil {
+        return false, err
+    }
     return true, nil
 }

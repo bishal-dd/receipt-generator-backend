@@ -11,6 +11,7 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/pagination"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 	"github.com/redis/go-redis/v9"
@@ -18,6 +19,10 @@ import (
 
 
 func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *string) (*model.ReceiptConnection, error) {
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return nil, err
+    }
     var receipts []*model.Receipt
     var totalReceipts int64
     limit := pagination.Limit(first)
@@ -29,7 +34,7 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
         return nil, err
     }
 
-    pageCacheKey := fmt.Sprintf("%s:%d:%d", ReceiptsKey, offset, limit)
+    pageCacheKey := fmt.Sprintf("%s:%d:%d:%s", ReceiptsKey, offset, limit,userId)
     receiptsJSON, err := r.redis.Get(ctx, pageCacheKey).Result()
     if err == redis.Nil {
         if err := r.db.Offset(offset).Limit(limit).Find(&receipts).Error; err != nil {

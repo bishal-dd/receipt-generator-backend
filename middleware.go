@@ -1,17 +1,12 @@
 package main
 
 import (
-	"context"
-
+	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/jwtUtil"
 	"github.com/gin-gonic/gin"
 )
-type ContextKey string
 
-const (
-	GinContextKey ContextKey = "GinContextKey"
-	UserIDKey     ContextKey = "UserID"
-)
+
 func GinContextToContextMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := jwtUtil.TokenFromRequest(c.Request)
@@ -30,17 +25,13 @@ func GinContextToContextMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Extract the user_id from claims
 		userID, ok := claims["user_id"].(string)
 		if !ok {
 			c.AbortWithStatusJSON(401, gin.H{"error": "user_id not found in token"})
 			return
 		}
-		// Inject the userID and Gin context into the request context
-		ctx := context.WithValue(c.Request.Context(), UserIDKey, userID)
-		ctx = context.WithValue(ctx, GinContextKey, c)
-
-		// Update the request with the new context
+		ctx := contextUtil.SetContextValue(c.Request.Context(), contextUtil.UserIDKey, userID)
+		ctx = contextUtil.SetContextValue(ctx, contextUtil.GinContextKey, c)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
