@@ -6,15 +6,11 @@ package receipt
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
-	"github.com/bishal-dd/receipt-generator-backend/helper/pagination"
+	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
-	"github.com/redis/go-redis/v9"
 )
 
 
@@ -23,41 +19,31 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
     if err != nil {
         return nil, err
     }
-    var receipts []*model.Receipt
-    var totalReceipts int64
-    limit := pagination.Limit(first)
-	offset, err := pagination.Offset(after)
+    
+    offset, limit, err := paginationUtil.CalculatePagination(first, after)
 	if err != nil {
 		return nil, err 
 	} 
-    if err := r.db.Model(&model.Receipt{}).Count(&totalReceipts).Error; err != nil {
+
+    totalReceipts, err := r.CountTotalReceipts()
+    if err != nil {
         return nil, err
     }
 
-    pageCacheKey := fmt.Sprintf("%s:%d:%d:%s", ReceiptsKey, offset, limit,userId)
-    receiptsJSON, err := r.redis.Get(ctx, pageCacheKey).Result()
-    if err == redis.Nil {
-        if err := r.db.Offset(offset).Limit(limit).Find(&receipts).Error; err != nil {
-            return nil, err
-        }
-        if err = r.redis.SAdd(ctx, ReceiptsPageGroupKey, pageCacheKey).Err(); err != nil {
-            return nil, err
-        }
-        if err := r.redis.Expire(ctx, ReceiptsPageGroupKey, 600*time.Second).Err(); err != nil {
-            return nil, err
-        }
-        if err = redisUtil.CacheResult(r.redis, ctx, pageCacheKey, receipts, 10); err != nil {
-            return nil, err
-        }
-    } else if err != nil {
+    receipts, err := r.GetCachedReceiptPages(ctx, userId, offset, limit)
+    if err != nil {
         return nil, err
-    } else {
-        if err := helper.Unmarshal([]byte(receiptsJSON), &receipts); err != nil {
+    }
+
+    if receipts == nil {
+        receipts, err = r.FetchReceiptsFromDB(ctx, offset, limit)
+        if err != nil {
             return nil, err
         }
-    }
-    if receipts == nil {
-        receipts = []*model.Receipt{}
+
+        if err = redisUtil.CachePages(r.redis, ReceiptsPageGroupKey, ctx, ReceiptsKey,receipts, offset, limit,userId ); err != nil {
+            return nil, err
+        }
     }
     
     edges, end := Edges(offset, limit, receipts)
@@ -71,24 +57,19 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
 
 
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	 cacheKey := ReceiptKey + id
-	 receiptJSON, err := r.redis.Get(ctx, cacheKey).Result()
-	 var receipt *model.Receipt
-	 if err == redis.Nil {
-		if err := r.db.Where("id = ?", id).First(&receipt).Error; err != nil {
+	 receipt, err := r.GetCachedReceipt(ctx, id)
+	 if receipt == nil {
+		newReceipt, err := r.GetReceiptFromDB(id)
+        if err != nil {
 			return nil, err
 		}
-		if err = redisUtil.CacheResult(r.redis, ctx, cacheKey, receipt, 10); err != nil {
+		if err = redisUtil.CacheResult(r.redis, ctx, ReceiptKey + id, newReceipt, 10); err != nil {
 			return nil, err
 		}
-        return receipt, nil
+        return newReceipt, nil
     } else if err != nil {
         return nil, err
     }
 	
-	if err := helper.Unmarshal([]byte(receiptJSON), &receipt); err != nil {
-		return nil, err
-	}	 
-    
 	 return receipt, nil
 }

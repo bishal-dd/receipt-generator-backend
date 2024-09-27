@@ -1,4 +1,4 @@
-package pagination
+package paginationUtil
 
 
 func Limit(limit *int) int {

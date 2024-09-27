@@ -6,54 +6,42 @@ package user
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
-	"github.com/bishal-dd/receipt-generator-backend/helper/pagination"
+	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
+	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
-	"github.com/redis/go-redis/v9"
 )
 
 
 func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*model.UserConnection, error) {
-	var users []*model.User
-    var totalUsers int64
-    limit := pagination.Limit(first)
-	offset, err := pagination.Offset(after)
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return nil, err
+    }
+    
+    offset, limit, err := paginationUtil.CalculatePagination(first, after)
 	if err != nil {
 		return nil, err 
 	} 
-    if err := r.db.Model(&model.User{}).Count(&totalUsers).Error; err != nil {
+    totalUsers, err := r.CountTotalUsers()
+    if err != nil {
         return nil, err
     }
-
-    pageCacheKey := fmt.Sprintf("%s:%d:%d", UsersKey, offset, limit)
-    usersJSON, err := r.redis.Get(ctx, pageCacheKey).Result()
-    if err == redis.Nil {
-        if err := r.db.Offset(offset).Limit(limit).Find(&users).Error; err != nil {
-            return nil, err
-        }
-        if err = r.redis.SAdd(ctx, UsersPageGroupKey, pageCacheKey).Err(); err != nil {
-            return nil, err
-        }
-        if err := r.redis.Expire(ctx, UsersPageGroupKey, 600*time.Second).Err(); err != nil {
-            return nil, err
-        }
-        if err = redisUtil.CacheResult(r.redis, ctx, pageCacheKey, users, 10); err != nil {
-            return nil, err
-        }
-    } else if err != nil {
+    users, err := r.GetCachedUsers(ctx, userId, offset, limit)
+    if err != nil {
         return nil, err
-    } else {
-        if err := helper.Unmarshal([]byte(usersJSON), &users); err != nil {
-            return nil, err
-        }
     }
     if users == nil {
-        users = []*model.User{}
+        users, err = r.FetchUsersFromDB(ctx, offset, limit)
+        if err != nil {
+            return nil, err
+        }
+
+        if err = redisUtil.CachePages(r.redis, UsersPageGroupKey, ctx, UsersKey, users, offset, limit,userId ); err != nil {
+            return nil, err
+        }
     }
     
     edges, end := Edges(offset, limit, users)
