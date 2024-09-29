@@ -6,6 +6,7 @@ package receipt
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
@@ -63,7 +64,8 @@ func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receip
         if err != nil {
 			return nil, err
 		}
-		if err = redisUtil.CacheResult(r.redis, ctx, ReceiptKey + id, newReceipt, 10); err != nil {
+        
+		if err = redisUtil.CacheResult(r.redis, ctx, fmt.Sprintf("%s:%s",ReceiptKey,id ), newReceipt, 10); err != nil {
 			return nil, err
 		}
         return newReceipt, nil

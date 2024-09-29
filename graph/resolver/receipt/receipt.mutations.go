@@ -41,8 +41,12 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
     if err := redisUtil.DeleteCacheItem(r.redis, ctx, ReceiptKey, input.ID); err != nil {
         return nil, err
     }
+    newReceipt, err := r.GetReceiptFromDB(input.ID)
+    if err != nil {
+        return nil, err
+    }
 
-    return receipt, nil
+    return newReceipt, nil
 }
 
 
