@@ -16,6 +16,7 @@ import (
 
 
 func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*model.UserConnection, error) {
+
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
         return nil, err
@@ -43,6 +44,7 @@ func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*m
             return nil, err
         }
     }
+   
     
     edges, end := Edges(offset, limit, users)
     pageInfo := PageInfo(edges, totalUsers, end, offset )

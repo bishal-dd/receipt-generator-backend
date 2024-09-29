@@ -14,7 +14,7 @@ import (
 
 type Loaders struct {
 	UserLoader *dataloadgen.Loader[string, *model.User]
-	ReceiptLoader *dataloadgen.Loader[string, *model.Receipt]
+	ReceiptLoader *dataloadgen.Loader[string, []*model.Receipt]
 }
 
 func NewLoaders(conn *gorm.DB) *Loaders {
