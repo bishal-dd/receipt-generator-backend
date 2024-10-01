@@ -8,6 +8,5 @@ import (
 )
 
 func DeleteCacheItem(r *redis.Client, ctx context.Context, key string, id string ) error {
-	fmt.Printf("%s:%s\n", key, id)
 	return r.Del(ctx, fmt.Sprintf("%s:%s", key, id)).Err();
 }

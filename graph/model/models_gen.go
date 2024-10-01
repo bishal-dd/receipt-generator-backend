@@ -2,6 +2,18 @@
 
 package model
 
+type CreateProfile struct {
+	CompanyName    string  `json:"company_name"`
+	LogoImage      *string `json:"logo_image,omitempty"`
+	PhoneNo        int     `json:"phone_no"`
+	Email          *string `json:"email,omitempty"`
+	Address        *string `json:"address,omitempty"`
+	City           *string `json:"city,omitempty"`
+	Title          *string `json:"title,omitempty"`
+	SignatureImage *string `json:"signature_image,omitempty"`
+	UserID         string  `json:"user_id"`
+}
+
 type CreateReceipt struct {
 	ReceiptName    string   `json:"receipt_name"`
 	RecipientName  string   `json:"recipient_name"`
@@ -25,6 +37,22 @@ type PageInfo struct {
 	HasPreviousPage bool    `json:"hasPreviousPage"`
 	StartCursor     *string `json:"startCursor,omitempty"`
 	EndCursor       *string `json:"endCursor,omitempty"`
+}
+
+type Profile struct {
+	ID             string  `json:"id"`
+	CompanyName    string  `json:"company_name"`
+	LogoImage      *string `json:"logo_image,omitempty"`
+	PhoneNo        int     `json:"phone_no"`
+	Email          *string `json:"email,omitempty"`
+	Address        *string `json:"address,omitempty"`
+	City           *string `json:"city,omitempty"`
+	Title          *string `json:"title,omitempty"`
+	SignatureImage *string `json:"signature_image,omitempty"`
+	UserID         string  `json:"user_id"`
+	CreatedAt      string  `json:"created_at"`
+	UpdatedAt      *string `json:"updated_at,omitempty"`
+	DeletedAt      *string `json:"deleted_at,omitempty"`
 }
 
 type Query struct {
@@ -54,6 +82,18 @@ type ReceiptConnection struct {
 type ReceiptEdge struct {
 	Cursor string   `json:"cursor"`
 	Node   *Receipt `json:"node"`
+}
+
+type UpdateProfile struct {
+	ID             string  `json:"id"`
+	CompanyName    *string `json:"company_name,omitempty"`
+	LogoImage      *string `json:"logo_image,omitempty"`
+	PhoneNo        *int    `json:"phone_no,omitempty"`
+	Email          *string `json:"email,omitempty"`
+	Address        *string `json:"address,omitempty"`
+	City           *string `json:"city,omitempty"`
+	Title          *string `json:"title,omitempty"`
+	SignatureImage *string `json:"signature_image,omitempty"`
 }
 
 type UpdateReceipt struct {

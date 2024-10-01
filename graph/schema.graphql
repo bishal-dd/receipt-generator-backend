@@ -3,6 +3,8 @@ type Query {
   user(id: ID!): User
   receipts(first: Int, after: String): ReceiptConnection!
   receipt(id: ID!): Receipt
+  profileByUserId(userId: String!): Profile
+  profile(id: ID!): Profile
 }
 
 type Mutation {
@@ -11,6 +13,9 @@ type Mutation {
   createReceipt(input: CreateReceipt!): Receipt!
   updateReceipt(input: UpdateReceipt!): Receipt!
   deleteReceipt(id: ID!): Boolean!
+  createProfile(input: CreateProfile!): Profile!
+  updateProfile(input: UpdateProfile!): Profile!
+  deleteProfile(id: ID!): Boolean!
 }
 
 type PageInfo {

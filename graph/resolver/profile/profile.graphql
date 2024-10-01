@@ -1,0 +1,39 @@
+type Profile {
+  id: UUID!
+  company_name: String!
+  logo_image: String
+  phone_no: Int!
+  email: String
+  address: String
+  city: String
+  title: String
+  signature_image: String
+  user_id: ID!
+  created_at: DateTime!
+  updated_at: DateTime
+  deleted_at: DateTime
+}
+
+input CreateProfile {
+  company_name: String!
+  logo_image: String
+  phone_no: Int!
+  email: String
+  address: String
+  city: String
+  title: String
+  signature_image: String
+  user_id: ID!
+}
+
+input UpdateProfile {
+  id: UUID!
+  company_name: String
+  logo_image: String
+  phone_no: Int
+  email: String
+  address: String
+  city: String
+  title: String
+  signature_image: String
+}
