@@ -1,0 +1,27 @@
+type Service {
+  id: UUID!
+  description: String!
+  rate: Float!
+  quantity: Int!
+  amount: Int!
+  receipt_id: UUID!
+  created_at: DateTime!
+  updated_at: DateTime
+  deleted_at: DateTime
+}
+
+input CreateService {
+  description: String!
+  rate: Float!
+  quantity: Int!
+  amount: Int!
+  receipt_id: UUID!
+}
+
+input UpdateService {
+  id: UUID!
+  description: String
+  rate: Float
+  quantity: Int
+  amount: Int
+}

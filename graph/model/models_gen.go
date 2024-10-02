@@ -25,8 +25,21 @@ type CreateReceipt struct {
 	TotalAmount    *float64 `json:"total_amount,omitempty"`
 }
 
+type CreateService struct {
+	Description string  `json:"description"`
+	Rate        float64 `json:"rate"`
+	Quantity    int     `json:"quantity"`
+	Amount      int     `json:"amount"`
+	ReceiptID   string  `json:"receipt_id"`
+}
+
 type CreateUser struct {
 	ID string `json:"id"`
+}
+
+type CreateVersion struct {
+	Mode   string `json:"mode"`
+	UserID string `json:"user_id"`
 }
 
 type Mutation struct {
@@ -84,6 +97,18 @@ type ReceiptEdge struct {
 	Node   *Receipt `json:"node"`
 }
 
+type Service struct {
+	ID          string  `json:"id"`
+	Description string  `json:"description"`
+	Rate        float64 `json:"rate"`
+	Quantity    int     `json:"quantity"`
+	Amount      int     `json:"amount"`
+	ReceiptID   string  `json:"receipt_id"`
+	CreatedAt   string  `json:"created_at"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+	DeletedAt   *string `json:"deleted_at,omitempty"`
+}
+
 type UpdateProfile struct {
 	ID             string  `json:"id"`
 	CompanyName    *string `json:"company_name,omitempty"`
@@ -108,6 +133,21 @@ type UpdateReceipt struct {
 	TotalAmount    *float64 `json:"total_amount,omitempty"`
 }
 
+type UpdateService struct {
+	ID          string   `json:"id"`
+	Description *string  `json:"description,omitempty"`
+	Rate        *float64 `json:"rate,omitempty"`
+	Quantity    *int     `json:"quantity,omitempty"`
+	Amount      *int     `json:"amount,omitempty"`
+}
+
+type UpdateVersion struct {
+	ID       string  `json:"id"`
+	Mode     *string `json:"mode,omitempty"`
+	UserID   *string `json:"user_id,omitempty"`
+	UseCount *int    `json:"use_count,omitempty"`
+}
+
 type User struct {
 	ID        string     `json:"id"`
 	CreatedAt string     `json:"created_at"`
@@ -125,4 +165,14 @@ type UserConnection struct {
 type UserEdge struct {
 	Cursor string `json:"cursor"`
 	Node   *User  `json:"node"`
+}
+
+type Version struct {
+	ID        string  `json:"id"`
+	Mode      string  `json:"mode"`
+	UserID    string  `json:"user_id"`
+	UseCount  int     `json:"use_count"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt *string `json:"updated_at,omitempty"`
+	DeletedAt *string `json:"deleted_at,omitempty"`
 }

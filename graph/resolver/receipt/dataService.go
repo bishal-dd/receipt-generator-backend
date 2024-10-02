@@ -14,7 +14,7 @@ func (r *ReceiptResolver) CountTotalReceipts() (int64, error) {
     return totalReceipts, nil
 }
 
-func (r *ReceiptResolver) FetchReceiptsFromDB(ctx context.Context, offset, limit int) ([]*model.Receipt, error) {
+func (r *ReceiptResolver) FetchReceiptsFromDB(ctx context.Context, offset, limit int, userId string) ([]*model.Receipt, error) {
     var receipts []*model.Receipt
     if err := r.db.Offset(offset).Limit(limit).Find(&receipts).Error; err != nil {
         return nil, err

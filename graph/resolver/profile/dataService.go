@@ -14,6 +14,14 @@ func (r *ProfileResolver) GetProfileFromDB(id string) (*model.Profile, error) {
 	return profile, nil
 }
 
+func (r *ProfileResolver) GetProfileByUserID(userId string) (*model.Profile, error) {
+	var profile *model.Profile
+	if err := r.db.Where("user_id = ?", userId).First(&profile).Error; err != nil {
+		return nil, err
+	}
+	return profile, nil
+}
+
 func (r *ProfileResolver) DeleteProfileFromDB(ctx context.Context, id string) (error) {
 	profile := &model.Profile{
 		ID: id,

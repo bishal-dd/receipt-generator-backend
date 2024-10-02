@@ -37,7 +37,7 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
     }
 
     if receipts == nil {
-        receipts, err = r.FetchReceiptsFromDB(ctx, offset, limit)
+        receipts, err = r.FetchReceiptsFromDB(ctx, offset, limit, userId)
         if err != nil {
             return nil, err
         }

@@ -18,4 +18,4 @@ func InitializeProfileResolver(redis *redis.Client, db *gorm.DB) *ProfileResolve
 }
 
 const ProfilesKey = "profiles"
-const ProfileKey = "profile"
+const ProfileKey = "profile:"
