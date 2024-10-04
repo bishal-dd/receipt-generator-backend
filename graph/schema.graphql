@@ -5,6 +5,8 @@ type Query {
   receipt(id: ID!): Receipt
   profileByUserId(userId: String!): Profile
   profile(id: ID!): Profile
+  serviceByReceiptId(receiptId: String!): [Service]
+  service(id: ID!): Service
 }
 
 type Mutation {
@@ -16,6 +18,9 @@ type Mutation {
   createProfile(input: CreateProfile!): Profile!
   updateProfile(input: UpdateProfile!): Profile!
   deleteProfile(id: ID!): Boolean!
+  createService(input: CreateService!): Service!
+  updateService(input: UpdateService!): Service!
+  deleteService(id: ID!): Boolean!
 }
 
 type PageInfo {

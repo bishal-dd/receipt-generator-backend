@@ -10,7 +10,7 @@ CREATE TABLE services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    FOREIGN KEY (receipt_id) REFERENCES receipts(id)
+    FOREIGN KEY (receipt_id) REFERENCES receipts(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 

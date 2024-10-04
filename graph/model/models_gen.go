@@ -37,11 +37,6 @@ type CreateUser struct {
 	ID string `json:"id"`
 }
 
-type CreateVersion struct {
-	Mode   string `json:"mode"`
-	UserID string `json:"user_id"`
-}
-
 type Mutation struct {
 }
 
@@ -72,18 +67,19 @@ type Query struct {
 }
 
 type Receipt struct {
-	ID             string   `json:"id"`
-	ReceiptName    string   `json:"receipt_name"`
-	RecipientName  string   `json:"recipient_name"`
-	RecipientPhone int      `json:"recipient_phone"`
-	Amount         float64  `json:"amount"`
-	TransactionNo  *int     `json:"transaction_no,omitempty"`
-	UserID         string   `json:"user_id"`
-	Date           string   `json:"date"`
-	TotalAmount    *float64 `json:"total_amount,omitempty"`
-	CreatedAt      string   `json:"created_at"`
-	UpdatedAt      *string  `json:"updated_at,omitempty"`
-	DeletedAt      *string  `json:"deleted_at,omitempty"`
+	ID             string     `json:"id"`
+	ReceiptName    string     `json:"receipt_name"`
+	RecipientName  string     `json:"recipient_name"`
+	RecipientPhone int        `json:"recipient_phone"`
+	Amount         float64    `json:"amount"`
+	TransactionNo  *int       `json:"transaction_no,omitempty"`
+	UserID         string     `json:"user_id"`
+	Date           string     `json:"date"`
+	TotalAmount    *float64   `json:"total_amount,omitempty"`
+	CreatedAt      string     `json:"created_at"`
+	UpdatedAt      *string    `json:"updated_at,omitempty"`
+	DeletedAt      *string    `json:"deleted_at,omitempty"`
+	Services       []*Service `json:"Services,omitempty"`
 }
 
 type ReceiptConnection struct {
@@ -141,19 +137,15 @@ type UpdateService struct {
 	Amount      *int     `json:"amount,omitempty"`
 }
 
-type UpdateVersion struct {
-	ID       string  `json:"id"`
-	Mode     *string `json:"mode,omitempty"`
-	UserID   *string `json:"user_id,omitempty"`
-	UseCount *int    `json:"use_count,omitempty"`
-}
-
 type User struct {
 	ID        string     `json:"id"`
+	Mode      string     `json:"mode"`
+	UseCount  int        `json:"use_count"`
 	CreatedAt string     `json:"created_at"`
 	UpdatedAt *string    `json:"updated_at,omitempty"`
 	DeletedAt *string    `json:"deleted_at,omitempty"`
 	Receipts  []*Receipt `json:"Receipts,omitempty"`
+	Profile   *Profile   `json:"Profile,omitempty"`
 }
 
 type UserConnection struct {
@@ -165,14 +157,4 @@ type UserConnection struct {
 type UserEdge struct {
 	Cursor string `json:"cursor"`
 	Node   *User  `json:"node"`
-}
-
-type Version struct {
-	ID        string  `json:"id"`
-	Mode      string  `json:"mode"`
-	UserID    string  `json:"user_id"`
-	UseCount  int     `json:"use_count"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt *string `json:"updated_at,omitempty"`
-	DeletedAt *string `json:"deleted_at,omitempty"`
 }

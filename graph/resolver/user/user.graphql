@@ -1,9 +1,12 @@
 type User {
   id: ID!
+  mode: String!
+  use_count: Int!
   created_at: DateTime!
   updated_at: DateTime
   deleted_at: DateTime
   Receipts: [Receipt]
+  Profile: Profile
 }
 
 input CreateUser {
