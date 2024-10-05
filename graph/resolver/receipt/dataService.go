@@ -19,6 +19,10 @@ func (r *ReceiptResolver) FetchReceiptsFromDB(ctx context.Context, offset, limit
     if err := r.db.Offset(offset).Limit(limit).Find(&receipts).Error; err != nil {
         return nil, err
     }
+	receipts, err := r.LoadServiceFromReceipts(ctx, receipts)
+	if err != nil {
+		return nil, err
+	}
     return receipts, nil
 }
 

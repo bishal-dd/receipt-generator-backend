@@ -15,6 +15,8 @@ func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (
 	db := r.db
 	me := &model.User{
 		ID: input.ID,
+		Mode: "trial",
+		UseCount: 0,
 		CreatedAt: helper.CurrentTime(),
 	}
 	if err := db.Create(me).Error; err != nil {

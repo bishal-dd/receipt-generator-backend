@@ -33,6 +33,11 @@ func (r *UserResolver) FetchUsersFromDB(ctx context.Context, offset, limit int) 
     for i, receipts := range receiptResults {
         users[i].Receipts = receipts  
     }
+
+    users, err = r.LoadProfileFromUsers(ctx, users)
+    if err != nil {
+        return nil, err
+    }
     
     return users, nil
 }
