@@ -138,14 +138,13 @@ type UpdateService struct {
 }
 
 type User struct {
-	ID        string     `json:"id"`
-	Mode      string     `json:"mode"`
-	UseCount  int        `json:"use_count"`
-	CreatedAt string     `json:"created_at"`
-	UpdatedAt *string    `json:"updated_at,omitempty"`
-	DeletedAt *string    `json:"deleted_at,omitempty"`
-	Receipts  []*Receipt `json:"Receipts,omitempty"`
-	Profile   *Profile   `json:"Profile,omitempty"`
+	ID        string   `json:"id"`
+	Mode      string   `json:"mode"`
+	UseCount  int      `json:"use_count"`
+	CreatedAt string   `json:"created_at"`
+	UpdatedAt *string  `json:"updated_at,omitempty"`
+	DeletedAt *string  `json:"deleted_at,omitempty"`
+	Profile   *Profile `json:"Profile,omitempty"`
 }
 
 type UserConnection struct {

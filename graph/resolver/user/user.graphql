@@ -5,7 +5,6 @@ type User {
   created_at: DateTime!
   updated_at: DateTime
   deleted_at: DateTime
-  Receipts: [Receipt]
   Profile: Profile
 }
 

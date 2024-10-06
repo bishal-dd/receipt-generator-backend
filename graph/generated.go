@@ -140,7 +140,6 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Mode      func(childComplexity int) int
 		Profile   func(childComplexity int) int
-		Receipts  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UseCount  func(childComplexity int) int
 	}
@@ -771,13 +770,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Profile(childComplexity), true
 
-	case "User.Receipts":
-		if e.complexity.User.Receipts == nil {
-			break
-		}
-
-		return e.complexity.User.Receipts(childComplexity), true
-
 	case "User.updated_at":
 		if e.complexity.User.UpdatedAt == nil {
 			break
@@ -1369,8 +1361,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_User_deleted_at(ctx, field)
-			case "Receipts":
-				return ec.fieldContext_User_Receipts(ctx, field)
 			case "Profile":
 				return ec.fieldContext_User_Profile(ctx, field)
 			}
@@ -2922,8 +2912,6 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_User_deleted_at(ctx, field)
-			case "Receipts":
-				return ec.fieldContext_User_Receipts(ctx, field)
 			case "Profile":
 				return ec.fieldContext_User_Profile(ctx, field)
 			}
@@ -5009,75 +4997,6 @@ func (ec *executionContext) fieldContext_User_deleted_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _User_Receipts(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_Receipts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Receipts, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Receipt)
-	fc.Result = res
-	return ec.marshalOReceipt2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_Receipts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Receipt_id(ctx, field)
-			case "receipt_name":
-				return ec.fieldContext_Receipt_receipt_name(ctx, field)
-			case "recipient_name":
-				return ec.fieldContext_Receipt_recipient_name(ctx, field)
-			case "recipient_phone":
-				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
-			case "amount":
-				return ec.fieldContext_Receipt_amount(ctx, field)
-			case "transaction_no":
-				return ec.fieldContext_Receipt_transaction_no(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Receipt_user_id(ctx, field)
-			case "date":
-				return ec.fieldContext_Receipt_date(ctx, field)
-			case "total_amount":
-				return ec.fieldContext_Receipt_total_amount(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Receipt_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Receipt_updated_at(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_Receipt_deleted_at(ctx, field)
-			case "Services":
-				return ec.fieldContext_Receipt_Services(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Receipt", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_Profile(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_Profile(ctx, field)
 	if err != nil {
@@ -5390,8 +5309,6 @@ func (ec *executionContext) fieldContext_UserEdge_node(ctx context.Context, fiel
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_User_deleted_at(ctx, field)
-			case "Receipts":
-				return ec.fieldContext_User_Receipts(ctx, field)
 			case "Profile":
 				return ec.fieldContext_User_Profile(ctx, field)
 			}
@@ -8379,8 +8296,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_updated_at(ctx, field, obj)
 		case "deleted_at":
 			out.Values[i] = ec._User_deleted_at(ctx, field, obj)
-		case "Receipts":
-			out.Values[i] = ec._User_Receipts(ctx, field, obj)
 		case "Profile":
 			out.Values[i] = ec._User_Profile(ctx, field, obj)
 		default:
@@ -9546,47 +9461,6 @@ func (ec *executionContext) marshalOProfile2ᚖgithubᚗcomᚋbishalᚑddᚋrece
 		return graphql.Null
 	}
 	return ec._Profile(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOReceipt2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx context.Context, sel ast.SelectionSet, v []*model.Receipt) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) marshalOReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx context.Context, sel ast.SelectionSet, v *model.Receipt) graphql.Marshaler {
