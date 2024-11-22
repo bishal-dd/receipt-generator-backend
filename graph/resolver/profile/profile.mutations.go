@@ -4,30 +4,18 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/database"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 
 func (r *ProfileResolver) CreateProfile(ctx context.Context, input model.CreateProfile) (*model.Profile, error) {
-	newProfile := &model.Profile{
-		ID: helper.UUID(),
-		CompanyName: input.CompanyName,
-		LogoImage: input.LogoImage,
-		PhoneNo: input.PhoneNo,
-		Address: input.Address,
-		Email: input.Email,
-		City: input.City,
-		Title: input.Title,
-		SignatureImage: input.SignatureImage,
-		UserID: input.UserID,
-		CreatedAt: helper.CurrentTime(),
-	}
-	if err := r.db.Create(newProfile).Error; err != nil {
+	inputData := database.CreateFields[model.Profile](input);
+	if err := r.db.Create(inputData).Error; err != nil {
 		return nil, err
 	}
 
-	return newProfile, nil
+	return inputData, nil
 }
 
 func (r *ProfileResolver) UpdateProfile(ctx context.Context, input model.UpdateProfile) (*model.Profile, error) {

@@ -1,9 +1,9 @@
 package paginationUtil
 
 
-func Limit(limit *int) int {
-	if limit == nil {
-		return 10 
-	}
-	return *limit
+func Limit(first *int) int {
+    if first == nil || *first <= 0 {
+        return 10 // Default limit
+    }
+    return *first
 }

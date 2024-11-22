@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/json"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,7 +19,7 @@ func (r *UserResolver) GetCachedUsers(ctx context.Context, userId string, offset
     }
 
     var users []*model.User
-    if err := helper.Unmarshal([]byte(usersJSON), &users); err != nil {
+    if err := json.Unmarshal([]byte(usersJSON), &users); err != nil {
         return nil, err
     }
     return users, nil

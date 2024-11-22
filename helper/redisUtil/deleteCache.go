@@ -5,13 +5,13 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/json"
 	"github.com/redis/go-redis/v9"
 )
 
 
 func DeleteCache[T any](cachedValues []T, key string, id string, jsonValue string, ctx context.Context, redis *redis.Client )  error  {
-	if err := helper.Unmarshal([]byte(jsonValue), &cachedValues); err != nil {
+	if err := json.Unmarshal([]byte(jsonValue), &cachedValues); err != nil {
 		return err
 	}
 	// Find the index of the deleted receipt in the cached list

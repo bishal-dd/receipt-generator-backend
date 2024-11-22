@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/json"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,7 +19,7 @@ func (r *ReceiptResolver) GetCachedReceiptPages(ctx context.Context, userId stri
     }
 
     var receipts []*model.Receipt
-    if err := helper.Unmarshal([]byte(receiptsJSON), &receipts); err != nil {
+    if err := json.Unmarshal([]byte(receiptsJSON), &receipts); err != nil {
         return nil, err
     }
     return receipts, nil
@@ -32,7 +32,7 @@ func (r *ReceiptResolver) GetCachedReceipt(ctx context.Context, id string) (*mod
 	if err == redis.Nil {
 		return nil, nil
 	}
-	if err := helper.Unmarshal([]byte(receiptJSON), &receipt); err != nil {
+	if err := json.Unmarshal([]byte(receiptJSON), &receipt); err != nil {
 		return nil, err
 	}	 
     

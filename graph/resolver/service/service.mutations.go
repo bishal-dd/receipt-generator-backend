@@ -4,24 +4,17 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/database"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 func (r *ServiceResolver) CreateService(ctx context.Context, input model.CreateService) (*model.Service, error) {
-	newService := &model.Service{
-		ID: helper.UUID(),
-		Description: input.Description,
-		Rate: input.Rate,
-		Quantity: input.Quantity,
-		Amount: input.Amount,
-		ReceiptID: input.ReceiptID,
-		CreatedAt: helper.CurrentTime(),
-	}
-	if err := r.db.Create(newService).Error; err != nil {
+	inputData := database.CreateFields[model.Service](input);
+
+	if err := r.db.Create(inputData).Error; err != nil {
 		return nil, err
 	}
-	return newService, nil
+	return inputData, nil
 }
 
 func (r *ServiceResolver) UpdateService(ctx context.Context, input model.UpdateService) (*model.Service, error) {	

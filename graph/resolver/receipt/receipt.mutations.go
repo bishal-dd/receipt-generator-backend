@@ -4,30 +4,18 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
+	"github.com/bishal-dd/receipt-generator-backend/helper/database"
 	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 
 func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateReceipt) (*model.Receipt, error) {
-    newReceipt := &model.Receipt{
-        ID: helper.UUID(),
-        ReceiptName:    input.ReceiptName,
-        RecipientName: input.RecipientName,
-        RecipientPhone: input.RecipientPhone,
-        Amount: input.Amount,
-        TransactionNo: input.TransactionNo,
-        UserID: input.UserID,
-        Date: input.Date,
-        TotalAmount: input.TotalAmount,
-		CreatedAt: helper.CurrentTime(),
-    }
-    if err := r.db.Create(newReceipt).Error; err != nil {
+    inputData := database.CreateFields[model.Receipt](input);
+    if err := r.db.Create(inputData).Error; err != nil {
         return nil, err
     }
-
-    return newReceipt, nil
+    return inputData, nil
 }
 
 func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateReceipt) (*model.Receipt, error) {

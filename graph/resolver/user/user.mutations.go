@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/time"
 )
 
 func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
@@ -17,7 +17,7 @@ func (r *UserResolver) CreateUser(ctx context.Context, input model.CreateUser) (
 		ID: input.ID,
 		Mode: "trial",
 		UseCount: 0,
-		CreatedAt: helper.CurrentTime(),
+		CreatedAt: time.CurrentTime().String(),
 	}
 	if err := db.Create(me).Error; err != nil {
 		return nil, err

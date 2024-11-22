@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper"
+	"github.com/bishal-dd/receipt-generator-backend/helper/json"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -15,7 +15,7 @@ func (r *ProfileResolver) GetCachedProfileByUserId(ctx context.Context, userId s
 	if err == redis.Nil {
 		return nil, nil
 	}
-	if err := helper.Unmarshal([]byte(profileJSON), &profile); err != nil {
+	if err := json.Unmarshal([]byte(profileJSON), &profile); err != nil {
 		return nil, err
 	}	 
     
