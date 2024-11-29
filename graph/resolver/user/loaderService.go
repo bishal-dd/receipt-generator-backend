@@ -21,7 +21,6 @@ func (r *UserResolver) LoadProfileFromUsers(ctx context.Context, users []*model.
 		return nil, fmt.Errorf("failed to load profiles: %w", err)
 	}
 
-	fmt.Printf("Loaded profiles: %+v\n", profileResults)
 
 	for i, profile := range profileResults {
 		if profile != nil {

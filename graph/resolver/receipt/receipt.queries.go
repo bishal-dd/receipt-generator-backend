@@ -47,12 +47,13 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
         }
     }
     
-    edges, end := Edges(offset, limit, receipts)
-    pageInfo := PageInfo(edges, totalReceipts, end, offset )
+
+    connection := paginationUtil.CreateConnection(receipts, totalReceipts, offset)
+
     return &model.ReceiptConnection{
-        Edges:      edges,
-        PageInfo:   pageInfo,
-        TotalCount: int(totalReceipts),
+        Edges: convertEdges(connection.Edges),
+        PageInfo: (*model.PageInfo)(connection.PageInfo),
+        TotalCount: connection.TotalCount,
     }, nil
 }
 
