@@ -5,7 +5,6 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/database"
-	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 
@@ -26,9 +25,6 @@ func (r *ProfileResolver) UpdateProfile(ctx context.Context, input model.UpdateP
 	if err := r.db.Model(profile).Updates(input).Error; err != nil {
 		return nil, err
 	}
-	if err := redisUtil.DeleteCacheItem(r.redis, ctx, ProfileKey, input.ID); err != nil {
-		return nil, err
-	}
 	newProfile, err := r.GetProfileFromDB(input.ID)
 	if err != nil {
 		return nil, err
@@ -42,9 +38,5 @@ func (r *ProfileResolver) DeleteProfile(ctx context.Context, id string) (bool, e
 	if err := r.DeleteProfileFromDB(ctx, id); err != nil {
 		return false, err
 	}
-	if err := redisUtil.DeleteCacheItem(r.redis, ctx, ProfileKey, id); err != nil {
-		return false, err
-	}
-	
 	return true, nil
 }
