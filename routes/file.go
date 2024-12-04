@@ -85,9 +85,12 @@ func initializeS3Client() (*S3Client, error) {
 func HandlePresignedURL(c *gin.Context) {
 	filename := c.Query("filename")
     contentType := c.Query("contentType")
+    organizationId := c.Query("organizationId")
+    userId := c.Query("userId")
 
-    if filename == "" || contentType == "" {
-        c.JSON(400, gin.H{"error": "Missing filename or contentType"})
+
+    if filename == "" || contentType == "" || organizationId == "" || userId == "" {
+        c.JSON(400, gin.H{"error": "Missing values"})
         return
     }
     s3Client, err := initializeS3Client()
@@ -96,10 +99,8 @@ func HandlePresignedURL(c *gin.Context) {
         return
     }
 
-    // Generate a unique key for the file
-    key := fmt.Sprintf("uploads/%s/%s", time.Now().Format("2006/01/02"), filename)
+    key := fmt.Sprintf("%s/%s/%s",organizationId, userId, filename)
     
-    // Generate presigned URL with 15-minute expiration
     url, err := s3Client.GeneratePresignedURL(key, contentType, 15*time.Minute)
     if err != nil {
         c.JSON(500, gin.H{"error": "Failed to generate presigned URL"})

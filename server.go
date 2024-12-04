@@ -35,7 +35,7 @@ func main() {
 	r.Use(GinContextToContextMiddleware())
 	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", routes.GraphqlHandler(dependencyResolver))
-	r.GET("/generate-upload-url", routes.HandlePresignedURL)
+	r.GET("/issuePresignedURL", routes.HandlePresignedURL)
 	r.Run()
 	
 }
