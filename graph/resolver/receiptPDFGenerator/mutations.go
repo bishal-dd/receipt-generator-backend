@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"text/template"
 	"time"
@@ -11,7 +12,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
-	"github.com/jung-kurt/gofpdf"
+	"github.com/go-resty/resty/v2"
 )
 
 
@@ -83,81 +84,66 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
     }
 	fmt.Print("Profile: ", profile)
 
-	if err := generatePDF(receiptModel); err != nil {
+	if err := generatePDF(receiptModel, profile); err != nil {
         return false, err
     }
     return true, nil
 }
 
-func generatePDF(receipt *model.Receipt) error {
-    // Read HTML template from file
-    templateFile := "templates/receipt_template.html"
-    templateContent, err := os.ReadFile(templateFile)
-    if err != nil {
-        return fmt.Errorf("error reading HTML template: %w", err)
-    }
+func generatePDF(receipt *model.Receipt, profile *model.Profile) error {
+	// Read HTML template from file
+	templateFile := "templates/receiptTemplate/index.html"
+	templateContent, err := os.ReadFile(templateFile)
+	if err != nil {
+		return fmt.Errorf("error reading HTML template: %w", err)
+	}
 
-    // Parse the template
-    tmpl, err := template.New("receipt").Parse(string(templateContent))
-    if err != nil {
-        return fmt.Errorf("error parsing HTML template: %w", err)
-    }
+	// Parse the template
+	tmpl, err := template.New("receipt").Parse(string(templateContent))
+	if err != nil {
+		return fmt.Errorf("error parsing HTML template: %w", err)
+	}
 
-    // Render the template into a buffer
-    var htmlBuffer bytes.Buffer
-    data := struct {
-        Receipt *model.Receipt
-    }{
-        Receipt: receipt,
-    }
-    if err := tmpl.Execute(&htmlBuffer, data); err != nil {
-        return fmt.Errorf("error rendering HTML template: %w", err)
-    }
+	// Render the template into a buffer
+	var htmlBuffer bytes.Buffer
+	data := struct {
+		Receipt *model.Receipt
+        Profile *model.Profile
+	}{
+		Receipt: receipt,
+        Profile: profile,
+	}
+	if err := tmpl.Execute(&htmlBuffer, data); err != nil {
+		return fmt.Errorf("error rendering HTML template: %w", err)
+	}
 
-    // Create a new PDF
-    pdf := gofpdf.New("P", "mm", "A4", "")
-    pdf.AddPage()
-    pdf.SetFont("Arial", "", 12)
+	// Use Resty to send the HTTP request to Gotenberg
+	client := resty.New()
+	gotenbergURL := "https://gotenberg-production-70d3.up.railway.app/forms/chromium/convert/html"
 
-    // Manually parse and write content
-    pdf.SetLeftMargin(10)
-    pdf.SetRightMargin(10)
+	resp, err := client.R().
+		SetHeader("Content-Type", "multipart/form-data").
+		SetFileReader("files", "index.html", bytes.NewReader(htmlBuffer.Bytes())). // Add the rendered HTML as a file
+		SetFormData(map[string]string{
+			"index": "index.html", // Specify the index file name
+		}).
+		Post(gotenbergURL)
 
-    // Title
-    pdf.SetFont("Arial", "B", 16)
-    pdf.CellFormat(190, 10, fmt.Sprintf("Receipt: %s", receipt.ReceiptName), "", 1, "C", false, 0, "")
-    pdf.Ln(10)
+	if err != nil {
+		return fmt.Errorf("error sending request to Gotenberg: %w", err)
+	}
 
-    // Receipt Details
-    pdf.SetFont("Arial", "", 12)
-    pdf.CellFormat(190, 7, fmt.Sprintf("Date: %s", receipt.Date), "", 1, "L", false, 0, "")
-    pdf.CellFormat(190, 7, fmt.Sprintf("Recipient: %s (%d)", receipt.RecipientName, receipt.RecipientPhone), "", 1, "L", false, 0, "")
-    pdf.CellFormat(190, 7, fmt.Sprintf("Total Amount: %v", receipt.TotalAmount), "", 1, "L", false, 0, "")
-    
-    pdf.Ln(10)
+	// Check response status
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("gotenberg returned status %d: %s", resp.StatusCode(), resp.String())
+	}
 
-    // Table Header
-    pdf.SetFont("Arial", "B", 12)
-    pdf.CellFormat(47.5, 7, "Description", "1", 0, "C", false, 0, "")
-    pdf.CellFormat(47.5, 7, "Rate", "1", 0, "C", false, 0, "")
-    pdf.CellFormat(47.5, 7, "Quantity", "1", 0, "C", false, 0, "")
-    pdf.CellFormat(47.5, 7, "Amount", "1", 1, "C", false, 0, "")
+	// Save the PDF to a file
+	outputFilename := fmt.Sprintf("receipt_%s.pdf", receipt.ID)
+	if err := os.WriteFile(outputFilename, resp.Body(), 0644); err != nil {
+		return fmt.Errorf("error saving PDF to file: %w", err)
+	}
 
-    // Table Rows
-    pdf.SetFont("Arial", "", 12)
-    for _, service := range receipt.Services {
-        pdf.CellFormat(47.5, 7, service.Description, "1", 0, "L", false, 0, "")
-        pdf.CellFormat(47.5, 7, fmt.Sprintf("%v", service.Rate), "1", 0, "R", false, 0, "")
-        pdf.CellFormat(47.5, 7, fmt.Sprintf("%v", service.Quantity), "1", 0, "R", false, 0, "")
-        pdf.CellFormat(47.5, 7, fmt.Sprintf("%v", service.Amount), "1", 1, "R", false, 0, "")
-    }
-
-    // Output the PDF
-    outputFilename := fmt.Sprintf("receipt_%s.pdf", receipt.ID)
-    if err := pdf.OutputFileAndClose(outputFilename); err != nil {
-        return fmt.Errorf("error generating PDF: %w", err)
-    }
-
-    fmt.Println("PDF generated successfully:", outputFilename)
-    return nil
+	fmt.Println("PDF generated successfully:", outputFilename)
+	return nil
 }
