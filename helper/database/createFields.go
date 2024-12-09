@@ -21,7 +21,7 @@ func CreateFields[T any](input interface{}) *T {
 
 	// Set CreatedAt if the struct has a CreatedAt field
 	if createdAtField := v.FieldByName("CreatedAt"); createdAtField.IsValid() && createdAtField.CanSet() {
-		createdAtField.Set(reflect.ValueOf(time.Now()))
+		createdAtField.Set(reflect.ValueOf(time.Now().Format(time.RFC3339)))
 	}
 
 	// Copy input fields to the model

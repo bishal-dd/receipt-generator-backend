@@ -2,6 +2,13 @@
 
 package model
 
+type CreateBulkService struct {
+	Description string  `json:"description"`
+	Rate        float64 `json:"rate"`
+	Quantity    int     `json:"quantity"`
+	Amount      int     `json:"amount"`
+}
+
 type CreateProfile struct {
 	CompanyName    string  `json:"company_name"`
 	LogoImage      *string `json:"logo_image,omitempty"`
@@ -23,6 +30,18 @@ type CreateReceipt struct {
 	UserID         string   `json:"user_id"`
 	Date           string   `json:"date"`
 	TotalAmount    *float64 `json:"total_amount,omitempty"`
+}
+
+type CreateReceiptPDFGenerator struct {
+	ReceiptName    string               `json:"receipt_name"`
+	RecipientName  string               `json:"recipient_name"`
+	RecipientPhone int                  `json:"recipient_phone"`
+	Amount         float64              `json:"amount"`
+	TransactionNo  *int                 `json:"transaction_no,omitempty"`
+	UserID         string               `json:"user_id"`
+	Date           string               `json:"date"`
+	TotalAmount    *float64             `json:"total_amount,omitempty"`
+	Services       []*CreateBulkService `json:"Services,omitempty"`
 }
 
 type CreateService struct {

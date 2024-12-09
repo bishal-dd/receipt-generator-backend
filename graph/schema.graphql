@@ -21,6 +21,7 @@ type Mutation {
   createService(input: CreateService!): Service!
   updateService(input: UpdateService!): Service!
   deleteService(id: ID!): Boolean!
+  createReceiptPDFGenerator(input: CreateReceiptPDFGenerator!): Boolean!
 }
 
 type PageInfo {

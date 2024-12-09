@@ -1,0 +1,18 @@
+input CreateReceiptPDFGenerator {
+  receipt_name: String!
+  recipient_name: String!
+  recipient_phone: Int!
+  amount: Float!
+  transaction_no: Int
+  user_id: ID!
+  date: Date!
+  total_amount: Float
+  Services: [CreateBulkService!]
+}
+
+input CreateBulkService {
+  description: String!
+  rate: Float!
+  quantity: Int!
+  amount: Int!
+}
