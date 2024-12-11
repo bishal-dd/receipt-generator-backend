@@ -1,53 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <style>
       body {
         font-family: Arial, sans-serif;
         margin: 20px;
+        color: #333;
       }
-      h1 {
-        text-align: center;
+      .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        border-color: #333;
+        border-style: solid;
+        border-width: 1px;
       }
-      table {
+      .logo-image {
+        border-radius: 10%;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      .header-col {
+        justify-items: center;
+        margin-right: 70px;
+      }
+      .label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .value {
+        margin-bottom: 5px;
+      }
+      .table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
       }
-      th,
-      td {
+      .table th,
+      .table td {
         border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
+        padding: 10px;
+        text-align: center;
       }
-      th {
+      .table th {
         background-color: #f2f2f2;
+      }
+      .totals {
+        text-align: right;
+        margin-top: 20px;
+      }
+      .logo img {
+        max-width: 100px;
+        margin-top: 20px;
       }
     </style>
   </head>
   <body>
-    <h1>Receipt: {{.Receipt.ReceiptName}}</h1>
-    <p><strong>Date:</strong> {{.Receipt.Date}}</p>
-    <p>
-      <strong>Recipient:</strong> {{.Receipt.RecipientName}}
-      ({{.Receipt.RecipientPhone}})
-    </p>
-    <p><strong>Total Amount:</strong> {{.Receipt.TotalAmount}}</p>
-    <table>
-      <tr>
-        <th>Description</th>
-        <th>Rate</th>
-        <th>Quantity</th>
-        <th>Amount</th>
-      </tr>
-      {{range .Receipt.Services}}
-      <tr>
-        <td>{{.Description}}</td>
-        <td>{{.Rate}}</td>
-        <td>{{.Quantity}}</td>
-        <td>{{.Amount}}</td>
-      </tr>
-      {{end}}
-    </table>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <img
+            src="https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvdXBsb2FkZWQvaW1nXzJwWmJvZU1PNXo0YmNzdUNlYVgwb013VElROCJ9"
+            alt="Logo"
+            width="100"
+            class="logo-image"
+          />
+        </div>
+        <div class="header-col">
+          <h2>{{.Profile.CompanyName}}</h2>
+          <p>{{.Profile.Address}}</p>
+          <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
+        </div>
+      </div>
+      <hr />
+      <div class="row" style="margin-top: 20px">
+        <div>
+          <b>Bill to:</b>
+          <div style="margin-left: 5px">
+            <p>{{.Receipt.RecipientName}}</p>
+            <p>{{.Receipt.RecipientPhone}}</p>
+            <p>dhakalbishal930@gmail.com</p>
+            <p>123 Main Street</p>
+          </div>
+        </div>
+        <div>
+          <p><b>Receipt No:</b> {{.Receipt.TransactionNo}}</p>
+          <p><b>Date:</b> {{.Receipt.Date}}</p>
+          <p><b>Payment Method:</b> Bank Transfer</p>
+          <p><b>Note:</b> Jr.no 21121212</p>
+        </div>
+      </div>
+      <hr />
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Rate</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Receipt.Services}}
+          <tr>
+            <td>{{.Description}}</td>
+            <td>{{.Rate}}</td>
+            <td>{{.Quantity}}</td>
+            <td>{{.Amount}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      <div class="totals">
+        <p>Subtotal: $50.00</p>
+        <p>Tax (8%): $4.00</p>
+        <p><strong>Total: $54.00</strong></p>
+      </div>
+      <div class="logo">
+        <img src="" alt="Company Stamp" />
+      </div>
+    </div>
   </body>
 </html>

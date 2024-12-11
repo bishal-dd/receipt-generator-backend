@@ -10,6 +10,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/pkg/rmq"
 	"github.com/bishal-dd/receipt-generator-backend/routes"
 	"github.com/gin-gonic/gin"
+	"github.com/go-resty/resty/v2"
 	"github.com/joho/godotenv"
 )
 
@@ -26,7 +27,9 @@ func main() {
 	 if err := rmq.InitEmailQueue(queueRedis); err != nil {
 		log.Fatal(err)
 	 }
-	 dependencyResolver := resolver.InitializeResolver(cacheRedis, database)
+	 httpClient := resty.New()
+
+	 dependencyResolver := resolver.InitializeResolver(cacheRedis, database,httpClient)
  
 	// Setting up Gin
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)

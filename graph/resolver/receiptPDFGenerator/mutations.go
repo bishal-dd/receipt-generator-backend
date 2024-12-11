@@ -12,7 +12,6 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
-	"github.com/go-resty/resty/v2"
 )
 
 
@@ -84,13 +83,13 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
     }
 	fmt.Print("Profile: ", profile)
 
-	if err := generatePDF(receiptModel, profile); err != nil {
+	if err := r.generatePDF(receiptModel, profile); err != nil {
         return false, err
     }
     return true, nil
 }
 
-func generatePDF(receipt *model.Receipt, profile *model.Profile) error {
+func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile) error {
 	// Read HTML template from file
 	templateFile := "templates/receiptTemplate/index.html"
 	templateContent, err := os.ReadFile(templateFile)
@@ -117,15 +116,13 @@ func generatePDF(receipt *model.Receipt, profile *model.Profile) error {
 		return fmt.Errorf("error rendering HTML template: %w", err)
 	}
 
-	// Use Resty to send the HTTP request to Gotenberg
-	client := resty.New()
 	gotenbergURL := "https://gotenberg-production-70d3.up.railway.app/forms/chromium/convert/html"
 
-	resp, err := client.R().
+	resp, err := r.httpClient.R().
 		SetHeader("Content-Type", "multipart/form-data").
-		SetFileReader("files", "index.html", bytes.NewReader(htmlBuffer.Bytes())). // Add the rendered HTML as a file
+		SetFileReader("files", "index.html", bytes.NewReader(htmlBuffer.Bytes())). 
 		SetFormData(map[string]string{
-			"index": "index.html", // Specify the index file name
+			"index": "index.html", 
 		}).
 		Post(gotenbergURL)
 
