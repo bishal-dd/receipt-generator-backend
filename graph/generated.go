@@ -74,12 +74,14 @@ type ComplexityRoot struct {
 		City           func(childComplexity int) int
 		CompanyName    func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
+		Currency       func(childComplexity int) int
 		DeletedAt      func(childComplexity int) int
 		Email          func(childComplexity int) int
 		ID             func(childComplexity int) int
 		LogoImage      func(childComplexity int) int
 		PhoneNo        func(childComplexity int) int
 		SignatureImage func(childComplexity int) int
+		Tax            func(childComplexity int) int
 		Title          func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
 		UserID         func(childComplexity int) int
@@ -97,19 +99,24 @@ type ComplexityRoot struct {
 	}
 
 	Receipt struct {
-		Amount         func(childComplexity int) int
-		CreatedAt      func(childComplexity int) int
-		Date           func(childComplexity int) int
-		DeletedAt      func(childComplexity int) int
-		ID             func(childComplexity int) int
-		ReceiptName    func(childComplexity int) int
-		RecipientName  func(childComplexity int) int
-		RecipientPhone func(childComplexity int) int
-		Services       func(childComplexity int) int
-		TotalAmount    func(childComplexity int) int
-		TransactionNo  func(childComplexity int) int
-		UpdatedAt      func(childComplexity int) int
-		UserID         func(childComplexity int) int
+		CreatedAt        func(childComplexity int) int
+		Date             func(childComplexity int) int
+		DeletedAt        func(childComplexity int) int
+		ID               func(childComplexity int) int
+		PaymentMethod    func(childComplexity int) int
+		PaymentNote      func(childComplexity int) int
+		ReceiptName      func(childComplexity int) int
+		ReceiptNo        func(childComplexity int) int
+		RecipientAddress func(childComplexity int) int
+		RecipientEmail   func(childComplexity int) int
+		RecipientName    func(childComplexity int) int
+		RecipientPhone   func(childComplexity int) int
+		Services         func(childComplexity int) int
+		SubTotalAmount   func(childComplexity int) int
+		TaxAmount        func(childComplexity int) int
+		TotalAmount      func(childComplexity int) int
+		UpdatedAt        func(childComplexity int) int
+		UserID           func(childComplexity int) int
 	}
 
 	ReceiptConnection struct {
@@ -401,6 +408,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Profile.CreatedAt(childComplexity), true
 
+	case "Profile.currency":
+		if e.complexity.Profile.Currency == nil {
+			break
+		}
+
+		return e.complexity.Profile.Currency(childComplexity), true
+
 	case "Profile.deleted_at":
 		if e.complexity.Profile.DeletedAt == nil {
 			break
@@ -442,6 +456,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Profile.SignatureImage(childComplexity), true
+
+	case "Profile.tax":
+		if e.complexity.Profile.Tax == nil {
+			break
+		}
+
+		return e.complexity.Profile.Tax(childComplexity), true
 
 	case "Profile.title":
 		if e.complexity.Profile.Title == nil {
@@ -560,13 +581,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity, args["first"].(*int), args["after"].(*string)), true
 
-	case "Receipt.amount":
-		if e.complexity.Receipt.Amount == nil {
-			break
-		}
-
-		return e.complexity.Receipt.Amount(childComplexity), true
-
 	case "Receipt.created_at":
 		if e.complexity.Receipt.CreatedAt == nil {
 			break
@@ -595,12 +609,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Receipt.ID(childComplexity), true
 
+	case "Receipt.payment_method":
+		if e.complexity.Receipt.PaymentMethod == nil {
+			break
+		}
+
+		return e.complexity.Receipt.PaymentMethod(childComplexity), true
+
+	case "Receipt.payment_note":
+		if e.complexity.Receipt.PaymentNote == nil {
+			break
+		}
+
+		return e.complexity.Receipt.PaymentNote(childComplexity), true
+
 	case "Receipt.receipt_name":
 		if e.complexity.Receipt.ReceiptName == nil {
 			break
 		}
 
 		return e.complexity.Receipt.ReceiptName(childComplexity), true
+
+	case "Receipt.receipt_no":
+		if e.complexity.Receipt.ReceiptNo == nil {
+			break
+		}
+
+		return e.complexity.Receipt.ReceiptNo(childComplexity), true
+
+	case "Receipt.recipient_address":
+		if e.complexity.Receipt.RecipientAddress == nil {
+			break
+		}
+
+		return e.complexity.Receipt.RecipientAddress(childComplexity), true
+
+	case "Receipt.recipient_email":
+		if e.complexity.Receipt.RecipientEmail == nil {
+			break
+		}
+
+		return e.complexity.Receipt.RecipientEmail(childComplexity), true
 
 	case "Receipt.recipient_name":
 		if e.complexity.Receipt.RecipientName == nil {
@@ -623,19 +672,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Receipt.Services(childComplexity), true
 
+	case "Receipt.sub_total_amount":
+		if e.complexity.Receipt.SubTotalAmount == nil {
+			break
+		}
+
+		return e.complexity.Receipt.SubTotalAmount(childComplexity), true
+
+	case "Receipt.tax_amount":
+		if e.complexity.Receipt.TaxAmount == nil {
+			break
+		}
+
+		return e.complexity.Receipt.TaxAmount(childComplexity), true
+
 	case "Receipt.total_amount":
 		if e.complexity.Receipt.TotalAmount == nil {
 			break
 		}
 
 		return e.complexity.Receipt.TotalAmount(childComplexity), true
-
-	case "Receipt.transaction_no":
-		if e.complexity.Receipt.TransactionNo == nil {
-			break
-		}
-
-		return e.complexity.Receipt.TransactionNo(childComplexity), true
 
 	case "Receipt.updated_at":
 		if e.complexity.Receipt.UpdatedAt == nil {
@@ -1515,16 +1571,26 @@ func (ec *executionContext) fieldContext_Mutation_createReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
 				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
-			case "amount":
-				return ec.fieldContext_Receipt_amount(ctx, field)
-			case "transaction_no":
-				return ec.fieldContext_Receipt_transaction_no(ctx, field)
+			case "recipient_email":
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
+			case "recipient_address":
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
+			case "receipt_no":
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
 				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Receipt_total_amount(ctx, field)
+			case "sub_total_amount":
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+			case "tax_amount":
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
+			case "payment_note":
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -1598,16 +1664,26 @@ func (ec *executionContext) fieldContext_Mutation_updateReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
 				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
-			case "amount":
-				return ec.fieldContext_Receipt_amount(ctx, field)
-			case "transaction_no":
-				return ec.fieldContext_Receipt_transaction_no(ctx, field)
+			case "recipient_email":
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
+			case "recipient_address":
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
+			case "receipt_no":
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
 				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Receipt_total_amount(ctx, field)
+			case "sub_total_amount":
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+			case "tax_amount":
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
+			case "payment_note":
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -1746,6 +1822,10 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 				return ec.fieldContext_Profile_title(ctx, field)
 			case "signature_image":
 				return ec.fieldContext_Profile_signature_image(ctx, field)
+			case "currency":
+				return ec.fieldContext_Profile_currency(ctx, field)
+			case "tax":
+				return ec.fieldContext_Profile_tax(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -1829,6 +1909,10 @@ func (ec *executionContext) fieldContext_Mutation_updateProfile(ctx context.Cont
 				return ec.fieldContext_Profile_title(ctx, field)
 			case "signature_image":
 				return ec.fieldContext_Profile_signature_image(ctx, field)
+			case "currency":
+				return ec.fieldContext_Profile_currency(ctx, field)
+			case "tax":
+				return ec.fieldContext_Profile_tax(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -2718,6 +2802,94 @@ func (ec *executionContext) fieldContext_Profile_signature_image(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Profile_currency(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Profile_currency(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currency, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Profile_currency(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Profile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Profile_tax(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Profile_tax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tax, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Profile_tax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Profile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Profile_user_id(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Profile_user_id(ctx, field)
 	if err != nil {
@@ -3126,16 +3298,26 @@ func (ec *executionContext) fieldContext_Query_receipt(ctx context.Context, fiel
 				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
 				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
-			case "amount":
-				return ec.fieldContext_Receipt_amount(ctx, field)
-			case "transaction_no":
-				return ec.fieldContext_Receipt_transaction_no(ctx, field)
+			case "recipient_email":
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
+			case "recipient_address":
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
+			case "receipt_no":
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
 				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Receipt_total_amount(ctx, field)
+			case "sub_total_amount":
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+			case "tax_amount":
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
+			case "payment_note":
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -3216,6 +3398,10 @@ func (ec *executionContext) fieldContext_Query_profileByUserId(ctx context.Conte
 				return ec.fieldContext_Profile_title(ctx, field)
 			case "signature_image":
 				return ec.fieldContext_Profile_signature_image(ctx, field)
+			case "currency":
+				return ec.fieldContext_Profile_currency(ctx, field)
+			case "tax":
+				return ec.fieldContext_Profile_tax(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -3296,6 +3482,10 @@ func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, fiel
 				return ec.fieldContext_Profile_title(ctx, field)
 			case "signature_image":
 				return ec.fieldContext_Profile_signature_image(ctx, field)
+			case "currency":
+				return ec.fieldContext_Profile_currency(ctx, field)
+			case "tax":
+				return ec.fieldContext_Profile_tax(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -3771,8 +3961,8 @@ func (ec *executionContext) fieldContext_Receipt_recipient_phone(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Receipt_amount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Receipt_amount(ctx, field)
+func (ec *executionContext) _Receipt_recipient_email(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_recipient_email(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3785,7 +3975,89 @@ func (ec *executionContext) _Receipt_amount(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Amount, nil
+		return obj.RecipientEmail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_recipient_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_recipient_address(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_recipient_address(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RecipientAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_recipient_address(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_receipt_no(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_receipt_no(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReceiptNo, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3797,60 +4069,19 @@ func (ec *executionContext) _Receipt_amount(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Receipt_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Receipt_receipt_no(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Receipt",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Receipt_transaction_no(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Receipt_transaction_no(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TransactionNo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Receipt_transaction_no(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Receipt",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3980,6 +4211,173 @@ func (ec *executionContext) fieldContext_Receipt_total_amount(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_sub_total_amount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubTotalAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_sub_total_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_tax_amount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_tax_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TaxAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_tax_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_payment_method(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_payment_method(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PaymentMethod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_payment_method(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receipt_payment_note(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_payment_note(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PaymentNote, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_payment_note(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4411,16 +4809,26 @@ func (ec *executionContext) fieldContext_ReceiptEdge_node(ctx context.Context, f
 				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
 				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
-			case "amount":
-				return ec.fieldContext_Receipt_amount(ctx, field)
-			case "transaction_no":
-				return ec.fieldContext_Receipt_transaction_no(ctx, field)
+			case "recipient_email":
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
+			case "recipient_address":
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
+			case "receipt_no":
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
 				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Receipt_total_amount(ctx, field)
+			case "sub_total_amount":
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+			case "tax_amount":
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
+			case "payment_note":
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -4638,9 +5046,9 @@ func (ec *executionContext) _Service_amount(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Service_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4650,7 +5058,7 @@ func (ec *executionContext) fieldContext_Service_amount(ctx context.Context, fie
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5138,6 +5546,10 @@ func (ec *executionContext) fieldContext_User_Profile(ctx context.Context, field
 				return ec.fieldContext_Profile_title(ctx, field)
 			case "signature_image":
 				return ec.fieldContext_Profile_signature_image(ctx, field)
+			case "currency":
+				return ec.fieldContext_Profile_currency(ctx, field)
+			case "tax":
+				return ec.fieldContext_Profile_tax(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -7215,7 +7627,7 @@ func (ec *executionContext) unmarshalInputCreateBulkService(ctx context.Context,
 			it.Quantity = data
 		case "amount":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7233,7 +7645,7 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "city", "title", "signature_image", "user_id"}
+	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "city", "title", "signature_image", "user_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7275,6 +7687,20 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.Address = data
+		case "currency":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currency"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Currency = data
+		case "tax":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tax = data
 		case "city":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -7316,7 +7742,7 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "amount", "transaction_no", "user_id", "date", "total_amount"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "date", "total_amount"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7344,20 +7770,41 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 				return it, err
 			}
 			it.RecipientPhone = data
-		case "amount":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+		case "recipient_email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Amount = data
-		case "transaction_no":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_no"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			it.RecipientEmail = data
+		case "recipient_address":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_address"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TransactionNo = data
+			it.RecipientAddress = data
+		case "receipt_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_no"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptNo = data
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "payment_note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentNote = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -7392,7 +7839,7 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "amount", "transaction_no", "user_id", "date", "total_amount", "Services"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "orginazation_id", "date", "Services"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7420,20 +7867,41 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 				return it, err
 			}
 			it.RecipientPhone = data
-		case "amount":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+		case "recipient_email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Amount = data
-		case "transaction_no":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_no"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			it.RecipientEmail = data
+		case "recipient_address":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_address"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TransactionNo = data
+			it.RecipientAddress = data
+		case "receipt_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_no"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptNo = data
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "payment_note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentNote = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -7441,6 +7909,13 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 				return it, err
 			}
 			it.UserID = data
+		case "orginazation_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazation_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrginazationID = data
 		case "date":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
 			data, err := ec.unmarshalNDate2string(ctx, v)
@@ -7448,13 +7923,6 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 				return it, err
 			}
 			it.Date = data
-		case "total_amount":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_amount"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TotalAmount = data
 		case "Services":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Services"))
 			data, err := ec.unmarshalOCreateBulkService2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateBulkServiceᚄ(ctx, v)
@@ -7505,7 +7973,7 @@ func (ec *executionContext) unmarshalInputCreateService(ctx context.Context, obj
 			it.Quantity = data
 		case "amount":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7557,7 +8025,7 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "city", "title", "signature_image"}
+	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "city", "title", "signature_image"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7606,6 +8074,20 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.Address = data
+		case "currency":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currency"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Currency = data
+		case "tax":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tax = data
 		case "city":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -7640,7 +8122,7 @@ func (ec *executionContext) unmarshalInputUpdateReceipt(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "receipt_name", "recipient_name", "recipient_phone", "amount", "transaction_no", "user_id", "date", "total_amount"}
+	fieldsInOrder := [...]string{"id", "receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "date", "total_amount"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7675,20 +8157,41 @@ func (ec *executionContext) unmarshalInputUpdateReceipt(ctx context.Context, obj
 				return it, err
 			}
 			it.RecipientPhone = data
-		case "amount":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+		case "recipient_email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Amount = data
-		case "transaction_no":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_no"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			it.RecipientEmail = data
+		case "recipient_address":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_address"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TransactionNo = data
+			it.RecipientAddress = data
+		case "receipt_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_no"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptNo = data
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "payment_note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentNote = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
@@ -7760,7 +8263,7 @@ func (ec *executionContext) unmarshalInputUpdateService(ctx context.Context, obj
 			it.Quantity = data
 		case "amount":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7991,6 +8494,16 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Profile_title(ctx, field, obj)
 		case "signature_image":
 			out.Values[i] = ec._Profile_signature_image(ctx, field, obj)
+		case "currency":
+			out.Values[i] = ec._Profile_currency(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tax":
+			out.Values[i] = ec._Profile_tax(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "user_id":
 			out.Values[i] = ec._Profile_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -8267,13 +8780,15 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "amount":
-			out.Values[i] = ec._Receipt_amount(ctx, field, obj)
+		case "recipient_email":
+			out.Values[i] = ec._Receipt_recipient_email(ctx, field, obj)
+		case "recipient_address":
+			out.Values[i] = ec._Receipt_recipient_address(ctx, field, obj)
+		case "receipt_no":
+			out.Values[i] = ec._Receipt_receipt_no(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "transaction_no":
-			out.Values[i] = ec._Receipt_transaction_no(ctx, field, obj)
 		case "user_id":
 			out.Values[i] = ec._Receipt_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -8286,6 +8801,17 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "total_amount":
 			out.Values[i] = ec._Receipt_total_amount(ctx, field, obj)
+		case "sub_total_amount":
+			out.Values[i] = ec._Receipt_sub_total_amount(ctx, field, obj)
+		case "tax_amount":
+			out.Values[i] = ec._Receipt_tax_amount(ctx, field, obj)
+		case "payment_method":
+			out.Values[i] = ec._Receipt_payment_method(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "payment_note":
+			out.Values[i] = ec._Receipt_payment_note(ctx, field, obj)
 		case "created_at":
 			out.Values[i] = ec._Receipt_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

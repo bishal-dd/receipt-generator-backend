@@ -3,7 +3,7 @@ type Service {
   description: String!
   rate: Float!
   quantity: Int!
-  amount: Int!
+  amount: Float!
   receipt_id: UUID!
   created_at: DateTime!
   updated_at: DateTime
@@ -14,7 +14,7 @@ input CreateService {
   description: String!
   rate: Float!
   quantity: Int!
-  amount: Int!
+  amount: Float!
   receipt_id: UUID!
 }
 
@@ -23,5 +23,5 @@ input UpdateService {
   description: String
   rate: Float
   quantity: Int
-  amount: Int
+  amount: Float
 }

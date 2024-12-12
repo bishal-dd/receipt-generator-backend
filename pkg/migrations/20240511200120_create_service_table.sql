@@ -5,7 +5,7 @@ CREATE TABLE services (
     description VARCHAR(5000) NOT NULL,
     rate FLOAT NOT NULL,
     quantity INT NOT NULL,
-    amount INT NOT NULL,
+    amount FLOAT NOT NULL,
     receipt_id UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

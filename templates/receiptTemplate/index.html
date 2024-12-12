@@ -23,6 +23,15 @@
         display: flex;
         justify-content: space-between;
       }
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* Align the items vertically */
+      }
+      .center-header {
+        justify-content: center; /* Center the header when there's no logo */
+        text-align: center; /* Ensure text is centered */
+      }
       .header-col {
         justify-items: center;
         margin-right: 70px;
@@ -61,7 +70,10 @@
   </head>
   <body>
     <div class="container">
-      <div class="row">
+      <div
+        class="header-row {{if .Profile.LogoImage}} {{else}}center-header{{end}}"
+      >
+        {{if .Profile.LogoImage}}
         <div class="col">
           <img
             src="{{.Profile.LogoImage}}"
@@ -75,6 +87,13 @@
           <p>{{.Profile.Address}}</p>
           <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
         </div>
+        {{else}}
+        <div class="header-col">
+          <h2>{{.Profile.CompanyName}}</h2>
+          <p>{{.Profile.Address}}</p>
+          <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
+        </div>
+        {{end}}
       </div>
       <hr />
       <div class="row" style="margin-top: 20px">
@@ -83,15 +102,17 @@
           <div style="margin-left: 5px">
             <p>{{.Receipt.RecipientName}}</p>
             <p>{{.Receipt.RecipientPhone}}</p>
-            <p>dhakalbishal930@gmail.com</p>
-            <p>123 Main Street</p>
+            <p>{{.Receipt.RecipientEmail}}</p>
+            <p>{{.Receipt.RecipientAddress}}</p>
           </div>
         </div>
         <div>
-          <p><b>Receipt No:</b> {{.Receipt.TransactionNo}}</p>
+          <p><b>Receipt No:</b> {{.Receipt.ReceiptNo}}</p>
           <p><b>Date:</b> {{.Receipt.Date}}</p>
-          <p><b>Payment Method:</b> Bank Transfer</p>
-          <p><b>Note:</b> Jr.no 21121212</p>
+          <p><b>Payment Method:</b> {{.Receipt.PaymentMethod}}</p>
+          {{if .Receipt.PaymentNote}}
+          <p><b>Payment Note:</b> {{.Receipt.PaymentNote}}</p>
+          {{end}}
         </div>
       </div>
       <hr />
@@ -116,9 +137,13 @@
         </tbody>
       </table>
       <div class="totals">
-        <p>Subtotal: $50.00</p>
-        <p>Tax (8%): $4.00</p>
-        <p><strong>Total: $54.00</strong></p>
+        <p>Subtotal: {{.Profile.Currency}} {{.Receipt.SubTotalAmount}}</p>
+        <p>
+          Tax ({{.Profile.Tax}}%): {{.Profile.Currency}}{{.Receipt.TaxAmount}}
+        </p>
+        <p>
+          <strong>Total: {{.Profile.Currency}}{{.Receipt.TotalAmount}}</strong>
+        </p>
       </div>
       <div class="logo">
         <img src="{{.Profile.SignatureImage}}" alt="Company Stamp" />

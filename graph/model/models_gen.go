@@ -6,49 +6,57 @@ type CreateBulkService struct {
 	Description string  `json:"description"`
 	Rate        float64 `json:"rate"`
 	Quantity    int     `json:"quantity"`
-	Amount      int     `json:"amount"`
+	Amount      float64 `json:"amount"`
 }
 
 type CreateProfile struct {
-	CompanyName    string  `json:"company_name"`
-	LogoImage      *string `json:"logo_image,omitempty"`
-	PhoneNo        int     `json:"phone_no"`
-	Email          *string `json:"email,omitempty"`
-	Address        *string `json:"address,omitempty"`
-	City           *string `json:"city,omitempty"`
-	Title          *string `json:"title,omitempty"`
-	SignatureImage *string `json:"signature_image,omitempty"`
-	UserID         string  `json:"user_id"`
+	CompanyName    string   `json:"company_name"`
+	LogoImage      *string  `json:"logo_image,omitempty"`
+	PhoneNo        int      `json:"phone_no"`
+	Email          *string  `json:"email,omitempty"`
+	Address        *string  `json:"address,omitempty"`
+	Currency       *string  `json:"currency,omitempty"`
+	Tax            *float64 `json:"tax,omitempty"`
+	City           *string  `json:"city,omitempty"`
+	Title          *string  `json:"title,omitempty"`
+	SignatureImage *string  `json:"signature_image,omitempty"`
+	UserID         string   `json:"user_id"`
 }
 
 type CreateReceipt struct {
-	ReceiptName    string   `json:"receipt_name"`
-	RecipientName  string   `json:"recipient_name"`
-	RecipientPhone int      `json:"recipient_phone"`
-	Amount         float64  `json:"amount"`
-	TransactionNo  *int     `json:"transaction_no,omitempty"`
-	UserID         string   `json:"user_id"`
-	Date           string   `json:"date"`
-	TotalAmount    *float64 `json:"total_amount,omitempty"`
+	ReceiptName      string   `json:"receipt_name"`
+	RecipientName    string   `json:"recipient_name"`
+	RecipientPhone   int      `json:"recipient_phone"`
+	RecipientEmail   *string  `json:"recipient_email,omitempty"`
+	RecipientAddress *string  `json:"recipient_address,omitempty"`
+	ReceiptNo        string   `json:"receipt_no"`
+	PaymentMethod    string   `json:"payment_method"`
+	PaymentNote      *string  `json:"payment_note,omitempty"`
+	UserID           string   `json:"user_id"`
+	Date             string   `json:"date"`
+	TotalAmount      *float64 `json:"total_amount,omitempty"`
 }
 
 type CreateReceiptPDFGenerator struct {
-	ReceiptName    string               `json:"receipt_name"`
-	RecipientName  string               `json:"recipient_name"`
-	RecipientPhone int                  `json:"recipient_phone"`
-	Amount         float64              `json:"amount"`
-	TransactionNo  *int                 `json:"transaction_no,omitempty"`
-	UserID         string               `json:"user_id"`
-	Date           string               `json:"date"`
-	TotalAmount    *float64             `json:"total_amount,omitempty"`
-	Services       []*CreateBulkService `json:"Services,omitempty"`
+	ReceiptName      string               `json:"receipt_name"`
+	RecipientName    string               `json:"recipient_name"`
+	RecipientPhone   int                  `json:"recipient_phone"`
+	RecipientEmail   *string              `json:"recipient_email,omitempty"`
+	RecipientAddress *string              `json:"recipient_address,omitempty"`
+	ReceiptNo        string               `json:"receipt_no"`
+	PaymentMethod    string               `json:"payment_method"`
+	PaymentNote      *string              `json:"payment_note,omitempty"`
+	UserID           string               `json:"user_id"`
+	OrginazationID   string               `json:"orginazation_id"`
+	Date             string               `json:"date"`
+	Services         []*CreateBulkService `json:"Services,omitempty"`
 }
 
 type CreateService struct {
 	Description string  `json:"description"`
 	Rate        float64 `json:"rate"`
 	Quantity    int     `json:"quantity"`
-	Amount      int     `json:"amount"`
+	Amount      float64 `json:"amount"`
 	ReceiptID   string  `json:"receipt_id"`
 }
 
@@ -76,6 +84,8 @@ type Profile struct {
 	City           *string `json:"city,omitempty"`
 	Title          *string `json:"title,omitempty"`
 	SignatureImage *string `json:"signature_image,omitempty"`
+	Currency       string  `json:"currency"`
+	Tax            float64 `json:"tax"`
 	UserID         string  `json:"user_id"`
 	CreatedAt      string  `json:"created_at"`
 	UpdatedAt      *string `json:"updated_at,omitempty"`
@@ -86,19 +96,24 @@ type Query struct {
 }
 
 type Receipt struct {
-	ID             string     `json:"id"`
-	ReceiptName    string     `json:"receipt_name"`
-	RecipientName  string     `json:"recipient_name"`
-	RecipientPhone int        `json:"recipient_phone"`
-	Amount         float64    `json:"amount"`
-	TransactionNo  *int       `json:"transaction_no,omitempty"`
-	UserID         string     `json:"user_id"`
-	Date           string     `json:"date"`
-	TotalAmount    *float64   `json:"total_amount,omitempty"`
-	CreatedAt      string     `json:"created_at"`
-	UpdatedAt      *string    `json:"updated_at,omitempty"`
-	DeletedAt      *string    `json:"deleted_at,omitempty"`
-	Services       []*Service `json:"Services,omitempty"`
+	ID               string     `json:"id"`
+	ReceiptName      string     `json:"receipt_name"`
+	RecipientName    string     `json:"recipient_name"`
+	RecipientPhone   int        `json:"recipient_phone"`
+	RecipientEmail   *string    `json:"recipient_email,omitempty"`
+	RecipientAddress *string    `json:"recipient_address,omitempty"`
+	ReceiptNo        string     `json:"receipt_no"`
+	UserID           string     `json:"user_id"`
+	Date             string     `json:"date"`
+	TotalAmount      *float64   `json:"total_amount,omitempty"`
+	SubTotalAmount   *float64   `json:"sub_total_amount,omitempty"`
+	TaxAmount        *float64   `json:"tax_amount,omitempty"`
+	PaymentMethod    string     `json:"payment_method"`
+	PaymentNote      *string    `json:"payment_note,omitempty"`
+	CreatedAt        string     `json:"created_at"`
+	UpdatedAt        *string    `json:"updated_at,omitempty"`
+	DeletedAt        *string    `json:"deleted_at,omitempty"`
+	Services         []*Service `json:"Services,omitempty"`
 }
 
 type ReceiptConnection struct {
@@ -117,7 +132,7 @@ type Service struct {
 	Description string  `json:"description"`
 	Rate        float64 `json:"rate"`
 	Quantity    int     `json:"quantity"`
-	Amount      int     `json:"amount"`
+	Amount      float64 `json:"amount"`
 	ReceiptID   string  `json:"receipt_id"`
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
@@ -125,27 +140,32 @@ type Service struct {
 }
 
 type UpdateProfile struct {
-	ID             string  `json:"id"`
-	CompanyName    *string `json:"company_name,omitempty"`
-	LogoImage      *string `json:"logo_image,omitempty"`
-	PhoneNo        *int    `json:"phone_no,omitempty"`
-	Email          *string `json:"email,omitempty"`
-	Address        *string `json:"address,omitempty"`
-	City           *string `json:"city,omitempty"`
-	Title          *string `json:"title,omitempty"`
-	SignatureImage *string `json:"signature_image,omitempty"`
+	ID             string   `json:"id"`
+	CompanyName    *string  `json:"company_name,omitempty"`
+	LogoImage      *string  `json:"logo_image,omitempty"`
+	PhoneNo        *int     `json:"phone_no,omitempty"`
+	Email          *string  `json:"email,omitempty"`
+	Address        *string  `json:"address,omitempty"`
+	Currency       *string  `json:"currency,omitempty"`
+	Tax            *float64 `json:"tax,omitempty"`
+	City           *string  `json:"city,omitempty"`
+	Title          *string  `json:"title,omitempty"`
+	SignatureImage *string  `json:"signature_image,omitempty"`
 }
 
 type UpdateReceipt struct {
-	ID             string   `json:"id"`
-	ReceiptName    *string  `json:"receipt_name,omitempty"`
-	RecipientName  *string  `json:"recipient_name,omitempty"`
-	RecipientPhone *int     `json:"recipient_phone,omitempty"`
-	Amount         *float64 `json:"amount,omitempty"`
-	TransactionNo  *int     `json:"transaction_no,omitempty"`
-	UserID         *string  `json:"user_id,omitempty"`
-	Date           *string  `json:"date,omitempty"`
-	TotalAmount    *float64 `json:"total_amount,omitempty"`
+	ID               string   `json:"id"`
+	ReceiptName      *string  `json:"receipt_name,omitempty"`
+	RecipientName    *string  `json:"recipient_name,omitempty"`
+	RecipientPhone   *int     `json:"recipient_phone,omitempty"`
+	RecipientEmail   *string  `json:"recipient_email,omitempty"`
+	RecipientAddress *string  `json:"recipient_address,omitempty"`
+	ReceiptNo        *string  `json:"receipt_no,omitempty"`
+	PaymentMethod    *string  `json:"payment_method,omitempty"`
+	PaymentNote      *string  `json:"payment_note,omitempty"`
+	UserID           *string  `json:"user_id,omitempty"`
+	Date             *string  `json:"date,omitempty"`
+	TotalAmount      *float64 `json:"total_amount,omitempty"`
 }
 
 type UpdateService struct {
@@ -153,7 +173,7 @@ type UpdateService struct {
 	Description *string  `json:"description,omitempty"`
 	Rate        *float64 `json:"rate,omitempty"`
 	Quantity    *int     `json:"quantity,omitempty"`
-	Amount      *int     `json:"amount,omitempty"`
+	Amount      *float64 `json:"amount,omitempty"`
 }
 
 type User struct {

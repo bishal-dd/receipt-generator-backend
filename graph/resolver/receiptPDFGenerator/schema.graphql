@@ -2,11 +2,14 @@ input CreateReceiptPDFGenerator {
   receipt_name: String!
   recipient_name: String!
   recipient_phone: Int!
-  amount: Float!
-  transaction_no: Int
+  recipient_email: String
+  recipient_address: String
+  receipt_no: String!
+  payment_method: String!
+  payment_note: String
   user_id: ID!
+  orginazation_id: ID!
   date: Date!
-  total_amount: Float
   Services: [CreateBulkService!]
 }
 
@@ -14,5 +17,5 @@ input CreateBulkService {
   description: String!
   rate: Float!
   quantity: Int!
-  amount: Int!
+  amount: Float!
 }

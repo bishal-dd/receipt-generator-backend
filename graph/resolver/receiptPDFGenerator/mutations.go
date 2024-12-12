@@ -23,66 +23,14 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
     if err != nil {
         return false, err
     }
-	orginazationId := "org_2pOGZatXWQW0DBh3k2HNZs3txHP"
-	organization, err := organization.Get(ctx, orginazationId)
+	
+	organization, err := organization.Get(ctx, input.OrginazationID)
 	if err != nil {
 		return false, err
 	}
 	fmt.Println(organization.Name)
-    // Create Receipt
-    receiptInput := input
-    receiptModel := &model.Receipt{
-        ID:        ids.UUID(),
-        UserID:    userId,
-        CreatedAt: time.Now().Format(time.RFC3339),
-		ReceiptName: receiptInput.ReceiptName,
-		RecipientPhone: receiptInput.RecipientPhone,
-		RecipientName: receiptInput.RecipientName,
-		Amount: receiptInput.Amount,
-		TransactionNo: receiptInput.TransactionNo,
-		Date: receiptInput.Date,
-		TotalAmount: receiptInput.TotalAmount,
-		Services:  make([]*model.Service, 0),
-    }
 
-    // Begin a transaction
-    tx := r.db.Begin()
-    if tx.Error != nil {
-        return false, tx.Error
-    }
-
-    // Create Receipt
-    if err := tx.Create(receiptModel).Error; err != nil {
-        tx.Rollback()
-        return false, err
-    }
-
-    // Create Services
-    for _, serviceInput := range input.Services {
-        serviceModel := &model.Service{
-            ID:         ids.UUID(),
-            ReceiptID:  receiptModel.ID,
-            CreatedAt:  time.Now().Format(time.RFC3339),
-            Description: serviceInput.Description,
-            Rate:      serviceInput.Rate,
-            Quantity:   serviceInput.Quantity,
-			Amount:    serviceInput.Amount,
-        }
-
-        if err := tx.Create(serviceModel).Error; err != nil {
-            tx.Rollback()
-            return false, err
-        }
-		receiptModel.Services = append(receiptModel.Services, serviceModel)
-    }
-
-    // Commit transaction
-    if err := tx.Commit().Error; err != nil {
-        return false, err
-    }
-
-    // Get profile (optional)
-    profile, err := r.GetProfileByUserID(userId)
+	profile, err := r.GetProfileByUserID(userId)
     if err != nil {
         // You might want to handle this differently
         // For now, we'll just log it and continue
@@ -97,7 +45,83 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
 		profile.SignatureImage = &signedURL
 	}
 	profile.CompanyName = organization.Name
-	profile.LogoImage = organization.ImageURL
+	if (organization.HasImage){
+		profile.LogoImage = organization.ImageURL
+	}
+	
+
+	subtotal := 0.0
+    for _, serviceInput := range input.Services {
+		subtotal += serviceInput.Amount
+    }
+
+	taxRate := profile.Tax / 100
+	taxAmount := subtotal * taxRate
+	totalAmount := subtotal + taxAmount
+
+    // Create Receipt
+    receiptInput := input
+    receiptModel := &model.Receipt{
+        ID:        ids.UUID(),
+        UserID:    userId,
+        CreatedAt: time.Now().Format(time.RFC3339),
+		ReceiptName: receiptInput.ReceiptName,
+		RecipientPhone: receiptInput.RecipientPhone,
+		RecipientName: receiptInput.RecipientName,
+		RecipientEmail: receiptInput.RecipientEmail,
+		RecipientAddress: receiptInput.RecipientAddress,
+		ReceiptNo: receiptInput.ReceiptNo,
+		Date: receiptInput.Date,
+		PaymentMethod: receiptInput.PaymentMethod,
+		PaymentNote: receiptInput.PaymentNote,
+		TotalAmount: &totalAmount,
+		SubTotalAmount: &subtotal,
+		TaxAmount: &taxAmount,
+		Services:  make([]*model.Service, 0),
+    }
+
+    // Begin a transaction
+    tx := r.db.Begin()
+    if tx.Error != nil {
+        return false, tx.Error
+    }
+
+    // Create Receipt
+    if err := tx.Create(receiptModel).Error; err != nil {
+        tx.Rollback()
+        return false, err
+    }
+	parsedDate, err := time.Parse(time.RFC3339, receiptModel.Date)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("invalid date format in receipt: %w", err)
+	}
+	receiptModel.Date = parsedDate.Format("2 January 2006")
+    // Create Services
+    for _, serviceInput := range input.Services {
+        serviceModel := &model.Service{
+            ID:         ids.UUID(),
+            ReceiptID:  receiptModel.ID,
+            CreatedAt:  time.Now().Format(time.RFC3339),
+            Description: serviceInput.Description,
+            Rate:      serviceInput.Rate,
+            Quantity:   serviceInput.Quantity,
+			Amount:    serviceInput.Amount,
+        }
+        if err := tx.Create(serviceModel).Error; err != nil {
+            tx.Rollback()
+            return false, err
+        }
+		receiptModel.Services = append(receiptModel.Services, serviceModel)
+    }
+
+    // Commit transaction
+    if err := tx.Commit().Error; err != nil {
+        return false, err
+    }
+
+    // Get profile (optional)
+   
 	if err := r.generatePDF(receiptModel, profile); err != nil {
         return false, err
     }
