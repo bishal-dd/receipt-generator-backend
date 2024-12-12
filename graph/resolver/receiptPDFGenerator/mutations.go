@@ -3,7 +3,9 @@ package receiptPDFGenerator
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"text/template"
@@ -28,7 +30,6 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(organization.Name)
 
 	profile, err := r.GetProfileByUserID(userId)
     if err != nil {
@@ -122,13 +123,13 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
 
     // Get profile (optional)
    
-	if err := r.generatePDF(receiptModel, profile); err != nil {
+	if err := r.generatePDF(receiptModel, profile, userId, organization.ID); err != nil {
         return false, err
     }
     return true, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile) error {
+func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile, userId string, organizationId string) error {
 	// Read HTML template from file
 	templateFile := "templates/receiptTemplate/index.html"
 	templateContent, err := os.ReadFile(templateFile)
@@ -174,12 +175,101 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 		return fmt.Errorf("gotenberg returned status %d: %s", resp.StatusCode(), resp.String())
 	}
 
+	
 	// Save the PDF to a file
 	outputFilename := fmt.Sprintf("receipt_%s.pdf", receipt.ID)
-	if err := os.WriteFile(outputFilename, resp.Body(), 0644); err != nil {
-		return fmt.Errorf("error saving PDF to file: %w", err)
+	// if err := os.WriteFile(outputFilename, resp.Body(), 0644); err != nil {
+	// 	return fmt.Errorf("error saving PDF to file: %w", err)
+	// }
+
+	
+
+
+	// Fetch the presigned URL
+	presignedResp, err := r.httpClient.R().
+		Get(fmt.Sprintf("http://localhost:8080/issuePresignedURL?filename=%s&contentType=%s&organizationId=%s&userId=%s",outputFilename, "application/pdf", organizationId, userId ))
+	if err != nil {
+		return fmt.Errorf("error getting presigned URL: %w", err)
 	}
 
-	fmt.Println("PDF generated successfully:", outputFilename)
+	if presignedResp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("failed to get presigned URL: %s", presignedResp.String())
+	}
+	// Parse presigned URL response
+	type PresignedURLResponse struct {
+		URL string `json:"url"`
+	}
+
+	var presignedRespData PresignedURLResponse
+	if err := json.Unmarshal(presignedResp.Body(), &presignedRespData); err != nil {
+		return fmt.Errorf("error parsing presigned URL: %w", err)
+	}
+
+	presignedURL := presignedRespData.URL
+	// Upload the PDF
+	uploadResp, err := r.httpClient.R().
+		SetHeader("Content-Type", "application/pdf").
+		SetBody(resp.Body()).
+		Put(presignedURL)	
+	if err != nil {
+		return fmt.Errorf("error uploading PDF: %w", err)
+	}
+	if uploadResp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("failed to upload PDF: %s", uploadResp.String())
+	}
+	key := fmt.Sprintf("%s/%s/%s", organizationId, userId, outputFilename)
+	signedURL, err := cloudFront.GetCloudFrontURL(key)
+	if err != nil {
+		return fmt.Errorf("failed to get cloudfront url: %v", err)
+	}
+	if receipt.RecipientPhone != 0 {
+        err = r.sendPDFToWhatsApp(signedURL,outputFilename, receipt)
+        if err != nil {
+            log.Printf("Failed to send PDF to WhatsApp: %v", err)
+			return fmt.Errorf("failed to send pdf to whatsapp: %v", err)
+
+        }
+    }
+
 	return nil
+}
+
+
+func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, receipt *model.Receipt,) error {
+    // Encode PDF to base64
+    // base64PDF := base64.StdEncoding.EncodeToString(pdfBytes)
+    // Prepare the API request payload
+	payload := map[string]interface{}{
+		"messaging_product": "whatsapp",
+		"recipient_type":    "individual",
+		"to": "97517959259",
+		"type": "document",
+		"document": map[string]string{
+    		"link": url,
+			"caption": "Receipt",
+			"filename": receiptName,
+		},
+    }
+
+    // Create Resty client
+   
+
+    // Send the request
+    resp, err := r.httpClient.R().
+        SetHeader("Content-Type", "application/json").
+        SetAuthToken(os.Getenv("WHATSAPP_ACCESS_TOKEN")).
+        SetBody(payload).
+        Post(fmt.Sprintf("https://graph.facebook.com/v21.0/%s/messages", os.Getenv("WHATSAPP_PHONE_NUMBER_ID")))
+
+    if err != nil {
+        return fmt.Errorf("error sending WhatsApp message: %w", err)
+    }
+    fmt.Printf("Response Body: %s\n", string(resp.Body()))    // Check response
+    if resp.StatusCode() != 200 {
+        return fmt.Errorf("WhatsApp API request failed with status %d: %s", 
+            resp.StatusCode(), 
+            string(resp.Body()))
+    }
+
+    return nil
 }
