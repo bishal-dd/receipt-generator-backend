@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
+	"github.com/clerk/clerk-sdk-go/v2/organization"
 )
 
 
@@ -21,7 +23,12 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
     if err != nil {
         return false, err
     }
-
+	orginazationId := "org_2pOGZatXWQW0DBh3k2HNZs3txHP"
+	organization, err := organization.Get(ctx, orginazationId)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println(organization.Name)
     // Create Receipt
     receiptInput := input
     receiptModel := &model.Receipt{
@@ -81,8 +88,16 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
         // For now, we'll just log it and continue
         fmt.Println("Could not fetch profile:", err)
     }
-	fmt.Print("Profile: ", profile)
 
+	if profile.SignatureImage != nil && *profile.SignatureImage != "" {
+		signedURL, err := cloudFront.GetCloudFrontURL(*profile.SignatureImage)
+		if err != nil {
+			return false, err
+		}
+		profile.SignatureImage = &signedURL
+	}
+	profile.CompanyName = organization.Name
+	profile.LogoImage = organization.ImageURL
 	if err := r.generatePDF(receiptModel, profile); err != nil {
         return false, err
     }

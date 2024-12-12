@@ -6,35 +6,43 @@ import (
 )
 
 
-func GinContextToContextMiddleware() gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// tokenString, err := jwtUtil.TokenFromRequest(c.Request)
-		// if err != nil {
-		// 	c.AbortWithStatusJSON(401, gin.H{"error": err.Error()})
-		// 	return
-		// }
-		// token, err := jwtUtil.ParseToken(tokenString)
-		// if err != nil {
-		// 	c.AbortWithStatusJSON(401, gin.H{"error": err.Error()})
-		// 	return
-		// }
-		// claims, err := jwtUtil.ClaimsFromToken(token)
-		// if err != nil {
-		// 	c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
-		// 	return
-		// }
+	//   ctx := c.Request.Context()
+	  
+	//   // Log the authorization header to debug
+	//   fmt.Print(c.GetHeader("authorization"), "\n")
+	//   authHeader := c.GetHeader("authorization")
 
-		// userID, ok := claims["user_id"].(string)
-		// if !ok {
-		// 	c.AbortWithStatusJSON(401, gin.H{"error": "user_id not found in token"})
-		// 	return
-		// }
+	//   if authHeader == "" {
+	// 	fmt.Print("Authorization header not found\n")
+	// 	c.AbortWithStatusJSON(401, gin.H{"error": "Missing authorization token"})
+	// 	return
+	//   }
 
-		userID := "user_2pOGOF48y7Y7wHWs33WK0AZIROH"
-		ctx := contextUtil.SetContextValue(c.Request.Context(), contextUtil.UserIDKey, userID)
-		ctx = contextUtil.SetContextValue(ctx, contextUtil.GinContextKey, c)
-		c.Request = c.Request.WithContext(ctx)
+	//   claims, ok := clerk.SessionClaimsFromContext(ctx)
 
-		c.Next()
+	//   if !ok {
+	// 	fmt.Print("Invalid or missing session claims\n")
+	// 	c.AbortWithStatusJSON(401, gin.H{"error": "Invalid or missing session claims"})
+	// 	return
+	//   }
+	  
+	//   usr, err := user.Get(ctx, claims.Subject)
+	//   if err != nil {
+	// 	c.AbortWithStatusJSON(401, gin.H{"error": fmt.Sprintf("User retrieval failed: %v", err)})
+	// 	return
+	//   }
+	  
+	//   if usr == nil {
+	// 	c.AbortWithStatusJSON(401, gin.H{"error": "User does not exist"})
+	// 	return
+	//   }
+
+	userId := "user_2pOGOF48y7Y7wHWs33WK0AZIROH"
+	  ctxs := contextUtil.SetContextValue(c.Request.Context(), contextUtil.UserIDKey, userId)
+	  ctxs = contextUtil.SetContextValue(ctxs, contextUtil.GinContextKey, c)
+	  c.Request = c.Request.WithContext(ctxs)
+	  c.Next()
 	}
-}
+  }
