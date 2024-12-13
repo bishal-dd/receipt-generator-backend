@@ -57,7 +57,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input, profile.Tax)
     receiptModel = inputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-     r.saveReceipt(receiptModel, input)
+    r.saveReceipt(receiptModel, input)
 
 
     // Parallel PDF generation and storage upload
@@ -68,7 +68,13 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
             return err
         }
         
-        fileURL, err = r.getFileURL(pdfFile, fileName, currentOrganization.ID, userId)
+		if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
+			return  err
+		}
+		fileURL, err = r.getFileURL( currentOrganization.ID, userId, fileName)
+		if err != nil {
+			return  err
+		}
         return err
     })
 
@@ -102,7 +108,6 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     var receiptModel *model.Receipt
     var fileName string
     var pdfFile []byte
-    var fileURL string
 
     currentOrganization, err = organization.Get(ctx, input.OrginazationID)
 	if err != nil {
@@ -121,32 +126,28 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     receiptModel = inputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
 	r.saveReceipt(receiptModel, input)
 
-	fmt.Print(receiptModel)
     fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
 	if err != nil {
 		return false, err
 	}
-        
-    fileURL, err = r.getFileURL(pdfFile, fileName, currentOrganization.ID, userId)
-	if err != nil {
-		return false, err
-	}
+    if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
+			return false, err
+		}
     if receiptModel.RecipientPhone != "" {
 			err := emails.SendEmailWithPDF(
 				*receiptModel.RecipientEmail,
 				"Receipt ",
-				"templates/emails/welcome.html",
+				"templates/emails/receipt.html",
 				map[string]interface{}{
-					"UserName": fileURL,  
+					"OrganizationName": currentOrganization.Name,
+					"CustomerName": receiptModel.RecipientName,
 				},
 				fileName,
 				pdfFile,
 			)
 			if err != nil {
-				log.Printf("Failed to send PDF to WhatsApp: %v", err)
+				log.Printf("Failed to send PDF to Email: %v", err)
 			}
-
-			fmt.Println("Email Was Send")
        
     }
 

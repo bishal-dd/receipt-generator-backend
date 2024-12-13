@@ -18,15 +18,15 @@ var (
     cachedTemplate *template.Template
 )
 
-func (r *ReceiptPDFGeneratorResolver) getFileURL(pdf []byte, fileName string, organizationId string, userId string)( string, error){
+func (r *ReceiptPDFGeneratorResolver) saveFile(pdf []byte, fileName string, organizationId string, userId string)( error){
 	presignedResp, err := r.httpClient.R().
 	Get(fmt.Sprintf("http://localhost:8080/issuePresignedURL?filename=%s&contentType=%s&organizationId=%s&userId=%s",fileName, "application/pdf", organizationId, userId ))
 	if err != nil {
-		return  "", err
+		return  err
 	}
 
 	if presignedResp.StatusCode() != http.StatusOK {
-		return  "", err
+		return  err
 	}
 	// Parse presigned URL response
 	type PresignedURLResponse struct {
@@ -35,7 +35,7 @@ func (r *ReceiptPDFGeneratorResolver) getFileURL(pdf []byte, fileName string, or
 
 	var presignedRespData PresignedURLResponse
 	if err := json.Unmarshal(presignedResp.Body(), &presignedRespData); err != nil {
-		return  "", err
+		return  err
 	}
 
 	presignedURL := presignedRespData.URL
@@ -45,11 +45,15 @@ func (r *ReceiptPDFGeneratorResolver) getFileURL(pdf []byte, fileName string, or
 		SetBody(pdf).
 		Put(presignedURL)	
 	if err != nil {
-		return   "", err
+		return   err
 	}
 	if uploadResp.StatusCode() != http.StatusOK {
-		return  "", fmt.Errorf("failed to upload PDF: %s", uploadResp.String())
+		return  fmt.Errorf("failed to upload PDF: %s", uploadResp.String())
 	}
+	return nil
+}	
+
+func (r *ReceiptPDFGeneratorResolver) getFileURL(organizationId, userId, fileName string) (string, error) {
 	key := fmt.Sprintf("%s/%s/%s", organizationId, userId, fileName)
 	signedURL, err := cloudFront.GetCloudFrontURL(key)
 	if err != nil {

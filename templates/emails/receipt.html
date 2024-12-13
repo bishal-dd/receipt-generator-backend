@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <style>
+      /* General styling for the email */
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f8f8;
+      }
+      .email-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        border-radius: 8px;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 20px;
+        color: #333333;
+      }
+      p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 10px 0;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <h1>Your Receipt from {{.OrganizationName}}</h1>
+      <p>Dear {{.CustomerName}},</p>
+      <p>
+        Thank you for your recent transaction with {{.OrganizationName}}.
+        Attached, you will find your receipt for your records.
+      </p>
+      <p>
+        If you have any questions or need further assistance, please don't
+        hesitate to contact us.
+      </p>
+      <p>Best regards,</p>
+      <p><strong>The {{.OrganizationName}} Team</strong></p>
+      <div class="footer">
+        <p>This email was sent from {{.OrganizationName}}.</p>
+        <p>If you have any concerns, please</p>
+      </div>
+    </div>
+  </body>
+</html>
