@@ -12,10 +12,13 @@ import (
 )
 
 type EmailMessage struct {
-    To      string `json:"to"`
-    Subject string `json:"subject"`
-    Body    string `json:"body"`
+	To           string `json:"to"`
+	Subject      string `json:"subject"`
+	Body         string `json:"body"`
+	PDFFileName  string `json:"pdf_file_name"`
+	PDFFileBytes []byte `json:"pdf_file_bytes"`
 }
+
 
 type EmailConsumer struct {
     resendClient *resend.Client
@@ -35,35 +38,42 @@ func NewEmailConsumer() (*EmailConsumer, error) {
 }
 
 func (c *EmailConsumer) Consume(delivery rmq.Delivery) {
-    var email EmailMessage
-    if err := json.Unmarshal([]byte(delivery.Payload()), &email); err != nil {
-        log.Printf("Failed to unmarshal email: %v", err)
-        if err := delivery.Reject(); err != nil {
-            log.Printf("Failed to reject delivery: %v", err)
-        }
-        return
-    }
+	var email EmailMessage
+	if err := json.Unmarshal([]byte(delivery.Payload()), &email); err != nil {
+		log.Printf("Failed to unmarshal email: %v", err)
+		if err := delivery.Reject(); err != nil {
+			log.Printf("Failed to reject delivery: %v", err)
+		}
+		return
+	}
 
-    params := &resend.SendEmailRequest{
-        From:    "hello@updates.yangkoo.com",
-        To:      []string{email.To},
-        Subject: email.Subject,
-        Html:    email.Body,
-    }
+	params := &resend.SendEmailRequest{
+		From:    "hello@updates.yangkoo.com",
+		To:      []string{email.To},
+		Subject: email.Subject,
+		Html:    email.Body,
+		Attachments: []*resend.Attachment{
+			{
+				Filename: email.PDFFileName,
+				Content:  email.PDFFileBytes,
+			},
+		},
+	}
 
-    _, err := c.resendClient.Emails.Send(params)
-    if err != nil {
-        log.Printf("Failed to send email: %v", err)
-        if err := delivery.Reject(); err != nil {
-            log.Printf("Failed to reject delivery: %v", err)
-        }
-        return
-    }
+	_, err := c.resendClient.Emails.Send(params)
+	if err != nil {
+		log.Printf("Failed to send email: %v", err)
+		if err := delivery.Reject(); err != nil {
+			log.Printf("Failed to reject delivery: %v", err)
+		}
+		return
+	}
 
-    if err := delivery.Ack(); err != nil {
-        log.Printf("Failed to ack delivery: %v", err)
-    }
+	if err := delivery.Ack(); err != nil {
+		log.Printf("Failed to ack delivery: %v", err)
+	}
 }
+
 
 // InitEmailQueue initializes the RMQ connection and email queue
 func InitEmailQueue(redisClient *redis.Client)  error {

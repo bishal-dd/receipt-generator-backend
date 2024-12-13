@@ -30,15 +30,15 @@ func main() {
 	 if err := rmq.InitEmailQueue(queueRedis); err != nil {
 		log.Fatal(err)
 	 }
+	 
 	 httpClient := resty.New()
 
-	 dependencyResolver := resolver.InitializeResolver(cacheRedis, database,httpClient)
+	 dependencyResolver := resolver.InitializeResolver(cacheRedis, database, httpClient)
  
-	// Setting up Gin
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3001"}, // Replace with your frontend URL
+		AllowOrigins:     []string{"http://localhost:3001"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

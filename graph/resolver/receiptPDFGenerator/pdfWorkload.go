@@ -6,12 +6,17 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 	"text/template"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
 )
 
+var (
+    templateOnce sync.Once
+    cachedTemplate *template.Template
+)
 
 func (r *ReceiptPDFGeneratorResolver) getFileURL(pdf []byte, fileName string, organizationId string, userId string)( string, error){
 	presignedResp, err := r.httpClient.R().
@@ -54,33 +59,31 @@ func (r *ReceiptPDFGeneratorResolver) getFileURL(pdf []byte, fileName string, or
 }
 
 func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile) (string, []byte, error) {
-	templateFile := "templates/receiptTemplate/index.html"
-	templateContent, err := os.ReadFile(templateFile)
-	if err != nil {
-		return  "", nil, err
-	}
-	tmpl, err := template.New("receipt").Parse(string(templateContent))
-	if err != nil {
-		return  "", nil, err
-	}
-	var htmlBuffer bytes.Buffer
-	data := struct {
-		Receipt *model.Receipt
+	templateOnce.Do(func() {
+        templateFile := "templates/receiptTemplate/index.html"
+        templateContent, _ := os.ReadFile(templateFile)
+        cachedTemplate = template.Must(template.New("receipt").Parse(string(templateContent)))
+    })
+
+    var htmlBuffer bytes.Buffer
+    data := struct {
+        Receipt *model.Receipt
         Profile *model.Profile
-	}{
-		Receipt: receipt,
+    }{
+        Receipt: receipt,
         Profile: profile,
-	}
-	if err := tmpl.Execute(&htmlBuffer, data); err != nil {
-		return "", nil, err
-	}
-	resp, err := r.httpClient.R().
-		SetHeader("Content-Type", "multipart/form-data").
-		SetFileReader("files", "index.html", bytes.NewReader(htmlBuffer.Bytes())). 
-		SetFormData(map[string]string{
-			"index": "index.html", 
-		}).
-		Post(os.Getenv("GOTENBERY_URL"))
+    }
+
+    if err := cachedTemplate.Execute(&htmlBuffer, data); err != nil {
+        return "", nil, err
+    }
+
+    // Consider using a Gotenberg connection pool
+    resp, err := r.httpClient.R().
+        SetHeader("Content-Type", "multipart/form-data").
+        SetFileReader("files", "index.html", bytes.NewReader(htmlBuffer.Bytes())).
+        SetFormData(map[string]string{"index": "index.html"}).
+        Post(os.Getenv("GOTENBERY_URL"))
 
 	if err != nil {
 		return "", nil, err
