@@ -3943,9 +3943,9 @@ func (ec *executionContext) _Receipt_recipient_phone(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Receipt_recipient_phone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3955,7 +3955,7 @@ func (ec *executionContext) fieldContext_Receipt_recipient_phone(ctx context.Con
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7765,7 +7765,7 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 			it.RecipientName = data
 		case "recipient_phone":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_phone"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7862,7 +7862,7 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 			it.RecipientName = data
 		case "recipient_phone":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_phone"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8152,7 +8152,7 @@ func (ec *executionContext) unmarshalInputUpdateReceipt(ctx context.Context, obj
 			it.RecipientName = data
 		case "recipient_phone":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_phone"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -26,7 +26,7 @@ type CreateProfile struct {
 type CreateReceipt struct {
 	ReceiptName      string   `json:"receipt_name"`
 	RecipientName    string   `json:"recipient_name"`
-	RecipientPhone   int      `json:"recipient_phone"`
+	RecipientPhone   string   `json:"recipient_phone"`
 	RecipientEmail   *string  `json:"recipient_email,omitempty"`
 	RecipientAddress *string  `json:"recipient_address,omitempty"`
 	ReceiptNo        string   `json:"receipt_no"`
@@ -40,7 +40,7 @@ type CreateReceipt struct {
 type CreateReceiptPDFGenerator struct {
 	ReceiptName      string               `json:"receipt_name"`
 	RecipientName    string               `json:"recipient_name"`
-	RecipientPhone   int                  `json:"recipient_phone"`
+	RecipientPhone   string               `json:"recipient_phone"`
 	RecipientEmail   *string              `json:"recipient_email,omitempty"`
 	RecipientAddress *string              `json:"recipient_address,omitempty"`
 	ReceiptNo        string               `json:"receipt_no"`
@@ -99,7 +99,7 @@ type Receipt struct {
 	ID               string     `json:"id"`
 	ReceiptName      string     `json:"receipt_name"`
 	RecipientName    string     `json:"recipient_name"`
-	RecipientPhone   int        `json:"recipient_phone"`
+	RecipientPhone   string     `json:"recipient_phone"`
 	RecipientEmail   *string    `json:"recipient_email,omitempty"`
 	RecipientAddress *string    `json:"recipient_address,omitempty"`
 	ReceiptNo        string     `json:"receipt_no"`
@@ -157,7 +157,7 @@ type UpdateReceipt struct {
 	ID               string   `json:"id"`
 	ReceiptName      *string  `json:"receipt_name,omitempty"`
 	RecipientName    *string  `json:"recipient_name,omitempty"`
-	RecipientPhone   *int     `json:"recipient_phone,omitempty"`
+	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string  `json:"recipient_email,omitempty"`
 	RecipientAddress *string  `json:"recipient_address,omitempty"`
 	ReceiptNo        *string  `json:"receipt_no,omitempty"`

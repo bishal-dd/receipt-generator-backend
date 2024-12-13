@@ -40,8 +40,8 @@ func (r *ReceiptPDFGeneratorResolver) CreateReceiptPDFGenerator(ctx context.Cont
 	if err != nil {
 		return false, err
 	}
-	if receiptModel.RecipientPhone != 0 {
-        err = r.sendPDFToWhatsApp(fileURL,fileName, organization.Name)
+	if receiptModel.RecipientPhone != "" {
+        err = r.sendPDFToWhatsApp(fileURL,fileName, organization.Name, receiptModel.RecipientPhone)
         if err != nil {
             log.Printf("Failed to send PDF to WhatsApp: %v", err)
 			return false, fmt.Errorf("failed to send pdf to whatsapp: %v", err)

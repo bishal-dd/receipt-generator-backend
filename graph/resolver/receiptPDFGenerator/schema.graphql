@@ -1,7 +1,7 @@
 input CreateReceiptPDFGenerator {
   receipt_name: String!
   recipient_name: String!
-  recipient_phone: Int!
+  recipient_phone: String!
   recipient_email: String
   recipient_address: String
   receipt_no: String!

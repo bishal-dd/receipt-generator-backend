@@ -93,11 +93,11 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 }
 
 
-func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string,) error {
+func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string) error {
 	payload := map[string]interface{}{
 		"messaging_product": "whatsapp",
 		"recipient_type":    "individual",
-		"to": "97517959259",
+		"to": recipientPhone,
 		"type": "document",
 		"document": map[string]string{
     		"link": url,
