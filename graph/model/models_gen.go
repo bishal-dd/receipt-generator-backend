@@ -26,7 +26,7 @@ type CreateProfile struct {
 type CreateReceipt struct {
 	ReceiptName      string   `json:"receipt_name"`
 	RecipientName    string   `json:"recipient_name"`
-	RecipientPhone   string   `json:"recipient_phone"`
+	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string  `json:"recipient_email,omitempty"`
 	RecipientAddress *string  `json:"recipient_address,omitempty"`
 	ReceiptNo        string   `json:"receipt_no"`
@@ -35,21 +35,6 @@ type CreateReceipt struct {
 	UserID           string   `json:"user_id"`
 	Date             string   `json:"date"`
 	TotalAmount      *float64 `json:"total_amount,omitempty"`
-}
-
-type CreateReceiptPDFGenerator struct {
-	ReceiptName      string               `json:"receipt_name"`
-	RecipientName    string               `json:"recipient_name"`
-	RecipientPhone   string               `json:"recipient_phone"`
-	RecipientEmail   *string              `json:"recipient_email,omitempty"`
-	RecipientAddress *string              `json:"recipient_address,omitempty"`
-	ReceiptNo        string               `json:"receipt_no"`
-	PaymentMethod    string               `json:"payment_method"`
-	PaymentNote      *string              `json:"payment_note,omitempty"`
-	UserID           string               `json:"user_id"`
-	OrginazationID   string               `json:"orginazation_id"`
-	Date             string               `json:"date"`
-	Services         []*CreateBulkService `json:"Services,omitempty"`
 }
 
 type CreateService struct {
@@ -99,7 +84,7 @@ type Receipt struct {
 	ID               string     `json:"id"`
 	ReceiptName      string     `json:"receipt_name"`
 	RecipientName    string     `json:"recipient_name"`
-	RecipientPhone   string     `json:"recipient_phone"`
+	RecipientPhone   *string    `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string    `json:"recipient_email,omitempty"`
 	RecipientAddress *string    `json:"recipient_address,omitempty"`
 	ReceiptNo        string     `json:"receipt_no"`
@@ -125,6 +110,36 @@ type ReceiptConnection struct {
 type ReceiptEdge struct {
 	Cursor string   `json:"cursor"`
 	Node   *Receipt `json:"node"`
+}
+
+type SendReceiptPDFToEmail struct {
+	ReceiptName      string               `json:"receipt_name"`
+	RecipientName    string               `json:"recipient_name"`
+	RecipientPhone   *string              `json:"recipient_phone,omitempty"`
+	RecipientEmail   string               `json:"recipient_email"`
+	RecipientAddress *string              `json:"recipient_address,omitempty"`
+	ReceiptNo        string               `json:"receipt_no"`
+	PaymentMethod    string               `json:"payment_method"`
+	PaymentNote      *string              `json:"payment_note,omitempty"`
+	UserID           string               `json:"user_id"`
+	OrginazationID   string               `json:"orginazation_id"`
+	Date             string               `json:"date"`
+	Services         []*CreateBulkService `json:"Services,omitempty"`
+}
+
+type SendReceiptPDFToWhatsApp struct {
+	ReceiptName      string               `json:"receipt_name"`
+	RecipientName    string               `json:"recipient_name"`
+	RecipientPhone   string               `json:"recipient_phone"`
+	RecipientEmail   *string              `json:"recipient_email,omitempty"`
+	RecipientAddress *string              `json:"recipient_address,omitempty"`
+	ReceiptNo        string               `json:"receipt_no"`
+	PaymentMethod    string               `json:"payment_method"`
+	PaymentNote      *string              `json:"payment_note,omitempty"`
+	UserID           string               `json:"user_id"`
+	OrginazationID   string               `json:"orginazation_id"`
+	Date             string               `json:"date"`
+	Services         []*CreateBulkService `json:"Services,omitempty"`
 }
 
 type Service struct {

@@ -2,8 +2,8 @@ package receiptPDFGenerator
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
@@ -14,7 +14,7 @@ import (
 )
 
 
-func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Context, input model.CreateReceiptPDFGenerator) (bool, error) {
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Context, input model.SendReceiptPDFToWhatsApp) (bool, error) {
     // Early error checking
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
@@ -55,9 +55,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
         return false, err
     }
 
-    totalAmount, subtotal, taxAmount := calculateTotalAmount(input, profile.Tax)
-    receiptModel = inputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    r.saveReceipt(receiptModel, input)
+    totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
+    receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
+    r.saveReceipt(receiptModel, input.Services)
 
 
     // Parallel PDF generation and storage upload
@@ -83,19 +83,20 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
     }
 
     // Optional: Async WhatsApp message
-    if receiptModel.RecipientPhone != "" {
-        go func() {
-            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, receiptModel.RecipientPhone)
+    if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone)
             if err != nil {
-                log.Printf("Failed to send PDF to WhatsApp: %v", err)
+                return false, err
             }
-        }()
+    } else {
+        return false, errors.New("recipient phone is empty")
     }
+
 
     return true, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context, input model.CreateReceiptPDFGenerator) (bool, error) {
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error) {
     // Early error checking
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
@@ -122,9 +123,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
         return false, err
     }
 
-    totalAmount, subtotal, taxAmount := calculateTotalAmount(input, profile.Tax)
-    receiptModel = inputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-	r.saveReceipt(receiptModel, input)
+    totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
+    receiptModel = emailInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
+	r.saveReceipt(receiptModel, input.Services)
 
     fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
 	if err != nil {
@@ -133,10 +134,10 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
 			return false, err
 		}
-    if receiptModel.RecipientPhone != "" {
+    if receiptModel.RecipientEmail != nil && *receiptModel.RecipientEmail != "" {
 			err := emails.SendEmailWithPDF(
 				*receiptModel.RecipientEmail,
-				"Receipt ",
+				"Receipt",
 				"templates/emails/receipt.html",
 				map[string]interface{}{
 					"OrganizationName": currentOrganization.Name,
@@ -146,9 +147,10 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 				pdfFile,
 			)
 			if err != nil {
-				log.Printf("Failed to send PDF to Email: %v", err)
+                return false, err
 			}
-       
+    } else {
+        return false, errors.New("recipient email is empty")
     }
 
     return true, nil

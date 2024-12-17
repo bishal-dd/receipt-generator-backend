@@ -1,8 +1,23 @@
-input CreateReceiptPDFGenerator {
+input SendReceiptPDFToWhatsApp {
   receipt_name: String!
   recipient_name: String!
   recipient_phone: String!
   recipient_email: String
+  recipient_address: String
+  receipt_no: String!
+  payment_method: String!
+  payment_note: String
+  user_id: ID!
+  orginazation_id: ID!
+  date: Date!
+  Services: [CreateBulkService!]
+}
+
+input SendReceiptPDFToEmail {
+  receipt_name: String!
+  recipient_name: String!
+  recipient_phone: String
+  recipient_email: String!
   recipient_address: String
   receipt_no: String!
   payment_method: String!

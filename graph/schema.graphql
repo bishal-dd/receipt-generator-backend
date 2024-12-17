@@ -21,8 +21,8 @@ type Mutation {
   createService(input: CreateService!): Service!
   updateService(input: UpdateService!): Service!
   deleteService(id: ID!): Boolean!
-  sendReceiptPDFToWhatsApp(input: CreateReceiptPDFGenerator!): Boolean!
-  sendReceiptPDFToEmail(input: CreateReceiptPDFGenerator!): Boolean!
+  sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
+  sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
 }
 
 type PageInfo {

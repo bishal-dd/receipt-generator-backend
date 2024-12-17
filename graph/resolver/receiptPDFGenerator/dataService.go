@@ -16,7 +16,7 @@ func (r *ReceiptPDFGeneratorResolver) GetProfileByUserID(userId string) (*model.
 	return profile, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, input model.CreateReceiptPDFGenerator)error{
+func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, services []*model.CreateBulkService)error{
 	tx := r.db.Begin()
     if tx.Error != nil {
         return tx.Error
@@ -34,7 +34,7 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, i
 	}
 	receiptModel.Date = parsedDate.Format("2 January 2006")
     // Create Services
-    for _, serviceInput := range input.Services {
+    for _, serviceInput := range services {
         serviceModel := &model.Service{
             ID:         ids.UUID(),
             ReceiptID:  receiptModel.ID,

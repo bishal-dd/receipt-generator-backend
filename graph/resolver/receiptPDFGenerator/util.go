@@ -9,9 +9,9 @@ import (
 	"github.com/clerk/clerk-sdk-go/v2"
 )
 
-func calculateTotalAmount(input model.CreateReceiptPDFGenerator, tax float64) (float64, float64, float64) {
+func calculateTotalAmount(services []*model.CreateBulkService, tax float64) (float64, float64, float64) {
 	subtotal := 0.0
-    for _, serviceInput := range input.Services {
+    for _, serviceInput := range services {
 		subtotal += serviceInput.Amount
     }
 
@@ -38,7 +38,7 @@ func updateProfileImages(profile *model.Profile, organization *clerk.Organizatio
 	return nil
 }
 
-func inputToReceiptModel(input model.CreateReceiptPDFGenerator, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
+func emailInputToReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
 	receiptInput := input
 
 	return &model.Receipt{
@@ -47,6 +47,29 @@ func inputToReceiptModel(input model.CreateReceiptPDFGenerator, userId string, t
         CreatedAt: time.Now().Format(time.RFC3339),
 		ReceiptName: receiptInput.ReceiptName,
 		RecipientPhone: receiptInput.RecipientPhone,
+		RecipientName: receiptInput.RecipientName,
+		RecipientEmail: &receiptInput.RecipientEmail,
+		RecipientAddress: receiptInput.RecipientAddress,
+		ReceiptNo: receiptInput.ReceiptNo,
+		Date: receiptInput.Date,
+		PaymentMethod: receiptInput.PaymentMethod,
+		PaymentNote: receiptInput.PaymentNote,
+		TotalAmount: &totalAmount,
+		SubTotalAmount: &subtotal,
+		TaxAmount: &taxAmount,
+		Services:  make([]*model.Service, 0),
+	}
+}
+
+func whatsAppInputToReceiptModel(input model.SendReceiptPDFToWhatsApp, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
+	receiptInput := input
+
+	return &model.Receipt{
+		ID:        ids.UUID(),
+        UserID:    userId,
+        CreatedAt: time.Now().Format(time.RFC3339),
+		ReceiptName: receiptInput.ReceiptName,
+		RecipientPhone: &receiptInput.RecipientPhone,
 		RecipientName: receiptInput.RecipientName,
 		RecipientEmail: receiptInput.RecipientEmail,
 		RecipientAddress: receiptInput.RecipientAddress,
@@ -60,4 +83,5 @@ func inputToReceiptModel(input model.CreateReceiptPDFGenerator, userId string, t
 		Services:  make([]*model.Service, 0),
 	}
 }
+
 

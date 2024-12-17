@@ -56,8 +56,8 @@ type ComplexityRoot struct {
 		DeleteReceipt            func(childComplexity int, id string) int
 		DeleteService            func(childComplexity int, id string) int
 		DeleteUser               func(childComplexity int, id string) int
-		SendReceiptPDFToEmail    func(childComplexity int, input model.CreateReceiptPDFGenerator) int
-		SendReceiptPDFToWhatsApp func(childComplexity int, input model.CreateReceiptPDFGenerator) int
+		SendReceiptPDFToEmail    func(childComplexity int, input model.SendReceiptPDFToEmail) int
+		SendReceiptPDFToWhatsApp func(childComplexity int, input model.SendReceiptPDFToWhatsApp) int
 		UpdateProfile            func(childComplexity int, input model.UpdateProfile) int
 		UpdateReceipt            func(childComplexity int, input model.UpdateReceipt) int
 		UpdateService            func(childComplexity int, input model.UpdateService) int
@@ -177,8 +177,8 @@ type MutationResolver interface {
 	CreateService(ctx context.Context, input model.CreateService) (*model.Service, error)
 	UpdateService(ctx context.Context, input model.UpdateService) (*model.Service, error)
 	DeleteService(ctx context.Context, id string) (bool, error)
-	SendReceiptPDFToWhatsApp(ctx context.Context, input model.CreateReceiptPDFGenerator) (bool, error)
-	SendReceiptPDFToEmail(ctx context.Context, input model.CreateReceiptPDFGenerator) (bool, error)
+	SendReceiptPDFToWhatsApp(ctx context.Context, input model.SendReceiptPDFToWhatsApp) (bool, error)
+	SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, first *int, after *string) (*model.UserConnection, error)
@@ -316,7 +316,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SendReceiptPDFToEmail(childComplexity, args["input"].(model.CreateReceiptPDFGenerator)), true
+		return e.complexity.Mutation.SendReceiptPDFToEmail(childComplexity, args["input"].(model.SendReceiptPDFToEmail)), true
 
 	case "Mutation.sendReceiptPDFToWhatsApp":
 		if e.complexity.Mutation.SendReceiptPDFToWhatsApp == nil {
@@ -328,7 +328,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SendReceiptPDFToWhatsApp(childComplexity, args["input"].(model.CreateReceiptPDFGenerator)), true
+		return e.complexity.Mutation.SendReceiptPDFToWhatsApp(childComplexity, args["input"].(model.SendReceiptPDFToWhatsApp)), true
 
 	case "Mutation.updateProfile":
 		if e.complexity.Mutation.UpdateProfile == nil {
@@ -914,9 +914,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateBulkService,
 		ec.unmarshalInputCreateProfile,
 		ec.unmarshalInputCreateReceipt,
-		ec.unmarshalInputCreateReceiptPDFGenerator,
 		ec.unmarshalInputCreateService,
 		ec.unmarshalInputCreateUser,
+		ec.unmarshalInputSendReceiptPDFToEmail,
+		ec.unmarshalInputSendReceiptPDFToWhatsApp,
 		ec.unmarshalInputUpdateProfile,
 		ec.unmarshalInputUpdateReceipt,
 		ec.unmarshalInputUpdateService,
@@ -1164,10 +1165,10 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_sendReceiptPDFToEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CreateReceiptPDFGenerator
+	var arg0 model.SendReceiptPDFToEmail
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateReceiptPDFGenerator2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateReceiptPDFGenerator(ctx, tmp)
+		arg0, err = ec.unmarshalNSendReceiptPDFToEmail2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSendReceiptPDFToEmail(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1179,10 +1180,10 @@ func (ec *executionContext) field_Mutation_sendReceiptPDFToEmail_args(ctx contex
 func (ec *executionContext) field_Mutation_sendReceiptPDFToWhatsApp_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CreateReceiptPDFGenerator
+	var arg0 model.SendReceiptPDFToWhatsApp
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateReceiptPDFGenerator2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateReceiptPDFGenerator(ctx, tmp)
+		arg0, err = ec.unmarshalNSendReceiptPDFToWhatsApp2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSendReceiptPDFToWhatsApp(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2242,7 +2243,7 @@ func (ec *executionContext) _Mutation_sendReceiptPDFToWhatsApp(ctx context.Conte
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SendReceiptPDFToWhatsApp(rctx, fc.Args["input"].(model.CreateReceiptPDFGenerator))
+		return ec.resolvers.Mutation().SendReceiptPDFToWhatsApp(rctx, fc.Args["input"].(model.SendReceiptPDFToWhatsApp))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2297,7 +2298,7 @@ func (ec *executionContext) _Mutation_sendReceiptPDFToEmail(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SendReceiptPDFToEmail(rctx, fc.Args["input"].(model.CreateReceiptPDFGenerator))
+		return ec.resolvers.Mutation().SendReceiptPDFToEmail(rctx, fc.Args["input"].(model.SendReceiptPDFToEmail))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4022,14 +4023,11 @@ func (ec *executionContext) _Receipt_recipient_phone(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Receipt_recipient_phone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7849,7 +7847,7 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 			it.RecipientName = data
 		case "recipient_phone":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_phone"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7916,8 +7914,194 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.Context, obj interface{}) (model.CreateReceiptPDFGenerator, error) {
-	var it model.CreateReceiptPDFGenerator
+func (ec *executionContext) unmarshalInputCreateService(ctx context.Context, obj interface{}) (model.CreateService, error) {
+	var it model.CreateService
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"description", "rate", "quantity", "amount", "receipt_id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "rate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rate"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rate = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "amount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Amount = data
+		case "receipt_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_id"))
+			data, err := ec.unmarshalNUUID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateUser(ctx context.Context, obj interface{}) (model.CreateUser, error) {
+	var it model.CreateUser
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSendReceiptPDFToEmail(ctx context.Context, obj interface{}) (model.SendReceiptPDFToEmail, error) {
+	var it model.SendReceiptPDFToEmail
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "orginazation_id", "date", "Services"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "receipt_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptName = data
+		case "recipient_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RecipientName = data
+		case "recipient_phone":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_phone"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RecipientPhone = data
+		case "recipient_email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RecipientEmail = data
+		case "recipient_address":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_address"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RecipientAddress = data
+		case "receipt_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_no"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiptNo = data
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "payment_note":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentNote = data
+		case "user_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "orginazation_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazation_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrginazationID = data
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			data, err := ec.unmarshalNDate2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Date = data
+		case "Services":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Services"))
+			data, err := ec.unmarshalOCreateBulkService2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateBulkServiceᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Services = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSendReceiptPDFToWhatsApp(ctx context.Context, obj interface{}) (model.SendReceiptPDFToWhatsApp, error) {
+	var it model.SendReceiptPDFToWhatsApp
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -8014,88 +8198,6 @@ func (ec *executionContext) unmarshalInputCreateReceiptPDFGenerator(ctx context.
 				return it, err
 			}
 			it.Services = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateService(ctx context.Context, obj interface{}) (model.CreateService, error) {
-	var it model.CreateService
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"description", "rate", "quantity", "amount", "receipt_id"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "rate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rate"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Rate = data
-		case "quantity":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Quantity = data
-		case "amount":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Amount = data
-		case "receipt_id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_id"))
-			data, err := ec.unmarshalNUUID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ReceiptID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateUser(ctx context.Context, obj interface{}) (model.CreateUser, error) {
-	var it model.CreateUser
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
 		}
 	}
 
@@ -8868,9 +8970,6 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "recipient_phone":
 			out.Values[i] = ec._Receipt_recipient_phone(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "recipient_email":
 			out.Values[i] = ec._Receipt_recipient_email(ctx, field, obj)
 		case "recipient_address":
@@ -9612,11 +9711,6 @@ func (ec *executionContext) unmarshalNCreateReceipt2githubᚗcomᚋbishalᚑdd�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateReceiptPDFGenerator2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateReceiptPDFGenerator(ctx context.Context, v interface{}) (model.CreateReceiptPDFGenerator, error) {
-	res, err := ec.unmarshalInputCreateReceiptPDFGenerator(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNCreateService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateService(ctx context.Context, v interface{}) (model.CreateService, error) {
 	res, err := ec.unmarshalInputCreateService(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9806,6 +9900,16 @@ func (ec *executionContext) marshalNReceiptEdge2ᚖgithubᚗcomᚋbishalᚑddᚋ
 		return graphql.Null
 	}
 	return ec._ReceiptEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSendReceiptPDFToEmail2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSendReceiptPDFToEmail(ctx context.Context, v interface{}) (model.SendReceiptPDFToEmail, error) {
+	res, err := ec.unmarshalInputSendReceiptPDFToEmail(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNSendReceiptPDFToWhatsApp2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSendReceiptPDFToWhatsApp(ctx context.Context, v interface{}) (model.SendReceiptPDFToWhatsApp, error) {
+	res, err := ec.unmarshalInputSendReceiptPDFToWhatsApp(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐService(ctx context.Context, sel ast.SelectionSet, v model.Service) graphql.Marshaler {
