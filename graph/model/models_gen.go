@@ -10,17 +10,18 @@ type CreateBulkService struct {
 }
 
 type CreateProfile struct {
-	CompanyName    string   `json:"company_name"`
-	LogoImage      *string  `json:"logo_image,omitempty"`
-	PhoneNo        int      `json:"phone_no"`
-	Email          *string  `json:"email,omitempty"`
-	Address        *string  `json:"address,omitempty"`
-	Currency       *string  `json:"currency,omitempty"`
-	Tax            *float64 `json:"tax,omitempty"`
-	City           *string  `json:"city,omitempty"`
-	Title          *string  `json:"title,omitempty"`
-	SignatureImage *string  `json:"signature_image,omitempty"`
-	UserID         string   `json:"user_id"`
+	CompanyName            string   `json:"company_name"`
+	LogoImage              *string  `json:"logo_image,omitempty"`
+	PhoneNo                int      `json:"phone_no"`
+	Email                  *string  `json:"email,omitempty"`
+	Address                *string  `json:"address,omitempty"`
+	Currency               *string  `json:"currency,omitempty"`
+	Tax                    *float64 `json:"tax,omitempty"`
+	PhoneNumberCountryCode string   `json:"phone_number_country_code"`
+	City                   *string  `json:"city,omitempty"`
+	Title                  *string  `json:"title,omitempty"`
+	SignatureImage         *string  `json:"signature_image,omitempty"`
+	UserID                 string   `json:"user_id"`
 }
 
 type CreateReceipt struct {
@@ -60,21 +61,22 @@ type PageInfo struct {
 }
 
 type Profile struct {
-	ID             string  `json:"id"`
-	CompanyName    string  `json:"company_name"`
-	LogoImage      *string `json:"logo_image,omitempty"`
-	PhoneNo        int     `json:"phone_no"`
-	Email          *string `json:"email,omitempty"`
-	Address        *string `json:"address,omitempty"`
-	City           *string `json:"city,omitempty"`
-	Title          *string `json:"title,omitempty"`
-	SignatureImage *string `json:"signature_image,omitempty"`
-	Currency       string  `json:"currency"`
-	Tax            float64 `json:"tax"`
-	UserID         string  `json:"user_id"`
-	CreatedAt      string  `json:"created_at"`
-	UpdatedAt      *string `json:"updated_at,omitempty"`
-	DeletedAt      *string `json:"deleted_at,omitempty"`
+	ID                     string  `json:"id"`
+	CompanyName            string  `json:"company_name"`
+	LogoImage              *string `json:"logo_image,omitempty"`
+	PhoneNo                int     `json:"phone_no"`
+	Email                  *string `json:"email,omitempty"`
+	Address                *string `json:"address,omitempty"`
+	City                   *string `json:"city,omitempty"`
+	Title                  *string `json:"title,omitempty"`
+	SignatureImage         *string `json:"signature_image,omitempty"`
+	Currency               string  `json:"currency"`
+	Tax                    float64 `json:"tax"`
+	PhoneNumberCountryCode string  `json:"phone_number_country_code"`
+	UserID                 string  `json:"user_id"`
+	CreatedAt              string  `json:"created_at"`
+	UpdatedAt              *string `json:"updated_at,omitempty"`
+	DeletedAt              *string `json:"deleted_at,omitempty"`
 }
 
 type Query struct {
@@ -155,17 +157,18 @@ type Service struct {
 }
 
 type UpdateProfile struct {
-	ID             string   `json:"id"`
-	CompanyName    *string  `json:"company_name,omitempty"`
-	LogoImage      *string  `json:"logo_image,omitempty"`
-	PhoneNo        *int     `json:"phone_no,omitempty"`
-	Email          *string  `json:"email,omitempty"`
-	Address        *string  `json:"address,omitempty"`
-	Currency       *string  `json:"currency,omitempty"`
-	Tax            *float64 `json:"tax,omitempty"`
-	City           *string  `json:"city,omitempty"`
-	Title          *string  `json:"title,omitempty"`
-	SignatureImage *string  `json:"signature_image,omitempty"`
+	ID                     string   `json:"id"`
+	CompanyName            *string  `json:"company_name,omitempty"`
+	LogoImage              *string  `json:"logo_image,omitempty"`
+	PhoneNo                *int     `json:"phone_no,omitempty"`
+	Email                  *string  `json:"email,omitempty"`
+	Address                *string  `json:"address,omitempty"`
+	Currency               *string  `json:"currency,omitempty"`
+	PhoneNumberCountryCode *string  `json:"phone_number_country_code,omitempty"`
+	Tax                    *float64 `json:"tax,omitempty"`
+	City                   *string  `json:"city,omitempty"`
+	Title                  *string  `json:"title,omitempty"`
+	SignatureImage         *string  `json:"signature_image,omitempty"`
 }
 
 type UpdateReceipt struct {

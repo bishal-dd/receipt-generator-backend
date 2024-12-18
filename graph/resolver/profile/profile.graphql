@@ -10,6 +10,7 @@ type Profile {
   signature_image: String
   currency: String!
   tax: Float!
+  phone_number_country_code: String!
   user_id: ID!
   created_at: DateTime!
   updated_at: DateTime
@@ -24,6 +25,7 @@ input CreateProfile {
   address: String
   currency: String
   tax: Float
+  phone_number_country_code: String!
   city: String
   title: String
   signature_image: String
@@ -38,6 +40,7 @@ input UpdateProfile {
   email: String
   address: String
   currency: String
+  phone_number_country_code: String
   tax: Float
   city: String
   title: String

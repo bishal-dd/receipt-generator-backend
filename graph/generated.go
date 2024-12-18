@@ -71,21 +71,22 @@ type ComplexityRoot struct {
 	}
 
 	Profile struct {
-		Address        func(childComplexity int) int
-		City           func(childComplexity int) int
-		CompanyName    func(childComplexity int) int
-		CreatedAt      func(childComplexity int) int
-		Currency       func(childComplexity int) int
-		DeletedAt      func(childComplexity int) int
-		Email          func(childComplexity int) int
-		ID             func(childComplexity int) int
-		LogoImage      func(childComplexity int) int
-		PhoneNo        func(childComplexity int) int
-		SignatureImage func(childComplexity int) int
-		Tax            func(childComplexity int) int
-		Title          func(childComplexity int) int
-		UpdatedAt      func(childComplexity int) int
-		UserID         func(childComplexity int) int
+		Address                func(childComplexity int) int
+		City                   func(childComplexity int) int
+		CompanyName            func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		Currency               func(childComplexity int) int
+		DeletedAt              func(childComplexity int) int
+		Email                  func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		LogoImage              func(childComplexity int) int
+		PhoneNo                func(childComplexity int) int
+		PhoneNumberCountryCode func(childComplexity int) int
+		SignatureImage         func(childComplexity int) int
+		Tax                    func(childComplexity int) int
+		Title                  func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UserID                 func(childComplexity int) int
 	}
 
 	Query struct {
@@ -463,6 +464,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Profile.PhoneNo(childComplexity), true
+
+	case "Profile.phone_number_country_code":
+		if e.complexity.Profile.PhoneNumberCountryCode == nil {
+			break
+		}
+
+		return e.complexity.Profile.PhoneNumberCountryCode(childComplexity), true
 
 	case "Profile.signature_image":
 		if e.complexity.Profile.SignatureImage == nil {
@@ -1856,6 +1864,8 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "phone_number_country_code":
+				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -1943,6 +1953,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProfile(ctx context.Cont
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "phone_number_country_code":
+				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -2975,6 +2987,50 @@ func (ec *executionContext) fieldContext_Profile_tax(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Profile_phone_number_country_code(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Profile_phone_number_country_code(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PhoneNumberCountryCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Profile_phone_number_country_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Profile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Profile_user_id(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Profile_user_id(ctx, field)
 	if err != nil {
@@ -3487,6 +3543,8 @@ func (ec *executionContext) fieldContext_Query_profileByUserId(ctx context.Conte
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "phone_number_country_code":
+				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -3571,6 +3629,8 @@ func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, fiel
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "phone_number_country_code":
+				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -5632,6 +5692,8 @@ func (ec *executionContext) fieldContext_User_Profile(ctx context.Context, field
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "phone_number_country_code":
+				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Profile_user_id(ctx, field)
 			case "created_at":
@@ -7727,7 +7789,7 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "city", "title", "signature_image", "user_id"}
+	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "phone_number_country_code", "city", "title", "signature_image", "user_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7783,6 +7845,13 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.Tax = data
+		case "phone_number_country_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_number_country_code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PhoneNumberCountryCode = data
 		case "city":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -8211,7 +8280,7 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "city", "title", "signature_image"}
+	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "currency", "phone_number_country_code", "tax", "city", "title", "signature_image"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8267,6 +8336,13 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.Currency = data
+		case "phone_number_country_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_number_country_code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PhoneNumberCountryCode = data
 		case "tax":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
 			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -8694,6 +8770,11 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "tax":
 			out.Values[i] = ec._Profile_tax(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "phone_number_country_code":
+			out.Values[i] = ec._Profile_phone_number_country_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
