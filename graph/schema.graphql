@@ -23,6 +23,7 @@ type Mutation {
   deleteService(id: ID!): Boolean!
   sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
   sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
+  downloadReceiptPDF(input: DownloadPDF!): String!
 }
 
 type PageInfo {

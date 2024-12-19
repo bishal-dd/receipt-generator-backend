@@ -50,6 +50,21 @@ type CreateUser struct {
 	ID string `json:"id"`
 }
 
+type DownloadPDF struct {
+	ReceiptName      string               `json:"receipt_name"`
+	RecipientName    string               `json:"recipient_name"`
+	RecipientPhone   *string              `json:"recipient_phone,omitempty"`
+	RecipientEmail   *string              `json:"recipient_email,omitempty"`
+	RecipientAddress *string              `json:"recipient_address,omitempty"`
+	ReceiptNo        string               `json:"receipt_no"`
+	PaymentMethod    string               `json:"payment_method"`
+	PaymentNote      *string              `json:"payment_note,omitempty"`
+	UserID           string               `json:"user_id"`
+	OrginazationID   string               `json:"orginazation_id"`
+	Date             string               `json:"date"`
+	Services         []*CreateBulkService `json:"Services,omitempty"`
+}
+
 type Mutation struct {
 }
 
