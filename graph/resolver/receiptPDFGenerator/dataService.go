@@ -6,6 +6,7 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
+	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 )
 
 func (r *ReceiptPDFGeneratorResolver) GetProfileByUserID(userId string) (*model.Profile, error) {
@@ -24,6 +25,11 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
 
     // Create Receipt
     if err := tx.Create(receiptModel).Error; err != nil {
+        tx.Rollback()
+        return  err
+    }
+    if err := search.AddReceiptDocument(r.httpClient, *receiptModel); err != nil {
+        fmt.Println("Error adding receipt document to search: ", err)
         tx.Rollback()
         return  err
     }

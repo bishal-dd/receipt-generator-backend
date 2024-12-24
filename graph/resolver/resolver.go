@@ -26,7 +26,7 @@ type Resolver struct {
 func InitializeResolver(redis *redis.Client, db *gorm.DB, httpClient *resty.Client) *Resolver {
 	return &Resolver{
 		UserResolver:    user.InitializeUserResolver(redis, db),
-		ReceiptResolver: receipt.InitializeReceiptResolver(redis, db),
+		ReceiptResolver: receipt.InitializeReceiptResolver(redis, db, httpClient),
 		ProfileResolver: profile.InitializeProfileResolver(redis, db),
 		ServiceResolver: service.InitializeServiceResolver(redis, db),
 		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(redis, db, httpClient ),

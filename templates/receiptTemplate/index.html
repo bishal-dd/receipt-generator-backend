@@ -139,14 +139,15 @@
       <div class="totals">
         <p>Subtotal: {{.Profile.Currency}} {{.Receipt.SubTotalAmount}}</p>
         <p>
-          Tax ({{.Profile.Tax}}%): {{.Profile.Currency}}{{.Receipt.TaxAmount}}
+          Tax ({{.Profile.Tax}}%): {{.Profile.Currency}} {{.Receipt.TaxAmount}}
         </p>
         <p>
-          <strong>Total: {{.Profile.Currency}}{{.Receipt.TotalAmount}}</strong>
+          <strong>Total: {{.Profile.Currency}} {{.Receipt.TotalAmount}}</strong>
         </p>
       </div>
       <div class="logo">
         <img src="{{.Profile.SignatureImage}}" alt="Company Stamp" />
+        <h3>{{.Profile.Title}}</h3>
       </div>
     </div>
   </body>

@@ -6,12 +6,10 @@ package receipt
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
-	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 
@@ -25,28 +23,14 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
 	if err != nil {
 		return nil, err 
 	} 
-
     totalReceipts, err := r.CountTotalReceipts()
     if err != nil {
         return nil, err
     }
-
-    receipts, err := r.GetCachedReceiptPages(ctx, userId, offset, limit)
+    receipts, err := r.FetchReceiptsFromDB(ctx, offset, limit, userId)
     if err != nil {
         return nil, err
     }
-
-    if receipts == nil {
-        receipts, err = r.FetchReceiptsFromDB(ctx, offset, limit, userId)
-        if err != nil {
-            return nil, err
-        }
-
-        if err = redisUtil.CachePages(r.redis, ReceiptsPageGroupKey, ctx, ReceiptsKey,receipts, offset, limit,userId ); err != nil {
-            return nil, err
-        }
-    }
-    
 
     connection := paginationUtil.CreateConnection(receipts, totalReceipts, offset)
 
@@ -59,20 +43,10 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
 
 
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	 receipt, err := r.GetCachedReceipt(ctx, id)
-	 if receipt == nil {
-		newReceipt, err := r.GetReceiptFromDB(id)
-        if err != nil {
-			return nil, err
-		}
+	newReceipt, err := r.GetReceiptFromDB(id)
+    if err != nil {
+		return nil, err
+	}
         
-		if err = redisUtil.CacheResult(r.redis, ctx, fmt.Sprintf("%s:%s",ReceiptKey,id ), newReceipt, 10); err != nil {
-			return nil, err
-		}
-        return newReceipt, nil
-    } else if err != nil {
-        return nil, err
-    }
-	
-	 return receipt, nil
+    return newReceipt, nil
 }

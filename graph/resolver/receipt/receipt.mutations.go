@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/database"
-	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
+	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 )
 
 
 func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateReceipt) (*model.Receipt, error) {
+   
     inputData := database.CreateFields[model.Receipt](input);
     if err := r.db.Create(inputData).Error; err != nil {
         return nil, err
     }
+   
     return inputData, nil
 }
 
@@ -24,9 +25,6 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
     }
     
     if err := r.db.Model(receipt).Updates(input).Error; err != nil {
-        return nil, err
-    }
-    if err := redisUtil.DeleteCacheItem(r.redis, ctx, ReceiptKey, input.ID); err != nil {
         return nil, err
     }
     newReceipt, err := r.GetReceiptFromDB(input.ID)
@@ -39,17 +37,11 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
 
 
 func (r *ReceiptResolver) DeleteReceipt(ctx context.Context, id string) (bool, error) {
-    userId, err := contextUtil.UserIdFromContext(ctx)
-    if err != nil {
-        return false, err
-    }
+   
     if err := r.DeleteReceiptFromDB(ctx, id); err != nil {
         return false, err
     }
-    if err := redisUtil.DeleteCacheItem(r.redis, ctx, ReceiptKey, id); err != nil {
-        return false, err
-    }
-    if err := redisUtil.DeleteCachePages(r.redis, ctx, ReceiptsPageGroupKey, userId); err != nil {
+    if err := search.DeleteReceiptDocument(r.httpClient, id); err != nil {
         return false, err
     }
 
