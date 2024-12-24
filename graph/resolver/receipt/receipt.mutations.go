@@ -15,7 +15,9 @@ func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateR
     if err := r.db.Create(inputData).Error; err != nil {
         return nil, err
     }
-   
+    if err := search.AddReceiptDocument(r.httpClient, *inputData); err != nil {
+        return nil, err
+    }
     return inputData, nil
 }
 
@@ -25,6 +27,9 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
     }
     
     if err := r.db.Model(receipt).Updates(input).Error; err != nil {
+        return nil, err
+    }
+    if err := search.UpdateReceiptDocument(r.httpClient, input); err != nil {
         return nil, err
     }
     newReceipt, err := r.GetReceiptFromDB(input.ID)
