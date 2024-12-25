@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/go-resty/resty/v2"
@@ -22,6 +23,10 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 	paymentNote := ensureString(receipt.PaymentNote)
 	subTotalAmount := ensureFloat(receipt.SubTotalAmount)
 	taxAmount := ensureFloat(receipt.TaxAmount)
+	year, err := getYearFromDate(receipt.Date)
+	if err != nil {
+		return err
+	}
 	resp, err := httpClient.R().
 	SetHeader("Content-Type", "application/json").
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
@@ -39,6 +44,7 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 		"payment_note": 	paymentNote,
 		"sub_total_amount": 	subTotalAmount,
 		"tax_amount": 	taxAmount,
+		"year": year,
 		"created_at": 	receipt.CreatedAt,
 		"updated_at": 	receipt.UpdatedAt,
 		"deleted_at": 	receipt.DeletedAt,
@@ -68,4 +74,13 @@ func ensureFloat(value *float64) float64 {
 		return 0
 	}
 	return *value
+}
+
+// Helper function to get the year from a date in ISO format
+func getYearFromDate(date string) (int, error) {
+	parsedDate, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse date: %v", err)
+	}
+	return parsedDate.Year(), nil
 }

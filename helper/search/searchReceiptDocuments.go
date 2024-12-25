@@ -16,7 +16,7 @@ func SearchReceiptDocuments (httpClient *resty.Client, userId string, page int )
 	}
 	resp, err := httpClient.R().
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
-	Get(fmt.Sprintf("%s/collections/receipts/documents/search?q=%s&query_by=user_id&page=%d&per_page=10&filter_by=date:2024", typeSenseURL, userId, page ) )
+	Get(fmt.Sprintf("%s/collections/receipts/documents/search?q=%s&query_by=user_id&page=%d&per_page=10&filter_by=year:=2024", typeSenseURL, userId, page ) )
 	if err != nil {
 		return nil,err
 	}
