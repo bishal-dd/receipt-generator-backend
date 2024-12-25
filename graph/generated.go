@@ -95,6 +95,7 @@ type ComplexityRoot struct {
 		ProfileByUserID    func(childComplexity int, userID string) int
 		Receipt            func(childComplexity int, id string) int
 		Receipts           func(childComplexity int, first *int, after *string) int
+		SearchReceipts     func(childComplexity int, page int) int
 		Service            func(childComplexity int, id string) int
 		ServiceByReceiptID func(childComplexity int, receiptID string) int
 		User               func(childComplexity int, id string) int
@@ -131,6 +132,12 @@ type ComplexityRoot struct {
 	ReceiptEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	SearchReceipt struct {
+		FoundCount func(childComplexity int) int
+		Receipts   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	Service struct {
@@ -192,6 +199,7 @@ type QueryResolver interface {
 	Profile(ctx context.Context, id string) (*model.Profile, error)
 	ServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.Service, error)
 	Service(ctx context.Context, id string) (*model.Service, error)
+	SearchReceipts(ctx context.Context, page int) (*model.SearchReceipt, error)
 }
 
 type executableSchema struct {
@@ -569,6 +577,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Receipts(childComplexity, args["first"].(*int), args["after"].(*string)), true
 
+	case "Query.searchReceipts":
+		if e.complexity.Query.SearchReceipts == nil {
+			break
+		}
+
+		args, err := ec.field_Query_searchReceipts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SearchReceipts(childComplexity, args["page"].(int)), true
+
 	case "Query.service":
 		if e.complexity.Query.Service == nil {
 			break
@@ -777,6 +797,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ReceiptEdge.Node(childComplexity), true
+
+	case "SearchReceipt.foundCount":
+		if e.complexity.SearchReceipt.FoundCount == nil {
+			break
+		}
+
+		return e.complexity.SearchReceipt.FoundCount(childComplexity), true
+
+	case "SearchReceipt.receipts":
+		if e.complexity.SearchReceipt.Receipts == nil {
+			break
+		}
+
+		return e.complexity.SearchReceipt.Receipts(childComplexity), true
+
+	case "SearchReceipt.totalCount":
+		if e.complexity.SearchReceipt.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.SearchReceipt.TotalCount(childComplexity), true
 
 	case "Service.amount":
 		if e.complexity.Service.Amount == nil {
@@ -1356,6 +1397,21 @@ func (ec *executionContext) field_Query_receipts_args(ctx context.Context, rawAr
 		}
 	}
 	args["after"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_searchReceipts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
 	return args, nil
 }
 
@@ -3886,6 +3942,69 @@ func (ec *executionContext) fieldContext_Query_service(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_searchReceipts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_searchReceipts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SearchReceipts(rctx, fc.Args["page"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SearchReceipt)
+	fc.Result = res
+	return ec.marshalNSearchReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSearchReceipt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_searchReceipts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "receipts":
+				return ec.fieldContext_SearchReceipt_receipts(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_SearchReceipt_totalCount(ctx, field)
+			case "foundCount":
+				return ec.fieldContext_SearchReceipt_foundCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SearchReceipt", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_searchReceipts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -5066,6 +5185,176 @@ func (ec *executionContext) fieldContext_ReceiptEdge_node(ctx context.Context, f
 				return ec.fieldContext_Receipt_Services(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Receipt", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchReceipt_receipts(ctx context.Context, field graphql.CollectedField, obj *model.SearchReceipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchReceipt_receipts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Receipts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Receipt)
+	fc.Result = res
+	return ec.marshalNReceipt2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceiptᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchReceipt_receipts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchReceipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Receipt_id(ctx, field)
+			case "receipt_name":
+				return ec.fieldContext_Receipt_receipt_name(ctx, field)
+			case "recipient_name":
+				return ec.fieldContext_Receipt_recipient_name(ctx, field)
+			case "recipient_phone":
+				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
+			case "recipient_email":
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
+			case "recipient_address":
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
+			case "receipt_no":
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Receipt_user_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Receipt_date(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Receipt_total_amount(ctx, field)
+			case "sub_total_amount":
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
+			case "tax_amount":
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
+			case "payment_note":
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Receipt_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Receipt_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Receipt_deleted_at(ctx, field)
+			case "Services":
+				return ec.fieldContext_Receipt_Services(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Receipt", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchReceipt_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.SearchReceipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchReceipt_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchReceipt_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchReceipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchReceipt_foundCount(ctx context.Context, field graphql.CollectedField, obj *model.SearchReceipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchReceipt_foundCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FoundCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchReceipt_foundCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchReceipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9188,6 +9477,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "searchReceipts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_searchReceipts(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -9380,6 +9691,55 @@ func (ec *executionContext) _ReceiptEdge(ctx context.Context, sel ast.SelectionS
 			}
 		case "node":
 			out.Values[i] = ec._ReceiptEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var searchReceiptImplementors = []string{"SearchReceipt"}
+
+func (ec *executionContext) _SearchReceipt(ctx context.Context, sel ast.SelectionSet, obj *model.SearchReceipt) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, searchReceiptImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SearchReceipt")
+		case "receipts":
+			out.Values[i] = ec._SearchReceipt_receipts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._SearchReceipt_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "foundCount":
+			out.Values[i] = ec._SearchReceipt_foundCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -10106,6 +10466,50 @@ func (ec *executionContext) marshalNReceipt2githubᚗcomᚋbishalᚑddᚋreceipt
 	return ec._Receipt(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNReceipt2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceiptᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Receipt) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx context.Context, sel ast.SelectionSet, v *model.Receipt) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10182,6 +10586,20 @@ func (ec *executionContext) marshalNReceiptEdge2ᚖgithubᚗcomᚋbishalᚑddᚋ
 		return graphql.Null
 	}
 	return ec._ReceiptEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSearchReceipt2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSearchReceipt(ctx context.Context, sel ast.SelectionSet, v model.SearchReceipt) graphql.Marshaler {
+	return ec._SearchReceipt(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSearchReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSearchReceipt(ctx context.Context, sel ast.SelectionSet, v *model.SearchReceipt) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SearchReceipt(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSendReceiptPDFToEmail2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐSendReceiptPDFToEmail(ctx context.Context, v interface{}) (model.SendReceiptPDFToEmail, error) {

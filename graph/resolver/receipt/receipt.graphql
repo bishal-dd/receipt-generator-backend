@@ -62,3 +62,9 @@ type ReceiptConnection {
   pageInfo: PageInfo!
   totalCount: Int!
 }
+
+type SearchReceipt {
+  receipts: [Receipt!]!
+  totalCount: Int!
+  foundCount: Int!
+}

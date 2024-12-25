@@ -14,6 +14,12 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 	if typeSenseURL == "" {
 		return fmt.Errorf("TYPESENSE_URL is not set")
 	}
+
+	// Replace nil fields with empty strings
+	recipientEmail := ensureString(receipt.RecipientEmail)
+	recipientAddress := ensureString(receipt.RecipientAddress)
+	recipientPhone := ensureString(receipt.RecipientPhone)
+	paymentNote := ensureString(receipt.PaymentNote)
 	resp, err := httpClient.R().
 	SetHeader("Content-Type", "application/json").
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
@@ -23,12 +29,12 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 		"total_amount": 	receipt.TotalAmount,
 		"user_id": 	receipt.UserID,
 		"recipient_name": 	receipt.RecipientName,
-		"recipient_email": 	receipt.RecipientEmail,
-		"recipient_address": 	receipt.RecipientAddress,
-		"recipient_phone": 	receipt.RecipientPhone,
+		"recipient_email": 	recipientEmail,
+		"recipient_address": 	recipientAddress,
+		"recipient_phone": 	recipientPhone,
 		"receipt_no": 	receipt.ReceiptNo,
 		"payment_method": 	receipt.PaymentMethod,
-		"payment_note": 	receipt.PaymentNote,
+		"payment_note": 	paymentNote,
 		}).
 	Post(fmt.Sprintf("%s/collections/receipts/documents", typeSenseURL ) )
 
@@ -39,4 +45,12 @@ if resp.StatusCode() != http.StatusCreated {
 	return fmt.Errorf("typesense returned status %d: %s", resp.StatusCode(), resp.String())
 }
 return  nil
+}
+
+// Helper function to ensure a string is not nil
+func ensureString(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
 }

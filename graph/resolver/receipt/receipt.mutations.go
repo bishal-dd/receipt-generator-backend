@@ -2,6 +2,7 @@ package receipt
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/database"
@@ -12,6 +13,7 @@ import (
 func (r *ReceiptResolver) CreateReceipt(ctx context.Context, input model.CreateReceipt) (*model.Receipt, error) {
    
     inputData := database.CreateFields[model.Receipt](input);
+    fmt.Print(inputData)
     if err := r.db.Create(inputData).Error; err != nil {
         return nil, err
     }
@@ -25,11 +27,13 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
     receipt := &model.Receipt{
         ID: input.ID,
     }
+
+    updateInput := searchUpdateInput(input)
     
     if err := r.db.Model(receipt).Updates(input).Error; err != nil {
         return nil, err
     }
-    if err := search.UpdateReceiptDocument(r.httpClient, input); err != nil {
+    if err := search.UpdateReceiptDocument(r.httpClient, updateInput, input.ID); err != nil {
         return nil, err
     }
     newReceipt, err := r.GetReceiptFromDB(input.ID)

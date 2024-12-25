@@ -10,6 +10,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
+	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 )
 
 
@@ -49,4 +50,17 @@ func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receip
 	}
         
     return newReceipt, nil
+}
+
+func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int) (*model.SearchReceipt, error) {
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return &model.SearchReceipt{}, err
+    }
+    response, err := search.SearchReceiptDocuments(r.httpClient, userId, page)
+    if err != nil {
+        return &model.SearchReceipt{}, err
+    }
+   
+    return response, nil
 }

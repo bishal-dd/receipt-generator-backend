@@ -16,7 +16,7 @@ func CreateFields[T any](input interface{}) *T {
 
 	// Set ID if the struct has an ID field
 	if idField := v.FieldByName("ID"); idField.IsValid() && idField.CanSet() {
-		idField.SetString(ids.UILD())
+		idField.SetString(ids.UUID())
 	}
 
 	// Set CreatedAt if the struct has a CreatedAt field

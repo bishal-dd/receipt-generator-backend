@@ -129,6 +129,12 @@ type ReceiptEdge struct {
 	Node   *Receipt `json:"node"`
 }
 
+type SearchReceipt struct {
+	Receipts   []*Receipt `json:"receipts"`
+	TotalCount int        `json:"totalCount"`
+	FoundCount int        `json:"foundCount"`
+}
+
 type SendReceiptPDFToEmail struct {
 	ReceiptName      string               `json:"receipt_name"`
 	RecipientName    string               `json:"recipient_name"`
