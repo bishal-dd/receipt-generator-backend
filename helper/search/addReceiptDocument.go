@@ -20,6 +20,8 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 	recipientAddress := ensureString(receipt.RecipientAddress)
 	recipientPhone := ensureString(receipt.RecipientPhone)
 	paymentNote := ensureString(receipt.PaymentNote)
+	subTotalAmount := ensureFloat(receipt.SubTotalAmount)
+	taxAmount := ensureFloat(receipt.TaxAmount)
 	resp, err := httpClient.R().
 	SetHeader("Content-Type", "application/json").
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
@@ -35,6 +37,11 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 		"receipt_no": 	receipt.ReceiptNo,
 		"payment_method": 	receipt.PaymentMethod,
 		"payment_note": 	paymentNote,
+		"sub_total_amount": 	subTotalAmount,
+		"tax_amount": 	taxAmount,
+		"created_at": 	receipt.CreatedAt,
+		"updated_at": 	receipt.UpdatedAt,
+		"deleted_at": 	receipt.DeletedAt,
 		}).
 	Post(fmt.Sprintf("%s/collections/receipts/documents", typeSenseURL ) )
 
@@ -51,6 +58,14 @@ return  nil
 func ensureString(value *string) string {
 	if value == nil {
 		return ""
+	}
+	return *value
+}
+
+// Helper function to ensure a float is not nil
+func ensureFloat(value *float64) float64 {
+	if value == nil {
+		return 0
 	}
 	return *value
 }
