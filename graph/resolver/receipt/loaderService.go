@@ -24,3 +24,14 @@ func (r *ReceiptResolver) LoadServiceFromReceipts(ctx context.Context, receipts 
     }
 	return receipts, nil
 }
+
+func (r *ReceiptResolver) LoadServiceFromReceipt(ctx context.Context, receipt *model.Receipt) (*model.Receipt, error) {
+	loaders := loaders.For(ctx)
+    serviceResults, err := loaders.ServiceLoader.Load(ctx, receipt.ID)
+    if err != nil {
+        return nil, err
+    }
+        receipt.Services = serviceResults  
+    
+	return receipt, nil
+}

@@ -35,7 +35,7 @@ func (r *ReceiptResolver) UpdateReceipt(ctx context.Context, input model.UpdateR
     if err := search.UpdateReceiptDocument(r.httpClient, updateInput, input.ID); err != nil {
         return nil, err
     }
-    newReceipt, err := r.GetReceiptFromDB(input.ID)
+    newReceipt, err := r.GetReceiptFromDB(ctx, input.ID)
     if err != nil {
         return nil, err
     }

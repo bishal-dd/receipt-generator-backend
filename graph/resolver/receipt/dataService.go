@@ -36,9 +36,14 @@ func (r *ReceiptResolver) DeleteReceiptFromDB(ctx context.Context, id string) (e
 	return  nil
 }
 
-func (r *ReceiptResolver) GetReceiptFromDB(id string) (*model.Receipt, error) {
+func (r *ReceiptResolver) GetReceiptFromDB(ctx context.Context, id string) (*model.Receipt, error) {
 	var receipt *model.Receipt
 	if err := r.db.Where("id = ?", id).First(&receipt).Error; err != nil {
+		return nil, err
+	}
+
+	receipt, err := r.LoadServiceFromReceipt(ctx, receipt)
+	if err != nil {
 		return nil, err
 	}
 	return receipt, nil

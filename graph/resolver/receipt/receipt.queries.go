@@ -44,7 +44,7 @@ func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *strin
 
 
 func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	newReceipt, err := r.GetReceiptFromDB(id)
+	newReceipt, err := r.GetReceiptFromDB( ctx, id)
     if err != nil {
 		return nil, err
 	}

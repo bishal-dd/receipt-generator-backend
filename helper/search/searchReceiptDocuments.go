@@ -18,10 +18,10 @@ func SearchReceiptDocuments (httpClient *resty.Client, userId string, page int, 
 	filters := ""
 
 	if year != nil {
-		filters = fmt.Sprintf("year:=%d", *year)
+		filters = fmt.Sprintf("&filter_by=year:=%d", *year)
 	}
 	if date != nil {
-		filters = fmt.Sprintf("date:=%s", *date)
+		filters = fmt.Sprintf("&filter_by=date:=%s", *date)
 	}
 	if dateRange != nil {
 		parsedDate1, err := time.Parse("2006-01-02", dateRange[0])
@@ -34,11 +34,11 @@ func SearchReceiptDocuments (httpClient *resty.Client, userId string, page int, 
 		}
 		unixDate1 := parsedDate1.Unix()
 		unixDate2 := parsedDate2.Unix()
-		filters = fmt.Sprintf("date_unix:[%d..%d]", unixDate1, unixDate2)
+		filters = fmt.Sprintf("&filter_by=date_unix:[%d..%d]", unixDate1, unixDate2)
 	}
 	resp, err := httpClient.R().
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
-	Get(fmt.Sprintf("%s/collections/receipts/documents/search?q=%s&query_by=user_id&page=%d&per_page=10&filter_by=%s", typeSenseURL, userId, page, filters) )
+	Get(fmt.Sprintf("%s/collections/receipts/documents/search?q=%s&query_by=user_id&page=%d&per_page=10%s", typeSenseURL, userId, page, filters) )
 	if err != nil {
 		return nil,err
 	}
