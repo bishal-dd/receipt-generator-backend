@@ -52,14 +52,17 @@ func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receip
     return newReceipt, nil
 }
 
-func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int) (*model.SearchReceipt, error) {
+func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error) {
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
-        return &model.SearchReceipt{}, err
+        return nil, err
     }
-    response, err := search.SearchReceiptDocuments(r.httpClient, userId, page)
+    if err := searchDataRangeValidation(dateRange); err != nil {
+        return nil, err
+    }
+    response, err := search.SearchReceiptDocuments(r.httpClient, userId, page, year, date, dateRange)
     if err != nil {
-        return &model.SearchReceipt{}, err
+        return nil, err
     }
    
     return response, nil

@@ -27,12 +27,25 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 	if err != nil {
 		return err
 	}
+	var unixTimestamp int64
+	if receipt.Date != "" {
+		// Parse the input date string into a time.Time object
+		parsedDate, err := time.Parse(time.RFC3339, receipt.Date)
+		if err != nil {
+			return fmt.Errorf("invalid date format: %v", err)
+		}
+		// Convert the date to a Unix timestamp
+		unixTimestamp = parsedDate.Unix()
+		// Format the date as "YYYY-MM-DD"
+		receipt.Date = parsedDate.Format("2006-01-02")
+	}
 	resp, err := httpClient.R().
 	SetHeader("Content-Type", "application/json").
 	SetHeader("X-TYPESENSE-API-KEY", os.Getenv("TYPESENSE_API_KEY")).
 	SetBody(map[string]interface{}{
 		"id": 		receipt.ID,
 		"date": 	receipt.Date,
+		"date_unix": 	unixTimestamp,
 		"total_amount": 	receipt.TotalAmount,
 		"user_id": 	receipt.UserID,
 		"recipient_name": 	receipt.RecipientName,

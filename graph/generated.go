@@ -95,7 +95,7 @@ type ComplexityRoot struct {
 		ProfileByUserID    func(childComplexity int, userID string) int
 		Receipt            func(childComplexity int, id string) int
 		Receipts           func(childComplexity int, first *int, after *string) int
-		SearchReceipts     func(childComplexity int, page int) int
+		SearchReceipts     func(childComplexity int, page int, year *int, date *string, dateRange []string) int
 		Service            func(childComplexity int, id string) int
 		ServiceByReceiptID func(childComplexity int, receiptID string) int
 		User               func(childComplexity int, id string) int
@@ -199,7 +199,7 @@ type QueryResolver interface {
 	Profile(ctx context.Context, id string) (*model.Profile, error)
 	ServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.Service, error)
 	Service(ctx context.Context, id string) (*model.Service, error)
-	SearchReceipts(ctx context.Context, page int) (*model.SearchReceipt, error)
+	SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error)
 }
 
 type executableSchema struct {
@@ -587,7 +587,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchReceipts(childComplexity, args["page"].(int)), true
+		return e.complexity.Query.SearchReceipts(childComplexity, args["page"].(int), args["year"].(*int), args["date"].(*string), args["dateRange"].([]string)), true
 
 	case "Query.service":
 		if e.complexity.Query.Service == nil {
@@ -1412,6 +1412,33 @@ func (ec *executionContext) field_Query_searchReceipts_args(ctx context.Context,
 		}
 	}
 	args["page"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["year"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["year"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["date"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["date"] = arg2
+	var arg3 []string
+	if tmp, ok := rawArgs["dateRange"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateRange"))
+		arg3, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dateRange"] = arg3
 	return args, nil
 }
 
@@ -3956,7 +3983,7 @@ func (ec *executionContext) _Query_searchReceipts(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchReceipts(rctx, fc.Args["page"].(int))
+		return ec.resolvers.Query().SearchReceipts(rctx, fc.Args["page"].(int), fc.Args["year"].(*int), fc.Args["date"].(*string), fc.Args["dateRange"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11192,6 +11219,44 @@ func (ec *executionContext) marshalOService2ᚖgithubᚗcomᚋbishalᚑddᚋrece
 		return graphql.Null
 	}
 	return ec._Service(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

@@ -7,7 +7,12 @@ type Query {
   profile(id: ID!): Profile
   serviceByReceiptId(receiptId: String!): [Service]
   service(id: ID!): Service
-  searchReceipts(page: Int!): SearchReceipt!
+  searchReceipts(
+    page: Int!
+    year: Int
+    date: String
+    dateRange: [String!]
+  ): SearchReceipt!
 }
 
 type Mutation {
