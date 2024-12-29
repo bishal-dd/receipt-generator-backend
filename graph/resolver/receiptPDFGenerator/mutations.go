@@ -8,6 +8,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/emails"
+	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/clerk/clerk-sdk-go/v2/organization"
 	"golang.org/x/sync/errgroup"
@@ -84,7 +85,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 
     // Optional: Async WhatsApp message
     if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
-            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone)
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, receiptModel.ID)
             if err != nil {
                 return false, err
             }
@@ -149,6 +150,18 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 			if err != nil {
                 return false, err
 			}
+            receipt := &model.Receipt{
+                ID: receiptModel.ID,
+            }
+        
+            
+            isReceiptSend := true
+            if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
+                return  false, err
+            }
+            if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptModel.ID); err != nil {
+                return  false, err
+            }
     } else {
         return false, errors.New("recipient email is empty")
     }

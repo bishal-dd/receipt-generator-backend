@@ -107,6 +107,7 @@ type ComplexityRoot struct {
 		Date             func(childComplexity int) int
 		DeletedAt        func(childComplexity int) int
 		ID               func(childComplexity int) int
+		IsReceiptSend    func(childComplexity int) int
 		PaymentMethod    func(childComplexity int) int
 		PaymentNote      func(childComplexity int) int
 		ReceiptName      func(childComplexity int) int
@@ -664,6 +665,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Receipt.ID(childComplexity), true
+
+	case "Receipt.is_receipt_send":
+		if e.complexity.Receipt.IsReceiptSend == nil {
+			break
+		}
+
+		return e.complexity.Receipt.IsReceiptSend(childComplexity), true
 
 	case "Receipt.payment_method":
 		if e.complexity.Receipt.PaymentMethod == nil {
@@ -1742,6 +1750,8 @@ func (ec *executionContext) fieldContext_Mutation_createReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
 				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "is_receipt_send":
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -1835,6 +1845,8 @@ func (ec *executionContext) fieldContext_Mutation_updateReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
 				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "is_receipt_send":
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -3627,6 +3639,8 @@ func (ec *executionContext) fieldContext_Query_receipt(ctx context.Context, fiel
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
 				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "is_receipt_send":
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -4756,6 +4770,50 @@ func (ec *executionContext) fieldContext_Receipt_payment_note(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Receipt_is_receipt_send(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_is_receipt_send(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsReceiptSend, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_is_receipt_send(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Receipt_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Receipt_created_at(ctx, field)
 	if err != nil {
@@ -5202,6 +5260,8 @@ func (ec *executionContext) fieldContext_ReceiptEdge_node(ctx context.Context, f
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
 				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "is_receipt_send":
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -5284,6 +5344,8 @@ func (ec *executionContext) fieldContext_SearchReceipt_receipts(ctx context.Cont
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
 				return ec.fieldContext_Receipt_payment_note(ctx, field)
+			case "is_receipt_send":
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
@@ -8294,7 +8356,7 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "date", "total_amount"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "is_receipt_send", "receipt_no", "payment_method", "payment_note", "user_id", "date", "total_amount"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8336,6 +8398,13 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 				return it, err
 			}
 			it.RecipientAddress = data
+		case "is_receipt_send":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_receipt_send"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsReceiptSend = data
 		case "receipt_no":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_no"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -8473,7 +8542,7 @@ func (ec *executionContext) unmarshalInputDownloadPDF(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "orginazation_id", "date", "Services"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "is_receipt_send", "user_id", "orginazation_id", "date", "Services"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8536,6 +8605,13 @@ func (ec *executionContext) unmarshalInputDownloadPDF(ctx context.Context, obj i
 				return it, err
 			}
 			it.PaymentNote = data
+		case "is_receipt_send":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_receipt_send"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsReceiptSend = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -8577,7 +8653,7 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToEmail(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "orginazation_id", "date", "Services"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "is_receipt_send", "user_id", "orginazation_id", "date", "Services"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8640,6 +8716,13 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToEmail(ctx context.Cont
 				return it, err
 			}
 			it.PaymentNote = data
+		case "is_receipt_send":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_receipt_send"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsReceiptSend = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -8681,7 +8764,7 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToWhatsApp(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "orginazation_id", "date", "Services"}
+	fieldsInOrder := [...]string{"receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "is_receipt_send", "orginazation_id", "date", "Services"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8751,6 +8834,13 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToWhatsApp(ctx context.C
 				return it, err
 			}
 			it.UserID = data
+		case "is_receipt_send":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_receipt_send"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsReceiptSend = data
 		case "orginazation_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazation_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -8889,7 +8979,7 @@ func (ec *executionContext) unmarshalInputUpdateReceipt(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "user_id", "date", "total_amount"}
+	fieldsInOrder := [...]string{"id", "receipt_name", "recipient_name", "recipient_phone", "recipient_email", "recipient_address", "receipt_no", "payment_method", "payment_note", "is_receipt_send", "user_id", "date", "total_amount"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8959,6 +9049,13 @@ func (ec *executionContext) unmarshalInputUpdateReceipt(ctx context.Context, obj
 				return it, err
 			}
 			it.PaymentNote = data
+		case "is_receipt_send":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_receipt_send"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsReceiptSend = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
@@ -9617,6 +9714,11 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "payment_note":
 			out.Values[i] = ec._Receipt_payment_note(ctx, field, obj)
+		case "is_receipt_send":
+			out.Values[i] = ec._Receipt_is_receipt_send(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "created_at":
 			out.Values[i] = ec._Receipt_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

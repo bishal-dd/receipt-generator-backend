@@ -30,6 +30,7 @@ type CreateReceipt struct {
 	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string  `json:"recipient_email,omitempty"`
 	RecipientAddress *string  `json:"recipient_address,omitempty"`
+	IsReceiptSend    bool     `json:"is_receipt_send"`
 	ReceiptNo        string   `json:"receipt_no"`
 	PaymentMethod    string   `json:"payment_method"`
 	PaymentNote      *string  `json:"payment_note,omitempty"`
@@ -59,6 +60,7 @@ type DownloadPDF struct {
 	ReceiptNo        string               `json:"receipt_no"`
 	PaymentMethod    string               `json:"payment_method"`
 	PaymentNote      *string              `json:"payment_note,omitempty"`
+	IsReceiptSend    bool                 `json:"is_receipt_send"`
 	UserID           string               `json:"user_id"`
 	OrginazationID   string               `json:"orginazation_id"`
 	Date             string               `json:"date"`
@@ -112,6 +114,7 @@ type Receipt struct {
 	TaxAmount        *float64   `json:"tax_amount,omitempty"`
 	PaymentMethod    string     `json:"payment_method"`
 	PaymentNote      *string    `json:"payment_note,omitempty"`
+	IsReceiptSend    bool       `json:"is_receipt_send"`
 	CreatedAt        string     `json:"created_at"`
 	UpdatedAt        *string    `json:"updated_at,omitempty"`
 	DeletedAt        *string    `json:"deleted_at,omitempty"`
@@ -144,6 +147,7 @@ type SendReceiptPDFToEmail struct {
 	ReceiptNo        string               `json:"receipt_no"`
 	PaymentMethod    string               `json:"payment_method"`
 	PaymentNote      *string              `json:"payment_note,omitempty"`
+	IsReceiptSend    bool                 `json:"is_receipt_send"`
 	UserID           string               `json:"user_id"`
 	OrginazationID   string               `json:"orginazation_id"`
 	Date             string               `json:"date"`
@@ -160,6 +164,7 @@ type SendReceiptPDFToWhatsApp struct {
 	PaymentMethod    string               `json:"payment_method"`
 	PaymentNote      *string              `json:"payment_note,omitempty"`
 	UserID           string               `json:"user_id"`
+	IsReceiptSend    bool                 `json:"is_receipt_send"`
 	OrginazationID   string               `json:"orginazation_id"`
 	Date             string               `json:"date"`
 	Services         []*CreateBulkService `json:"Services,omitempty"`
@@ -202,6 +207,7 @@ type UpdateReceipt struct {
 	ReceiptNo        *string  `json:"receipt_no,omitempty"`
 	PaymentMethod    *string  `json:"payment_method,omitempty"`
 	PaymentNote      *string  `json:"payment_note,omitempty"`
+	IsReceiptSend    *bool    `json:"is_receipt_send,omitempty"`
 	UserID           *string  `json:"user_id,omitempty"`
 	Date             *string  `json:"date,omitempty"`
 	TotalAmount      *float64 `json:"total_amount,omitempty"`

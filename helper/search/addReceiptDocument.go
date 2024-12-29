@@ -51,6 +51,7 @@ func AddReceiptDocument (httpClient *resty.Client, receipt model.Receipt ) error
 		"recipient_name": 	receipt.RecipientName,
 		"recipient_email": 	recipientEmail,
 		"recipient_address": 	recipientAddress,
+		"is_receipt_send": receipt.IsReceiptSend,
 		"recipient_phone": 	recipientPhone,
 		"receipt_no": 	receipt.ReceiptNo,
 		"payment_method": 	receipt.PaymentMethod,

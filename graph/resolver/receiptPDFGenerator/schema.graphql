@@ -8,6 +8,7 @@ input SendReceiptPDFToWhatsApp {
   payment_method: String!
   payment_note: String
   user_id: ID!
+  is_receipt_send: Boolean!
   orginazation_id: ID!
   date: Date!
   Services: [CreateBulkService!]
@@ -22,6 +23,7 @@ input SendReceiptPDFToEmail {
   receipt_no: String!
   payment_method: String!
   payment_note: String
+  is_receipt_send: Boolean!
   user_id: ID!
   orginazation_id: ID!
   date: Date!
@@ -37,6 +39,7 @@ input DownloadPDF {
   receipt_no: String!
   payment_method: String!
   payment_note: String
+  is_receipt_send: Boolean!
   user_id: ID!
   orginazation_id: ID!
   date: Date!

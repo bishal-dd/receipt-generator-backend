@@ -17,6 +17,7 @@ type Receipt {
   tax_amount: Float
   payment_method: String!
   payment_note: String
+  is_receipt_send: Boolean!
   created_at: DateTime!
   updated_at: DateTime
   deleted_at: DateTime
@@ -29,6 +30,7 @@ input CreateReceipt {
   recipient_phone: String
   recipient_email: String
   recipient_address: String
+  is_receipt_send: Boolean!
   receipt_no: String!
   payment_method: String!
   payment_note: String
@@ -47,6 +49,7 @@ input UpdateReceipt {
   receipt_no: String
   payment_method: String
   payment_note: String
+  is_receipt_send: Boolean
   user_id: ID
   date: Date
   total_amount: Float

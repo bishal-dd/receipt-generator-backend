@@ -11,6 +11,7 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
+	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 )
 
 var (
@@ -100,7 +101,7 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 }
 
 
-func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string) error {
+func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string, receiptId string) error {
 	payload := map[string]interface{}{
 		"messaging_product": "whatsapp",
 		"recipient_type":    "individual",
@@ -126,6 +127,17 @@ func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName
             resp.StatusCode(), 
             string(resp.Body()))
     }
+	receipt := &model.Receipt{
+        ID: receiptId,
+    }
 
+    
+	isReceiptSend := true
+	if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
+        return  err
+    }
+    if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptId); err != nil {
+        return  err
+    }
     return nil
 }
