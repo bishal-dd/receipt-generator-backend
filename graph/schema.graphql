@@ -31,6 +31,18 @@ type Mutation {
   sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
   downloadReceiptPDF(input: DownloadPDF!): String!
   saveReceipt(input: DownloadPDF!): Boolean!
+  sendReceiptPDFToWhatsAppWithReceiptId(
+    receiptId: String!
+    orginazationId: String!
+  ): Boolean!
+  sendReceiptPDFToEmailWithReceiptId(
+    receiptId: String!
+    orginazationId: String!
+  ): Boolean!
+  downloadReceiptPDFWithReceiptId(
+    receiptId: String!
+    orginazationId: String!
+  ): String!
 }
 
 type PageInfo {

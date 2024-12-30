@@ -1,6 +1,7 @@
 package receiptPDFGenerator
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -61,4 +62,17 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
     }
 
 	return nil
+}
+
+func (r *ReceiptPDFGeneratorResolver) GetReceiptFromDB(ctx context.Context, id string) (*model.Receipt, error) {
+	var receipt *model.Receipt
+	if err := r.db.Where("id = ?", id).First(&receipt).Error; err != nil {
+		return nil, err
+	}
+
+	receipt, err := r.LoadServiceFromReceipt(ctx, receipt)
+	if err != nil {
+		return nil, err
+	}
+	return receipt, nil
 }

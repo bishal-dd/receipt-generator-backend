@@ -98,6 +98,88 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
     return true, nil
 }
 
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, receiptId string, orginazationId string) (bool, error) {
+    // Early error checking
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return false, err
+    }
+
+    // Use errgroup for parallel processing
+    var g errgroup.Group
+    var currentOrganization *clerk.Organization
+    var profile *model.Profile
+    var receiptModel *model.Receipt
+    var fileName string
+    var pdfFile []byte
+    var fileURL string
+
+    // Parallel goroutines for fetching data
+    g.Go(func() error {
+        var err error
+        currentOrganization, err = organization.Get(ctx, orginazationId)
+        return err
+    })
+
+    g.Go(func() error {
+        var err error
+        profile, err = r.GetProfileByUserID(userId)
+        if err != nil {
+            fmt.Println("Could not fetch profile:", err)
+        }
+        return nil
+    })
+
+    if err := g.Wait(); err != nil {
+        return false, err
+    }
+
+    // Prepare receipt model
+    if err := updateProfileImages(profile, currentOrganization); err != nil {
+        return false, err
+    }
+
+    receiptModel, err = r.GetReceiptFromDB(ctx, receiptId)
+    if err != nil {
+        return false, err
+    }
+
+    // Parallel PDF generation and storage upload
+    g.Go(func() error {
+        var err error
+        fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+        if err != nil {
+            return err
+        }
+        
+		if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
+			return  err
+		}
+		fileURL, err = r.getFileURL( currentOrganization.ID, userId, fileName)
+		if err != nil {
+			return  err
+		}
+        return err
+    })
+
+    if err := g.Wait(); err != nil {
+        return false, err
+    }
+
+    // Optional: Async WhatsApp message
+    if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, receiptModel.ID)
+            if err != nil {
+                return false, err
+            }
+    } else {
+        return false, errors.New("recipient phone is empty")
+    }
+
+
+    return true, nil
+}
+
 func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error) {
     // Early error checking
     userId, err := contextUtil.UserIdFromContext(ctx)
@@ -118,7 +200,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 	}
 	profile, err = r.GetProfileByUserID(userId)
 	if err != nil {
-		fmt.Println("Could not fetch profile:", err)
+        return false, err
 	}
 
     if err := updateProfileImages(profile, currentOrganization); err != nil {
@@ -130,6 +212,78 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     if err := r.saveReceipt(receiptModel, input.Services); err != nil {
         return false, err
      }
+    fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+	if err != nil {
+		return false, err
+	}
+    if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
+			return false, err
+		}
+    if receiptModel.RecipientEmail != nil && *receiptModel.RecipientEmail != "" {
+			err := emails.SendEmailWithPDF(
+				*receiptModel.RecipientEmail,
+				"Receipt",
+				"templates/emails/receipt.html",
+				map[string]interface{}{
+					"OrganizationName": currentOrganization.Name,
+					"CustomerName": receiptModel.RecipientName,
+				},
+				fileName,
+				pdfFile,
+			)
+			if err != nil {
+                return false, err
+			}
+            receipt := &model.Receipt{
+                ID: receiptModel.ID,
+            }
+        
+            
+            isReceiptSend := true
+            if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
+                return  false, err
+            }
+            if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptModel.ID); err != nil {
+                return  false, err
+            }
+    } else {
+        return false, errors.New("recipient email is empty")
+    }
+
+    return true, nil
+}
+
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx context.Context, receiptId string, orginazationId string) (bool, error) {
+    // Early error checking
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return false, err
+    }
+
+    // Use errgroup for parallel processing
+    var currentOrganization *clerk.Organization
+    var profile *model.Profile
+    var receiptModel *model.Receipt
+    var fileName string
+    var pdfFile []byte
+
+    currentOrganization, err = organization.Get(ctx, orginazationId)
+	if err != nil {
+		return false, err
+	}
+	profile, err = r.GetProfileByUserID(userId)
+	if err != nil {
+        return false, err
+	}
+
+    if err := updateProfileImages(profile, currentOrganization); err != nil {
+        return false, err
+    }
+
+    receiptModel, err = r.GetReceiptFromDB(ctx, receiptId)
+    if err != nil {
+        return false, err
+    }
     fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
 	if err != nil {
 		return false, err
@@ -218,6 +372,76 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
         return "", err
      }
 
+    // Parallel PDF generation and storage upload
+    g.Go(func() error {
+        var err error
+        fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+        if err != nil {
+            return err
+        }
+        
+		if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
+			return  err
+		}
+		fileURL, err = r.getFileURL( currentOrganization.ID, userId, fileName)
+		if err != nil {
+			return  err
+		}
+        return err
+    })
+
+    if err := g.Wait(); err != nil {
+        return "", err
+    }
+
+    return fileURL, nil
+}
+
+func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDFWithReceiptID(ctx context.Context, receiptId string, orginazationId string) (string, error) {
+    // Early error checking
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return "", err
+    }
+
+    // Use errgroup for parallel processing
+    var g errgroup.Group
+    var currentOrganization *clerk.Organization
+    var profile *model.Profile
+    var receiptModel *model.Receipt
+    var fileName string
+    var pdfFile []byte
+    var fileURL string
+
+    // Parallel goroutines for fetching data
+    g.Go(func() error {
+        var err error
+        currentOrganization, err = organization.Get(ctx, orginazationId)
+        return err
+    })
+
+    g.Go(func() error {
+        var err error
+        profile, err = r.GetProfileByUserID(userId)
+        if err != nil {
+            fmt.Println("Could not fetch profile:", err)
+        }
+        return nil
+    })
+
+    if err := g.Wait(); err != nil {
+        return "", err
+    }
+
+    // Prepare receipt model
+    if err := updateProfileImages(profile, currentOrganization); err != nil {
+        return "", err
+    }
+
+    receiptModel, err = r.GetReceiptFromDB(ctx, receiptId)
+    if err != nil {
+        return "", err
+    }
     // Parallel PDF generation and storage upload
     g.Go(func() error {
         var err error
