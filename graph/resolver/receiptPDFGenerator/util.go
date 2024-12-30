@@ -41,6 +41,7 @@ func updateProfileImages(profile *model.Profile, organization *clerk.Organizatio
 func emailInputToReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
 	receiptInput := input
 
+	
 	return &model.Receipt{
 		ID:        ids.UUID(),
         UserID:    userId,

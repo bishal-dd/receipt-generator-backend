@@ -58,8 +58,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    r.saveReceipt(receiptModel, input.Services)
-
+    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+        return false, err
+     }
 
     // Parallel PDF generation and storage upload
     g.Go(func() error {
@@ -126,8 +127,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = emailInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-	r.saveReceipt(receiptModel, input.Services)
-
+    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+        return false, err
+     }
     fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
 	if err != nil {
 		return false, err
@@ -212,8 +214,9 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    r.saveReceipt(receiptModel, input.Services)
-
+    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+        return "", err
+     }
 
     // Parallel PDF generation and storage upload
     g.Go(func() error {
@@ -238,4 +241,27 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
     }
 
     return fileURL, nil
+}
+
+
+func (r *ReceiptPDFGeneratorResolver) SaveReceipt(ctx context.Context, input model.DownloadPDF) (bool, error) {
+    userId, err := contextUtil.UserIdFromContext(ctx)
+    if err != nil {
+        return false, err
+    }
+    var profile *model.Profile
+    var receiptModel *model.Receipt
+
+    profile, err = r.GetProfileByUserID(userId)
+    if err != nil {
+            fmt.Println("Could not fetch profile:", err)
+        }
+
+    totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
+    receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
+     if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+        return false, err
+     }
+
+    return true, nil
 }

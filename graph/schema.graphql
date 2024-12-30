@@ -30,6 +30,7 @@ type Mutation {
   sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
   sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
   downloadReceiptPDF(input: DownloadPDF!): String!
+  saveReceipt(input: DownloadPDF!): Boolean!
 }
 
 type PageInfo {
