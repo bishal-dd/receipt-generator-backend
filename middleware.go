@@ -1,48 +1,55 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
+	"github.com/clerk/clerk-sdk-go/v2/jwt"
+	"github.com/clerk/clerk-sdk-go/v2/user"
 	"github.com/gin-gonic/gin"
 )
 
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-	//   ctx := c.Request.Context()
-	  
-	//   // Log the authorization header to debug
-	//   fmt.Print(c.GetHeader("authorization"), "\n")
-	//   authHeader := c.GetHeader("authorization")
+		ctx := c.Request.Context()
+        
+        // Extract the Bearer token
+        authHeader := c.GetHeader("Authorization")
+        if authHeader == "" {
+            c.AbortWithStatusJSON(401, gin.H{"error": "Missing authorization header"})
+            return
+        }
+		
+        // Remove "Bearer " prefix
+        sessionToken := strings.TrimPrefix(authHeader, "Bearer ")
+        if sessionToken == authHeader {
+            c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token format"})
+            return
+        }
 
-	//   if authHeader == "" {
-	// 	fmt.Print("Authorization header not found\n")
-	// 	c.AbortWithStatusJSON(401, gin.H{"error": "Missing authorization token"})
-	// 	return
-	//   }
+        // Verify the JWT token
+        claims, err := jwt.Verify(ctx, &jwt.VerifyParams{
+            Token: sessionToken,
+        })
+        if err != nil {
+            c.AbortWithStatusJSON(401, gin.H{"error": fmt.Sprintf("Invalid token: %v", err)})
+            return
+        }
 
-	//   claims, ok := clerk.SessionClaimsFromContext(ctx)
+        // Get user details
+        usr, err := user.Get(ctx, claims.Subject)
+        if err != nil {
+            c.AbortWithStatusJSON(401, gin.H{"error": fmt.Sprintf("Failed to get user: %v", err)})
+            return
+        }
 
-	//   if !ok {
-	// 	fmt.Print("Invalid or missing session claims\n")
-	// 	c.AbortWithStatusJSON(401, gin.H{"error": "Invalid or missing session claims"})
-	// 	return
-	//   }
-	  
-	//   usr, err := user.Get(ctx, claims.Subject)
-	//   if err != nil {
-	// 	c.AbortWithStatusJSON(401, gin.H{"error": fmt.Sprintf("User retrieval failed: %v", err)})
-	// 	return
-	//   }
-	  
-	//   if usr == nil {
-	// 	c.AbortWithStatusJSON(401, gin.H{"error": "User does not exist"})
-	// 	return
-	//   }
+        // Set user ID in context
+        ctxWithUser := contextUtil.SetContextValue(ctx, contextUtil.UserIDKey, usr.ID)
+        ctxWithGin := contextUtil.SetContextValue(ctxWithUser, contextUtil.GinContextKey, c)
+        c.Request = c.Request.WithContext(ctxWithGin)
 
-	userId := "user_2pOGOF48y7Y7wHWs33WK0AZIROH"
-	  ctxs := contextUtil.SetContextValue(c.Request.Context(), contextUtil.UserIDKey, userId)
-	  ctxs = contextUtil.SetContextValue(ctxs, contextUtil.GinContextKey, c)
-	  c.Request = c.Request.WithContext(ctxs)
-	  c.Next()
+        c.Next()
 	}
   }
