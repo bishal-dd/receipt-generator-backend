@@ -2,9 +2,9 @@
 -- +goose StatementBegin
 CREATE TABLE profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_name VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255),
     logo_image TEXT,
-    phone_no INT NOT NULL,
+    phone_no VARCHAR(255),
     address VARCHAR(255),
     email VARCHAR(255),
     city VARCHAR(255),

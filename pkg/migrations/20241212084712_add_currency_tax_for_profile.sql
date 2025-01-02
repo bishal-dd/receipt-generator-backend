@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 ALTER TABLE profiles
-ADD COLUMN currency VARCHAR(50) NOT NULL DEFAULT '$',
+ADD COLUMN currency VARCHAR(50) NOT NULL DEFAULT 'USD',
 ADD COLUMN tax FLOAT NOT NULL DEFAULT 0.0;
 -- +goose StatementEnd
 

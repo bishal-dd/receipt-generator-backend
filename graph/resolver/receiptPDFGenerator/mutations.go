@@ -393,7 +393,7 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
     if err := g.Wait(); err != nil {
         return "", err
     }
-
+    
     return fileURL, nil
 }
 
