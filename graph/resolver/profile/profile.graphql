@@ -1,8 +1,8 @@
 type Profile {
   id: UUID!
-  company_name: String!
+  company_name: String
   logo_image: String
-  phone_no: Int!
+  phone_no: String
   email: String
   address: String
   city: String
@@ -18,9 +18,9 @@ type Profile {
 }
 
 input CreateProfile {
-  company_name: String!
+  company_name: String
   logo_image: String
-  phone_no: Int!
+  phone_no: String
   email: String
   address: String
   currency: String

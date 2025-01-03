@@ -10,9 +10,9 @@ type CreateBulkService struct {
 }
 
 type CreateProfile struct {
-	CompanyName            string   `json:"company_name"`
+	CompanyName            *string  `json:"company_name,omitempty"`
 	LogoImage              *string  `json:"logo_image,omitempty"`
-	PhoneNo                int      `json:"phone_no"`
+	PhoneNo                *string  `json:"phone_no,omitempty"`
 	Email                  *string  `json:"email,omitempty"`
 	Address                *string  `json:"address,omitempty"`
 	Currency               *string  `json:"currency,omitempty"`
@@ -79,9 +79,9 @@ type PageInfo struct {
 
 type Profile struct {
 	ID                     string  `json:"id"`
-	CompanyName            string  `json:"company_name"`
+	CompanyName            *string `json:"company_name,omitempty"`
 	LogoImage              *string `json:"logo_image,omitempty"`
-	PhoneNo                int     `json:"phone_no"`
+	PhoneNo                *string `json:"phone_no,omitempty"`
 	Email                  *string `json:"email,omitempty"`
 	Address                *string `json:"address,omitempty"`
 	City                   *string `json:"city,omitempty"`

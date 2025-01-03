@@ -3129,14 +3129,11 @@ func (ec *executionContext) _Profile_company_name(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Profile_company_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3214,14 +3211,11 @@ func (ec *executionContext) _Profile_phone_no(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Profile_phone_no(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3231,7 +3225,7 @@ func (ec *executionContext) fieldContext_Profile_phone_no(ctx context.Context, f
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8624,7 +8618,7 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 		switch k {
 		case "company_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("company_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8638,7 +8632,7 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 			it.LogoImage = data
 		case "phone_no":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_no"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9743,16 +9737,10 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "company_name":
 			out.Values[i] = ec._Profile_company_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "logo_image":
 			out.Values[i] = ec._Profile_logo_image(ctx, field, obj)
 		case "phone_no":
 			out.Values[i] = ec._Profile_phone_no(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "email":
 			out.Values[i] = ec._Profile_email(ctx, field, obj)
 		case "address":

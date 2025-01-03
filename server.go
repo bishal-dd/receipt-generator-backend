@@ -46,7 +46,10 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 	r.GET("/graphql", routes.PlaygroundHandler())
-    r.Use(AuthMiddleware())
+	r.POST("/profile", func(c *gin.Context) {
+		routes.AddProfile(c, database)
+	})
+	r.Use(AuthMiddleware())
 	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", routes.GraphqlHandler(dependencyResolver))
 	r.GET("/issuePresignedURL", routes.HandlePresignedURL)

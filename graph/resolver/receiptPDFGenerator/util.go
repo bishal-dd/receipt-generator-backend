@@ -30,7 +30,7 @@ func updateProfileImages(profile *model.Profile, organization *clerk.Organizatio
 		}
 		profile.SignatureImage = &signedURL
 	}
-	profile.CompanyName = organization.Name
+	profile.CompanyName = &organization.Name
 	if (organization.HasImage){
 		profile.LogoImage = organization.ImageURL
 	}
