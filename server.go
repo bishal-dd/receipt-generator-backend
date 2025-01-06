@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
@@ -18,8 +19,11 @@ import (
 
 func main() {
 	 err := godotenv.Load()
-	 if err != nil {
-	   log.Fatal("Error loading .env file")
+	 env := os.Getenv("ENV")
+	 if env == "development" {
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		  }
 	 }
 	 InitializeApi()
 	 database := db.Init()
