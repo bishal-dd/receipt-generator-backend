@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
@@ -18,7 +17,6 @@ func AddProfile(c *gin.Context, db *gorm.DB) {
     var req ProfileRequest
     
     if err := c.BindJSON(&req); err != nil {
-        fmt.Printf("Error binding JSON: %v\n", err)
         c.JSON(400, gin.H{"error": "Invalid request body"})
         return
     }
@@ -48,7 +46,6 @@ func AddProfile(c *gin.Context, db *gorm.DB) {
     }
 
     if err := db.Create(&profile).Error; err != nil {
-        fmt.Printf("Error creating profile: %v\n", err)
         c.JSON(400, gin.H{"error": "Cannot create profile"})
         return
     }

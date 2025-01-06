@@ -21,11 +21,11 @@ var (
 
 func (r *ReceiptPDFGeneratorResolver) saveFile(pdf []byte, fileName string, organizationId string, userId string)( error){
 	presignedResp, err := r.httpClient.R().
-	Get(fmt.Sprintf("http://localhost:8080/issuePresignedURL?filename=%s&contentType=%s&organizationId=%s&userId=%s",fileName, "application/pdf", organizationId, userId ))
+	Get(fmt.Sprintf("%s/issuePresignedURL?filename=%s&contentType=%s&organizationId=%s&userId=%s",os.Getenv("BACKEND_URL"),fileName, "application/pdf", organizationId, userId ))
 	if err != nil {
 		return  err
 	}
-
+	fmt.Println(presignedResp.String())
 	if presignedResp.StatusCode() != http.StatusOK {
 		return  err
 	}
