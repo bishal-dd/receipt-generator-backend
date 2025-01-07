@@ -9262,7 +9262,7 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 			it.LogoImage = data
 		case "phone_no":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_no"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

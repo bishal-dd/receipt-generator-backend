@@ -186,7 +186,7 @@ type UpdateProfile struct {
 	ID                     string   `json:"id"`
 	CompanyName            *string  `json:"company_name,omitempty"`
 	LogoImage              *string  `json:"logo_image,omitempty"`
-	PhoneNo                *int     `json:"phone_no,omitempty"`
+	PhoneNo                *string  `json:"phone_no,omitempty"`
 	Email                  *string  `json:"email,omitempty"`
 	Address                *string  `json:"address,omitempty"`
 	Currency               *string  `json:"currency,omitempty"`

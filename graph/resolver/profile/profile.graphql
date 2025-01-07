@@ -36,7 +36,7 @@ input UpdateProfile {
   id: UUID!
   company_name: String
   logo_image: String
-  phone_no: Int
+  phone_no: String
   email: String
   address: String
   currency: String
