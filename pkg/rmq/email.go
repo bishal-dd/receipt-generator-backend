@@ -48,7 +48,7 @@ func (c *EmailConsumer) Consume(delivery rmq.Delivery) {
 	}
 
 	params := &resend.SendEmailRequest{
-		From:    "receipt@2quickpaper.lightwebx.com",
+		From:    "receipt@2quickpaper.com",
 		To:      []string{email.To},
 		Subject: email.Subject,
 		Html:    email.Body,
