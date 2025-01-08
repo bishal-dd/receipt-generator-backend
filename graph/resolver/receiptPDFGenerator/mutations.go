@@ -86,7 +86,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 
     // Optional: Async WhatsApp message
     if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
-            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, receiptModel.ID)
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, *receiptModel.TotalAmount, receiptModel.ID)
             if err != nil {
                 return false, err
             }
@@ -168,7 +168,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx 
 
     // Optional: Async WhatsApp message
     if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
-            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, receiptModel.ID)
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, *receiptModel.TotalAmount, receiptModel.ID)
             if err != nil {
                 return false, err
             }

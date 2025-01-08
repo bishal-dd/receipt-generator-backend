@@ -23,7 +23,6 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
     if tx.Error != nil {
         return tx.Error
     }
-
     // Create Receipt
     if err := tx.Create(receiptModel).Error; err != nil {
         tx.Rollback()
@@ -34,12 +33,7 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
         tx.Rollback()
         return  err
     }
-	parsedDate, err := time.Parse(time.RFC3339, receiptModel.Date)
-	if err != nil {
-		tx.Rollback()
-		return  fmt.Errorf("invalid date format in receipt: %w", err)
-	}
-	receiptModel.Date = parsedDate.Format("2 January 2006")
+	
     // Create Services
     for _, serviceInput := range services {
         serviceModel := &model.Service{

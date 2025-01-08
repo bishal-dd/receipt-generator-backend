@@ -101,18 +101,41 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 }
 
 
-func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string, receiptId string) error {
+func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string, receiptAmount float64, receiptId string) error {
 	payload := map[string]interface{}{
 		"messaging_product": "whatsapp",
-		"recipient_type":    "individual",
 		"to": recipientPhone,
-		"type": "document",
-		"document": map[string]string{
-    		"link": url,
-			"caption": fmt.Sprintf("Receipt from %s", orginaztionName),
-			"filename": receiptName,
+		"type": "template",
+		"template": map[string]interface{}{
+			"name": "receipt_template", // Replace with your approved template name
+			"language": map[string]string{
+				"code": "en_US", // Adjust as necessary
+			},
+			"components": []map[string]interface{}{
+				{
+					"type": "header",
+					"parameters": []map[string]interface{}{
+						{
+							"type": "document",
+							"document": map[string]interface{}{
+								"link":     url, // URL to the document (PDF)
+								"filename": receiptName,
+							},
+						},
+					},
+				},
+				{
+					"type": "body",
+					"parameters": []map[string]interface{}{
+						{"type": "text", "text": receiptAmount},
+						{"type": "text", "text": orginaztionName},
+						{"type": "text", "text": "receipt"},
+					},
+				},
+			},
 		},
-    }
+	}
+	
     resp, err := r.httpClient.R().
         SetHeader("Content-Type", "application/json").
         SetAuthToken(os.Getenv("WHATSAPP_ACCESS_TOKEN")).
