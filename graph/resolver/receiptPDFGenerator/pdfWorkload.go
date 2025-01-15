@@ -26,7 +26,6 @@ func (r *ReceiptPDFGeneratorResolver) saveFile(pdf []byte, fileName string, orga
 	if err != nil {
 		return  err
 	}
-	fmt.Println(presignedResp.String())
 	if presignedResp.StatusCode() != http.StatusOK {
 		return  err
 	}
