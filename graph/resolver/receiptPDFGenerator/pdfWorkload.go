@@ -12,6 +12,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
 	"github.com/bishal-dd/receipt-generator-backend/helper/search"
+	"gorm.io/gorm"
 )
 
 var (
@@ -50,6 +51,10 @@ func (r *ReceiptPDFGeneratorResolver) saveFile(pdf []byte, fileName string, orga
 	}
 	if uploadResp.StatusCode() != http.StatusOK {
 		return  fmt.Errorf("failed to upload PDF: %s", uploadResp.String())
+	}
+	user := &model.User{}
+	if err := r.db.Model(user).Where("id = ?", userId).Update("use_count", gorm.Expr("use_count + 1")).Error; err != nil {
+		return fmt.Errorf("failed to increment use_count for user %s: %w", userId, err)
 	}
 	return nil
 }	
@@ -162,5 +167,7 @@ func (r *ReceiptPDFGeneratorResolver)  sendPDFToWhatsApp(url string, receiptName
     if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptId); err != nil {
         return  err
     }
+	
+	
     return nil
 }

@@ -21,7 +21,13 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
     if err != nil {
         return false, err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return false, err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return false, errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var g errgroup.Group
     var currentOrganization *clerk.Organization
@@ -90,6 +96,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
             if err != nil {
                 return false, err
             }
+
     } else {
         return false, errors.New("recipient phone is empty")
     }
@@ -104,7 +111,13 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx 
     if err != nil {
         return false, err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return false, err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return false, errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var g errgroup.Group
     var currentOrganization *clerk.Organization
@@ -186,7 +199,13 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     if err != nil {
         return false, err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return false, err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return false, errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var currentOrganization *clerk.Organization
     var profile *model.Profile
@@ -259,7 +278,13 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx con
     if err != nil {
         return false, err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return false, err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return false, errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var currentOrganization *clerk.Organization
     var profile *model.Profile
@@ -318,6 +343,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx con
             if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptModel.ID); err != nil {
                 return  false, err
             }
+            
     } else {
         return false, errors.New("recipient email is empty")
     }
@@ -331,7 +357,13 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
     if err != nil {
         return "", err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return "", err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return "", errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var g errgroup.Group
     var currentOrganization *clerk.Organization
@@ -403,7 +435,13 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDFWithReceiptID(ctx contex
     if err != nil {
         return "", err
     }
-
+    user, err := r.GetUserFromDB(ctx, userId)
+    if err != nil {
+        return "", err
+    }
+    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
+        return "", errors.New("trial limit exceeded")
+    }
     // Use errgroup for parallel processing
     var g errgroup.Group
     var currentOrganization *clerk.Organization

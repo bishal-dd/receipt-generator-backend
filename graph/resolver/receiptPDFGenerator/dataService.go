@@ -70,3 +70,12 @@ func (r *ReceiptPDFGeneratorResolver) GetReceiptFromDB(ctx context.Context, id s
 	}
 	return receipt, nil
 }
+
+
+func (r *ReceiptPDFGeneratorResolver) GetUserFromDB(ctx context.Context, id string) (*model.User, error) {
+    var user *model.User
+    if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+        return nil, err
+    }
+    return user, nil
+}

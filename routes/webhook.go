@@ -15,7 +15,6 @@ type ProfileRequest struct {
 
 func AddProfile(c *gin.Context, db *gorm.DB) {
     var req ProfileRequest
-    
     if err := c.BindJSON(&req); err != nil {
         c.JSON(400, gin.H{"error": "Invalid request body"})
         return
