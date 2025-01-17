@@ -8,6 +8,7 @@ import (
 	"os"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
@@ -74,7 +75,12 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
         cachedTemplate = template.Must(template.New("receipt").Parse(string(templateContent)))
     })
 
-    var htmlBuffer bytes.Buffer
+	parsedDate, err := time.Parse(time.RFC3339, receipt.Date)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to parse receipt date: %w", err)
+	}
+	receipt.Date = parsedDate.Format("January 02 2006")
+	var htmlBuffer bytes.Buffer
     data := struct {
         Receipt *model.Receipt
         Profile *model.Profile

@@ -52,8 +52,8 @@ type CreateUser struct {
 }
 
 type DownloadPDF struct {
-	ReceiptName      string               `json:"receipt_name"`
-	RecipientName    string               `json:"recipient_name"`
+	ReceiptName      *string              `json:"receipt_name,omitempty"`
+	RecipientName    *string              `json:"recipient_name,omitempty"`
 	RecipientPhone   *string              `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string              `json:"recipient_email,omitempty"`
 	RecipientAddress *string              `json:"recipient_address,omitempty"`
@@ -139,8 +139,8 @@ type SearchReceipt struct {
 }
 
 type SendReceiptPDFToEmail struct {
-	ReceiptName      string               `json:"receipt_name"`
-	RecipientName    string               `json:"recipient_name"`
+	ReceiptName      *string              `json:"receipt_name,omitempty"`
+	RecipientName    *string              `json:"recipient_name,omitempty"`
 	RecipientPhone   *string              `json:"recipient_phone,omitempty"`
 	RecipientEmail   string               `json:"recipient_email"`
 	RecipientAddress *string              `json:"recipient_address,omitempty"`
@@ -155,8 +155,8 @@ type SendReceiptPDFToEmail struct {
 }
 
 type SendReceiptPDFToWhatsApp struct {
-	ReceiptName      string               `json:"receipt_name"`
-	RecipientName    string               `json:"recipient_name"`
+	ReceiptName      *string              `json:"receipt_name,omitempty"`
+	RecipientName    *string              `json:"recipient_name,omitempty"`
 	RecipientPhone   string               `json:"recipient_phone"`
 	RecipientEmail   *string              `json:"recipient_email,omitempty"`
 	RecipientAddress *string              `json:"recipient_address,omitempty"`

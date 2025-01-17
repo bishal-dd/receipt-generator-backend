@@ -8902,14 +8902,14 @@ func (ec *executionContext) unmarshalInputDownloadPDF(ctx context.Context, obj i
 		switch k {
 		case "receipt_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ReceiptName = data
 		case "recipient_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9013,14 +9013,14 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToEmail(ctx context.Cont
 		switch k {
 		case "receipt_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ReceiptName = data
 		case "recipient_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9124,14 +9124,14 @@ func (ec *executionContext) unmarshalInputSendReceiptPDFToWhatsApp(ctx context.C
 		switch k {
 		case "receipt_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ReceiptName = data
 		case "recipient_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

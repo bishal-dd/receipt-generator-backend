@@ -1,6 +1,6 @@
 input SendReceiptPDFToWhatsApp {
-  receipt_name: String!
-  recipient_name: String!
+  receipt_name: String
+  recipient_name: String
   recipient_phone: String!
   recipient_email: String
   recipient_address: String
@@ -15,8 +15,8 @@ input SendReceiptPDFToWhatsApp {
 }
 
 input SendReceiptPDFToEmail {
-  receipt_name: String!
-  recipient_name: String!
+  receipt_name: String
+  recipient_name: String
   recipient_phone: String
   recipient_email: String!
   recipient_address: String
@@ -31,8 +31,8 @@ input SendReceiptPDFToEmail {
 }
 
 input DownloadPDF {
-  receipt_name: String!
-  recipient_name: String!
+  receipt_name: String
+  recipient_name: String
   recipient_phone: String
   recipient_email: String
   recipient_address: String
