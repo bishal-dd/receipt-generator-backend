@@ -110,7 +110,7 @@
           <p><b>Receipt No:</b> {{.Receipt.ReceiptNo}}</p>
           <p><b>Date:</b> {{.Receipt.Date}}</p>
           <p><b>Payment Method:</b> {{.Receipt.PaymentMethod}}</p>
-          {{if .Receipt.PaymentNote}}
+          {{if eq .Receipt.PaymentMethod "Bank Transfer"}}
           <p><b>Payment Note:</b> {{.Receipt.PaymentNote}}</p>
           {{end}}
         </div>
