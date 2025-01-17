@@ -4,8 +4,8 @@ scalar UUID
 
 type Receipt {
   id: UUID!
-  receipt_name: String!
-  recipient_name: String!
+  receipt_name: String
+  recipient_name: String
   recipient_phone: String
   recipient_email: String
   recipient_address: String
@@ -25,8 +25,8 @@ type Receipt {
 }
 
 input CreateReceipt {
-  receipt_name: String!
-  recipient_name: String!
+  receipt_name: String
+  recipient_name: String
   recipient_phone: String
   recipient_email: String
   recipient_address: String

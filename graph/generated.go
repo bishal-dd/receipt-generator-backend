@@ -4597,14 +4597,11 @@ func (ec *executionContext) _Receipt_receipt_name(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Receipt_receipt_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4641,14 +4638,11 @@ func (ec *executionContext) _Receipt_recipient_name(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Receipt_recipient_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8722,14 +8716,14 @@ func (ec *executionContext) unmarshalInputCreateReceipt(ctx context.Context, obj
 		switch k {
 		case "receipt_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receipt_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ReceiptName = data
 		case "recipient_name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recipient_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10051,14 +10045,8 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "receipt_name":
 			out.Values[i] = ec._Receipt_receipt_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "recipient_name":
 			out.Values[i] = ec._Receipt_recipient_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "recipient_phone":
 			out.Values[i] = ec._Receipt_recipient_phone(ctx, field, obj)
 		case "recipient_email":

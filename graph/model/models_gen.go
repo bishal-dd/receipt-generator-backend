@@ -25,8 +25,8 @@ type CreateProfile struct {
 }
 
 type CreateReceipt struct {
-	ReceiptName      string   `json:"receipt_name"`
-	RecipientName    string   `json:"recipient_name"`
+	ReceiptName      *string  `json:"receipt_name,omitempty"`
+	RecipientName    *string  `json:"recipient_name,omitempty"`
 	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string  `json:"recipient_email,omitempty"`
 	RecipientAddress *string  `json:"recipient_address,omitempty"`
@@ -101,8 +101,8 @@ type Query struct {
 
 type Receipt struct {
 	ID               string     `json:"id"`
-	ReceiptName      string     `json:"receipt_name"`
-	RecipientName    string     `json:"recipient_name"`
+	ReceiptName      *string    `json:"receipt_name,omitempty"`
+	RecipientName    *string    `json:"recipient_name,omitempty"`
 	RecipientPhone   *string    `json:"recipient_phone,omitempty"`
 	RecipientEmail   *string    `json:"recipient_email,omitempty"`
 	RecipientAddress *string    `json:"recipient_address,omitempty"`
