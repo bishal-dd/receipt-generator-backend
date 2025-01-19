@@ -33,6 +33,7 @@ func SearchReceiptDocuments(httpClient *resty.Client, userId string, page int, y
 		if err != nil {
 			return nil, fmt.Errorf("invalid date format: %v", err)
 		}
+		parsedDate1 = parsedDate1.AddDate(0, 0, -1)
 		unixDate1 := parsedDate1.Unix()
 		unixDate2 := parsedDate2.Unix()
 		
