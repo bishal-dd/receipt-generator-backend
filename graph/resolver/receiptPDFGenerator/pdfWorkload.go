@@ -13,6 +13,7 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
 	"github.com/bishal-dd/receipt-generator-backend/helper/search"
+	"github.com/bishal-dd/receipt-generator-backend/helper/stringUtil"
 	"gorm.io/gorm"
 )
 
@@ -106,7 +107,7 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 	if resp.StatusCode() != http.StatusOK {
 		return  "", nil, fmt.Errorf("gotenberg returned status %d: %s", resp.StatusCode(), resp.String())
 	}
-	outputFilename := fmt.Sprintf("receipt_%s.pdf", receipt.ID)
+	outputFilename := fmt.Sprintf("receipt_of_%v_from_%s_%s.pdf", *receipt.TotalAmount, stringUtil.ReplaceSpaceWithUnderscore(*profile.CompanyName), receipt.ID)
 	return  outputFilename, resp.Body(), nil
 }
 
