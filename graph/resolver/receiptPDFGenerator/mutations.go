@@ -105,7 +105,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
     return true, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, receiptId string, orginazationId string) (bool, error) {
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, receiptId string, orginazationId string, phoneNumber string) (bool, error) {
     // Early error checking
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
@@ -180,8 +180,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx 
     }
 
     // Optional: Async WhatsApp message
-    if receiptModel.RecipientPhone != nil && *receiptModel.RecipientPhone != "" {
-            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, *receiptModel.RecipientPhone, *receiptModel.TotalAmount, receiptModel.ID)
+    if phoneNumber != "" {
+            err := r.sendPDFToWhatsApp(fileURL, fileName, currentOrganization.Name, phoneNumber, *receiptModel.TotalAmount, receiptModel.ID)
             if err != nil {
                 return false, err
             }
@@ -272,7 +272,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     return true, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx context.Context, receiptId string, orginazationId string) (bool, error) {
+func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx context.Context, receiptId string, orginazationId string, email string) (bool, error) {
     // Early error checking
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
@@ -316,36 +316,31 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx con
     if err := r.saveFile(pdfFile, fileName, currentOrganization.ID, userId); err != nil {
 			return false, err
 		}
-    if receiptModel.RecipientEmail != nil && *receiptModel.RecipientEmail != "" {
-			err := emails.SendEmailWithPDF(
-				*receiptModel.RecipientEmail,
-				"Receipt",
-				"templates/emails/receipt.html",
-				map[string]interface{}{
-					"OrganizationName": currentOrganization.Name,
-					"CustomerName": receiptModel.RecipientName,
-				},
-				fileName,
-				pdfFile,
-			)
-			if err != nil {
-                return false, err
-			}
-            receipt := &model.Receipt{
-                ID: receiptModel.ID,
-            }
-        
-            
-            isReceiptSend := true
-            if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
-                return  false, err
-            }
-            if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptModel.ID); err != nil {
-                return  false, err
-            }
-            
-    } else {
-        return false, errors.New("recipient email is empty")
+    err = emails.SendEmailWithPDF(
+        email,
+        "Receipt",
+        "templates/emails/receipt.html",
+        map[string]interface{}{
+            "OrganizationName": currentOrganization.Name,
+            "CustomerName": receiptModel.RecipientName,
+        },
+        fileName,
+        pdfFile,
+    )
+    if err != nil {
+        return false, err
+    }
+    receipt := &model.Receipt{
+        ID: receiptModel.ID,
+    }
+
+    
+    isReceiptSend := true
+    if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
+        return  false, err
+    }
+    if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptModel.ID); err != nil {
+        return  false, err
     }
 
     return true, nil

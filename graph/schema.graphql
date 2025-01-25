@@ -34,10 +34,12 @@ type Mutation {
   sendReceiptPDFToWhatsAppWithReceiptId(
     receiptId: String!
     orginazationId: String!
+    phoneNumber: String!
   ): Boolean!
   sendReceiptPDFToEmailWithReceiptId(
     receiptId: String!
     orginazationId: String!
+    email: String!
   ): Boolean!
   downloadReceiptPDFWithReceiptId(
     receiptId: String!
