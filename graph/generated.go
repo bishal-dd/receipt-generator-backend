@@ -114,6 +114,7 @@ type ComplexityRoot struct {
 		ProfileByUserID    func(childComplexity int, userID string) int
 		Receipt            func(childComplexity int, id string) int
 		Receipts           func(childComplexity int, first *int, after *string) int
+		SearchProducts     func(childComplexity int, query *string) int
 		SearchReceipts     func(childComplexity int, page int, year *int, date *string, dateRange []string) int
 		Service            func(childComplexity int, id string) int
 		ServiceByReceiptID func(childComplexity int, receiptID string) int
@@ -229,6 +230,7 @@ type QueryResolver interface {
 	SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error)
 	Products(ctx context.Context) ([]*model.Product, error)
 	Product(ctx context.Context, id string) (*model.Product, error)
+	SearchProducts(ctx context.Context, query *string) ([]*model.Product, error)
 }
 
 type executableSchema struct {
@@ -757,6 +759,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Receipts(childComplexity, args["first"].(*int), args["after"].(*string)), true
+
+	case "Query.searchProducts":
+		if e.complexity.Query.SearchProducts == nil {
+			break
+		}
+
+		args, err := ec.field_Query_searchProducts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SearchProducts(childComplexity, args["query"].(*string)), true
 
 	case "Query.searchReceipts":
 		if e.complexity.Query.SearchReceipts == nil {
@@ -1753,6 +1767,21 @@ func (ec *executionContext) field_Query_receipts_args(ctx context.Context, rawAr
 		}
 	}
 	args["after"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_searchProducts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["query"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["query"] = arg0
 	return args, nil
 }
 
@@ -5226,6 +5255,74 @@ func (ec *executionContext) fieldContext_Query_product(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_product_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_searchProducts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_searchProducts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SearchProducts(rctx, fc.Args["query"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Product)
+	fc.Result = res
+	return ec.marshalOProduct2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐProductᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_searchProducts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Product_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
+			case "unit_price":
+				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Product_user_id(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Product_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Product_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Product_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_searchProducts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11020,6 +11117,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_product(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "searchProducts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_searchProducts(ctx, field)
 				return res
 			}
 

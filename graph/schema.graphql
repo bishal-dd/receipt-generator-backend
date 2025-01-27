@@ -15,6 +15,7 @@ type Query {
   ): SearchReceipt!
   products: [Product!]
   product(id: ID!): Product
+  searchProducts(query: String): [Product!]
 }
 
 type Mutation {

@@ -32,6 +32,6 @@ func InitializeResolver(redis *redis.Client, db *gorm.DB, httpClient *resty.Clie
 		ProfileResolver: profile.InitializeProfileResolver(redis, db),
 		ServiceResolver: service.InitializeServiceResolver(redis, db),
 		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(redis, db, httpClient ),
-		ProductResolver: product.InitializeProductResolver(redis, db),
+		ProductResolver: product.InitializeProductResolver(redis, db, httpClient),
 	}
 }
