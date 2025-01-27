@@ -9,6 +9,12 @@ type CreateBulkService struct {
 	Amount      float64 `json:"amount"`
 }
 
+type CreateProduct struct {
+	Name      string  `json:"name"`
+	UnitPrice float64 `json:"unit_price"`
+	UserID    string  `json:"user_id"`
+}
+
 type CreateProfile struct {
 	CompanyName            *string  `json:"company_name,omitempty"`
 	LogoImage              *string  `json:"logo_image,omitempty"`
@@ -75,6 +81,16 @@ type PageInfo struct {
 	HasPreviousPage bool    `json:"hasPreviousPage"`
 	StartCursor     *string `json:"startCursor,omitempty"`
 	EndCursor       *string `json:"endCursor,omitempty"`
+}
+
+type Product struct {
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	UnitPrice float64 `json:"unit_price"`
+	UserID    string  `json:"user_id"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt *string `json:"updated_at,omitempty"`
+	DeletedAt *string `json:"deleted_at,omitempty"`
 }
 
 type Profile struct {
@@ -180,6 +196,12 @@ type Service struct {
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	DeletedAt   *string `json:"deleted_at,omitempty"`
+}
+
+type UpdateProduct struct {
+	ID        string   `json:"id"`
+	Name      *string  `json:"name,omitempty"`
+	UnitPrice *float64 `json:"unit_price,omitempty"`
 }
 
 type UpdateProfile struct {

@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/product"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/profile"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/receipt"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/receiptPDFGenerator"
@@ -21,6 +22,7 @@ type Resolver struct {
 	*profile.ProfileResolver
 	*service.ServiceResolver
 	*receiptPDFGenerator.ReceiptPDFGeneratorResolver
+	*product.ProductResolver
 }
 
 func InitializeResolver(redis *redis.Client, db *gorm.DB, httpClient *resty.Client) *Resolver {
@@ -30,5 +32,6 @@ func InitializeResolver(redis *redis.Client, db *gorm.DB, httpClient *resty.Clie
 		ProfileResolver: profile.InitializeProfileResolver(redis, db),
 		ServiceResolver: service.InitializeServiceResolver(redis, db),
 		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(redis, db, httpClient ),
+		ProductResolver: product.InitializeProductResolver(redis, db),
 	}
 }

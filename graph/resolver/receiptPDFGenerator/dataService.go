@@ -2,7 +2,6 @@ package receiptPDFGenerator
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
@@ -29,7 +28,6 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
         return  err
     }
     if err := search.AddReceiptDocument(r.httpClient, *receiptModel); err != nil {
-        fmt.Println("Error adding receipt document to search: ", err)
         tx.Rollback()
         return  err
     }

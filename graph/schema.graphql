@@ -13,6 +13,8 @@ type Query {
     date: String
     dateRange: [String!]
   ): SearchReceipt!
+  products: [Product!]
+  product(id: ID!): Product
 }
 
 type Mutation {
@@ -45,6 +47,9 @@ type Mutation {
     receiptId: String!
     orginazationId: String!
   ): String!
+  createProduct(input: CreateProduct!): Product!
+  updateProduct(input: UpdateProduct!): Product!
+  deleteProduct(id: ID!): Boolean!
 }
 
 type PageInfo {
