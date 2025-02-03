@@ -9,18 +9,11 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
-	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
-	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 
 func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*model.UserConnection, error) {
-    userId, err := contextUtil.UserIdFromContext(ctx)
-    if err != nil {
-        return nil, err
-    }
-    
     offset, limit, err := paginationUtil.CalculatePagination(first, after)
 	if err != nil {
 		return nil, err 
@@ -29,21 +22,10 @@ func (r *UserResolver) Users(ctx context.Context, first *int, after *string) (*m
     if err != nil {
         return nil, err
     }
-    users, err := r.GetCachedUsers(ctx, userId, offset, limit)
-    if err != nil {
-        return nil, err
-    }
-    if users == nil {
-        users, err = r.FetchUsersFromDB(ctx, offset, limit)
+    users, err := r.FetchUsersFromDB(ctx, offset, limit)
         if err != nil {
             return nil, err
         }
-
-        if err = redisUtil.CachePages(r.redis, UsersPageGroupKey, ctx, UsersKey, users, offset, limit,userId ); err != nil {
-            return nil, err
-        }
-    }
-   
     
     connection := paginationUtil.CreateConnection(users, totalUsers, offset)
 

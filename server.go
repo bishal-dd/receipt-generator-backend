@@ -27,7 +27,7 @@ func main() {
 	 }
 	 InitializeApi()
 	 database := db.Init()
-	 cacheRedis, queueRedis, err := redis.Init()
+	  queueRedis, err := redis.Init()
 	 if err != nil {
 		log.Fatal(err)
 	 }
@@ -37,7 +37,7 @@ func main() {
 	 
 	 httpClient := resty.New()
 
-	 dependencyResolver := resolver.InitializeResolver(cacheRedis, database, httpClient)
+	 dependencyResolver := resolver.InitializeResolver( database, httpClient)
  
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()

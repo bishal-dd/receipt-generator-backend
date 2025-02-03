@@ -10,7 +10,7 @@ import (
 
 // Redis clients for different purposes
 var (
-	CacheClient *redis.Client
+	// CacheClient *redis.Client
 	QueueClient *redis.Client
 )
 
@@ -41,44 +41,44 @@ func createClient(cfg Config) (*redis.Client, error) {
 }
 
 // Init initializes both Redis clients
-func Init() (*redis.Client, *redis.Client, error) {
+func Init() ( *redis.Client, error) {
 	// Configuration for cache client (using database 0)
-	cacheConfig := Config{
-		URL:      os.Getenv("REDIS_CACHE_URL"),
-		Database: 0,
-	}
+	// cacheConfig := Config{
+	// 	URL:      os.Getenv("REDIS_CACHE_URL"),
+	// 	Database: 0,
+	// }
 
 	// Configuration for queue client (using database 1)
 	queueConfig := Config{
 		URL:      os.Getenv("REDIS_QUEUE_URL"), // You can use a different URL if needed
-		Database: 1,
+		Database: 0,
 	}
 
 	// Initialize cache client
 	var err error
-	CacheClient, err = createClient(cacheConfig)
-	if err != nil {
-		return nil,nil,err
-	}
-	log.Println("Successfully connected to Redis Cache (DB: 0)")
+	// CacheClient, err = createClient(cacheConfig)
+	// if err != nil {
+	// 	return nil,nil,err
+	// }
+	// log.Println("Successfully connected to Redis Cache (DB: 0)")
 
 	// Initialize queue client
 	QueueClient, err = createClient(queueConfig)
 	if err != nil {
-		return nil, nil,err
+		return nil,err
 	}
-	log.Println("Successfully connected to Redis Queue (DB: 1)")
+	log.Println("Successfully connected to Redis Queue (DB: 0)")
 
-	return CacheClient, QueueClient,nil
+	return  QueueClient,nil
 }
 
 // Close closes both Redis clients
 func Close() {
-	if CacheClient != nil {
-		if err := CacheClient.Close(); err != nil {
-			log.Printf("Error closing cache client: %v", err)
-		}
-	}
+	// if CacheClient != nil {
+	// 	if err := CacheClient.Close(); err != nil {
+	// 		log.Printf("Error closing cache client: %v", err)
+	// 	}
+	// }
 	if QueueClient != nil {
 		if err := QueueClient.Close(); err != nil {
 			log.Printf("Error closing queue client: %v", err)

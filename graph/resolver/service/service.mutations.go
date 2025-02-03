@@ -5,7 +5,6 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/database"
-	"github.com/bishal-dd/receipt-generator-backend/helper/redisUtil"
 )
 
 func (r *ServiceResolver) CreateService(ctx context.Context, input model.CreateService) (*model.Service, error) {
@@ -25,9 +24,6 @@ func (r *ServiceResolver) UpdateService(ctx context.Context, input model.UpdateS
 	if err := r.db.Model(service).Updates(input).Error; err != nil {
 		return nil, err
 	}
-	if err := redisUtil.DeleteCacheItem(r.redis, ctx, ServiceKey, input.ID); err != nil {
-		return nil, err
-	}
 	newService, err := r.GetServiceFromDB(input.ID)
 	if err != nil {
 		return nil, err
@@ -38,9 +34,6 @@ func (r *ServiceResolver) UpdateService(ctx context.Context, input model.UpdateS
 
 func (r *ServiceResolver) DeleteService(ctx context.Context, id string) (bool, error) {
 	if err := r.DeleteServiceFromDB(ctx, id); err != nil {
-		return false, err
-	}
-	if err := redisUtil.DeleteCacheItem(r.redis, ctx, ServiceKey, id); err != nil {
 		return false, err
 	}
 	

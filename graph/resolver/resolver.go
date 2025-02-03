@@ -8,7 +8,6 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/service"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/user"
 	"github.com/go-resty/resty/v2"
-	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -25,13 +24,13 @@ type Resolver struct {
 	*product.ProductResolver
 }
 
-func InitializeResolver(redis *redis.Client, db *gorm.DB, httpClient *resty.Client) *Resolver {
+func InitializeResolver( db *gorm.DB, httpClient *resty.Client) *Resolver {
 	return &Resolver{
-		UserResolver:    user.InitializeUserResolver(redis, db),
-		ReceiptResolver: receipt.InitializeReceiptResolver(redis, db, httpClient),
-		ProfileResolver: profile.InitializeProfileResolver(redis, db),
-		ServiceResolver: service.InitializeServiceResolver(redis, db),
-		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(redis, db, httpClient ),
-		ProductResolver: product.InitializeProductResolver(redis, db, httpClient),
+		UserResolver:    user.InitializeUserResolver(db),
+		ReceiptResolver: receipt.InitializeReceiptResolver(db, httpClient),
+		ProfileResolver: profile.InitializeProfileResolver(db),
+		ServiceResolver: service.InitializeServiceResolver(db),
+		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient ),
+		ProductResolver: product.InitializeProductResolver(db, httpClient),
 	}
 }
