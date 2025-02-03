@@ -53,6 +53,9 @@ func main() {
 	r.POST("/profile", func(c *gin.Context) {
 		routes.AddProfile(c, database)
 	})
+	r.POST("/payment-webhook", func(c *gin.Context) {
+		routes.PaymentWebhook(c, database)
+	})
 	r.GET("/issuePresignedURL", routes.HandlePresignedURL)
 	r.Use(AuthMiddleware())
 	r.Use(loaders.LoaderMiddleware(database))
