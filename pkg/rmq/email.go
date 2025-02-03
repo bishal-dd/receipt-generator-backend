@@ -112,7 +112,6 @@ func InitEmailQueue(redisClient *redis.Client)  error {
     if err != nil {
         return  err
     }
-    PollQueueStats(5 * time.Second)
     return nil
 }
 

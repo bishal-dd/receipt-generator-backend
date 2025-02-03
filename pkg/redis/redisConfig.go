@@ -53,7 +53,6 @@ func Init() ( *redis.Client, error) {
 		URL:      os.Getenv("REDIS_QUEUE_URL"), // You can use a different URL if needed
 		Database: 0,
 	}
-
 	// Initialize cache client
 	var err error
 	// CacheClient, err = createClient(cacheConfig)
