@@ -25,8 +25,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
     if err != nil {
         return false, err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return false, errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return false, err
     }
     // Use errgroup for parallel processing
     var g errgroup.Group
@@ -115,8 +115,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx 
     if err != nil {
         return false, err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return false, errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return false, err
     }
     // Use errgroup for parallel processing
     var g errgroup.Group
@@ -203,8 +203,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
     if err != nil {
         return false, err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return false, errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return false, err
     }
     // Use errgroup for parallel processing
     var currentOrganization *clerk.Organization
@@ -282,8 +282,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx con
     if err != nil {
         return false, err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return false, errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return false, err
     }
     // Use errgroup for parallel processing
     var currentOrganization *clerk.Organization
@@ -356,8 +356,8 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
     if err != nil {
         return "", err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return "", errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return "", err
     }
     // Use errgroup for parallel processing
     var g errgroup.Group
@@ -434,8 +434,8 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDFWithReceiptID(ctx contex
     if err != nil {
         return "", err
     }
-    if user.Mode == trial && user.UseCount >= trialUseCountLimit {
-        return "", errors.New("trial limit exceeded")
+    if err := checkUserMode(user.Mode, user.UseCount); err != nil {
+        return "", err
     }
     // Use errgroup for parallel processing
     var g errgroup.Group

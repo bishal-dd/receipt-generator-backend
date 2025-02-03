@@ -1,6 +1,7 @@
 package receiptPDFGenerator
 
 import (
+	"errors"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
@@ -109,4 +110,15 @@ func downloadInputToReceiptModel(input model.DownloadPDF, userId string, totalAm
 	}
 }
 
-
+func checkUserMode(mode string, useCount int) error {
+	if mode == trial && useCount >= trialUseCountLimit {
+		return errors.New("trial limit exceeded")
+	}
+	if mode == starter && useCount >= starterUseCountLimit {
+		return errors.New("starter limit exceeded")
+	}
+	if mode == growth && useCount >= growthUseCountLimit {
+		return errors.New("growth limit exceeded")
+	}
+	return nil
+}
