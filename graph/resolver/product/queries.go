@@ -24,10 +24,24 @@ func (r *ProductResolver) SearchProducts(ctx context.Context, query *string) ([]
 	if err != nil {
 		return nil, err
 	}
-	products, err := searchProductDocuments(r.httpClient, userId, *query)
-	if err != nil {
+
+	var products []*model.Product
+
+	db := r.db // assuming you have a `*gorm.DB` instance in your resolver
+
+	q := db.
+		Where("deleted_at IS NULL").
+		Where("user_id = ?", userId)
+
+	if query != nil && *query != "" {
+		// This will use the idx_products_name index if the LIKE pattern is left-anchored (e.g., "term%")
+		q = q.Where("name ILIKE ?", *query+"%")
+	}
+
+	if err := q.Find(&products).Error; err != nil {
 		return nil, err
-	};
+	}
+
 	return products, nil
 }
 
