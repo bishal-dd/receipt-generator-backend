@@ -10,7 +10,6 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
-	"github.com/bishal-dd/receipt-generator-backend/helper/search"
 )
 
 
@@ -57,13 +56,60 @@ func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *in
     if err != nil {
         return nil, err
     }
+
     if err := searchDataRangeValidation(dateRange); err != nil {
         return nil, err
     }
-    response, err := search.SearchReceiptDocuments(r.httpClient, userId, page, year, date, dateRange)
-    if err != nil {
+
+    const pageSize = 10
+    offset := (page - 1) * pageSize
+
+    var (
+        receipts   []model.Receipt
+        totalCount int64
+        foundCount int64
+    )
+
+    // 1. Count total receipts for user (no filters)
+    if err := r.db.Model(&model.Receipt{}).
+        Where("user_id = ?", userId).
+        Count(&totalCount).Error; err != nil {
         return nil, err
     }
-   
-    return response, nil
+
+    // 2. Build filtered query
+    query := r.db.Where("user_id = ?", userId)
+
+    if year != nil {
+        query = query.Where("EXTRACT(YEAR FROM date) = ?", *year)
+    }
+
+    if date != nil {
+        query = query.Where("date = ?", *date)
+    }
+
+    if len(dateRange) == 2 {
+        query = query.Where("date BETWEEN ? AND ?", dateRange[0], dateRange[1])
+    }
+
+    // 3. Count found receipts (after applying filters)
+    if err := query.Model(&model.Receipt{}).Count(&foundCount).Error; err != nil {
+        return nil, err
+    }
+
+    // 4. Fetch paginated receipts
+    if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&receipts).Error; err != nil {
+        return nil, err
+    }
+
+    receiptsPtr := []*model.Receipt{}
+    for _, receipt := range receipts {
+        receiptsPtr = append(receiptsPtr, &receipt)
+    }
+    
+    return &model.SearchReceipt{
+        Receipts:  receiptsPtr,
+        TotalCount: int(totalCount),
+        FoundCount: int(foundCount),
+    }, nil
 }
