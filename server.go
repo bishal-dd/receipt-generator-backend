@@ -42,7 +42,7 @@ func main() {
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3001", "https://2quickpaper.com", "https://www.2quickpaper.com"},
+		AllowOrigins:     []string{"http://localhost:3001", "https://2quickpaper.com", "https://www.2quickpaper.com", "https://www.billstotrack.com", "https://billstotrack.com"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
