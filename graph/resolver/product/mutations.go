@@ -13,9 +13,6 @@ func (r *ProductResolver) CreateProduct(ctx context.Context, input model.CreateP
 	if err := r.db.Create(inputData).Error; err != nil {
 		return nil, err
 	}
-	if err := addProductDocument(r.httpClient, *inputData); err != nil {
-		return nil, err
-	}
 	return inputData, nil
 }
 
@@ -37,9 +34,6 @@ func (r *ProductResolver) UpdateProduct(ctx context.Context, input model.UpdateP
 
 func (r *ProductResolver) DeleteProduct(ctx context.Context, id string) (bool, error) {
 	if err := r.DeleteProductFromDB(ctx, id); err != nil {
-		return false, err
-	}
-	if err := deleteProductDocument(r.httpClient, id); err != nil {
 		return false, err
 	}
 	return true, nil
