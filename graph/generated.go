@@ -83,6 +83,7 @@ type ComplexityRoot struct {
 		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Quantity  func(childComplexity int) int
 		UnitPrice func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UserID    func(childComplexity int) int
@@ -559,6 +560,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Product.Name(childComplexity), true
+
+	case "Product.quantity":
+		if e.complexity.Product.Quantity == nil {
+			break
+		}
+
+		return e.complexity.Product.Quantity(childComplexity), true
 
 	case "Product.unit_price":
 		if e.complexity.Product.UnitPrice == nil {
@@ -3173,6 +3181,8 @@ func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Cont
 				return ec.fieldContext_Product_name(ctx, field)
 			case "unit_price":
 				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Product_quantity(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -3244,6 +3254,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Cont
 				return ec.fieldContext_Product_name(ctx, field)
 			case "unit_price":
 				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Product_quantity(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -3622,6 +3634,47 @@ func (ec *executionContext) fieldContext_Product_unit_price(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Product_quantity(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Product_quantity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Quantity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Product_quantity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5178,6 +5231,8 @@ func (ec *executionContext) fieldContext_Query_products(ctx context.Context, fie
 				return ec.fieldContext_Product_name(ctx, field)
 			case "unit_price":
 				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Product_quantity(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -5235,6 +5290,8 @@ func (ec *executionContext) fieldContext_Query_product(ctx context.Context, fiel
 				return ec.fieldContext_Product_name(ctx, field)
 			case "unit_price":
 				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Product_quantity(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -5303,6 +5360,8 @@ func (ec *executionContext) fieldContext_Query_searchProducts(ctx context.Contex
 				return ec.fieldContext_Product_name(ctx, field)
 			case "unit_price":
 				return ec.fieldContext_Product_unit_price(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Product_quantity(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -9529,7 +9588,7 @@ func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit_price", "user_id"}
+	fieldsInOrder := [...]string{"name", "unit_price", "quantity", "user_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9550,6 +9609,13 @@ func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj
 				return it, err
 			}
 			it.UnitPrice = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
 		case "user_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
@@ -10193,7 +10259,7 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "unit_price"}
+	fieldsInOrder := [...]string{"id", "name", "unit_price", "quantity"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10221,6 +10287,13 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 				return it, err
 			}
 			it.UnitPrice = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
 		}
 	}
 
@@ -10768,6 +10841,8 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "quantity":
+			out.Values[i] = ec._Product_quantity(ctx, field, obj)
 		case "user_id":
 			out.Values[i] = ec._Product_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

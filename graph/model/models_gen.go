@@ -12,6 +12,7 @@ type CreateBulkService struct {
 type CreateProduct struct {
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
+	Quantity  *int    `json:"quantity,omitempty"`
 	UserID    string  `json:"user_id"`
 }
 
@@ -87,6 +88,7 @@ type Product struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
+	Quantity  *int    `json:"quantity,omitempty"`
 	UserID    string  `json:"user_id"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt *string `json:"updated_at,omitempty"`
@@ -202,6 +204,7 @@ type UpdateProduct struct {
 	ID        string   `json:"id"`
 	Name      *string  `json:"name,omitempty"`
 	UnitPrice *float64 `json:"unit_price,omitempty"`
+	Quantity  *int     `json:"quantity,omitempty"`
 }
 
 type UpdateProfile struct {
