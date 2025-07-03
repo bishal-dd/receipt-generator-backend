@@ -7,6 +7,7 @@ type CreateBulkService struct {
 	Rate        float64 `json:"rate"`
 	Quantity    int     `json:"quantity"`
 	Amount      float64 `json:"amount"`
+	ID          *string `json:"id,omitempty"`
 }
 
 type CreateProduct struct {

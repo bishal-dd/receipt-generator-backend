@@ -9540,7 +9540,7 @@ func (ec *executionContext) unmarshalInputCreateBulkService(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"description", "rate", "quantity", "amount"}
+	fieldsInOrder := [...]string{"description", "rate", "quantity", "amount", "id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9575,6 +9575,13 @@ func (ec *executionContext) unmarshalInputCreateBulkService(ctx context.Context,
 				return it, err
 			}
 			it.Amount = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
 		}
 	}
 
