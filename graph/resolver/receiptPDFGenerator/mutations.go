@@ -16,6 +16,7 @@ import (
 
 func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Context, input model.SendReceiptPDFToWhatsApp) (bool, error) {
     // Early error checking
+    tx := r.db.Begin()
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
         return false, err
@@ -63,10 +64,17 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    fmt.Print(input.Services)
-    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+    if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
+        tx.Rollback()
         return false, err
      }
+     if err := r.MinusProductQuantity(input.Services, tx); err != nil {
+        tx.Rollback()
+        return false, err
+     }
+    if err := tx.Commit().Error; err != nil {
+        return false, err
+    }
 
     // Parallel PDF generation and storage upload
     g.Go(func() error {
@@ -195,6 +203,8 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsAppWithReceiptID(ctx 
 
 func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error) {
     // Early error checking
+            tx := r.db.Begin()
+
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
         return false, err
@@ -228,9 +238,17 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = emailInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+    if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
+        tx.Rollback()
         return false, err
      }
+     if err := r.MinusProductQuantity(input.Services, tx); err != nil {
+        tx.Rollback()
+        return false, err
+     }
+    if err := tx.Commit().Error; err != nil {
+        return false, err
+    }
     fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
 	if err != nil {
 		return false, err
@@ -348,6 +366,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmailWithReceiptID(ctx con
 
 func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, input model.DownloadPDF) (string, error) {
     // Early error checking
+    tx := r.db.Begin()
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
         return "", err
@@ -395,9 +414,17 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-    if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+       if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
+        tx.Rollback()
         return "", err
      }
+     if err := r.MinusProductQuantity(input.Services, tx); err != nil {
+        tx.Rollback()
+        return "", err
+     }
+    if err := tx.Commit().Error; err != nil {
+        return "", err
+    }
 
     // Parallel PDF generation and storage upload
     g.Go(func() error {
@@ -502,6 +529,7 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDFWithReceiptID(ctx contex
 
 
 func (r *ReceiptPDFGeneratorResolver) SaveReceipt(ctx context.Context, input model.DownloadPDF) (bool, error) {
+    tx := r.db.Begin()
     userId, err := contextUtil.UserIdFromContext(ctx)
     if err != nil {
         return false, err
@@ -516,9 +544,17 @@ func (r *ReceiptPDFGeneratorResolver) SaveReceipt(ctx context.Context, input mod
 
     totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
     receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-     if err := r.saveReceipt(receiptModel, input.Services); err != nil {
+        if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
+        tx.Rollback()
         return false, err
      }
+     if err := r.MinusProductQuantity(input.Services, tx); err != nil {
+        tx.Rollback()
+        return false, err
+     }
+    if err := tx.Commit().Error; err != nil {
+        return false, err
+    }
 
     return true, nil
 }

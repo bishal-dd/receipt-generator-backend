@@ -2,10 +2,12 @@ package receiptPDFGenerator
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
+	"gorm.io/gorm"
 )
 
 func (r *ReceiptPDFGeneratorResolver) GetProfileByUserID(userId string) (*model.Profile, error) {
@@ -16,8 +18,7 @@ func (r *ReceiptPDFGeneratorResolver) GetProfileByUserID(userId string) (*model.
 	return profile, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, services []*model.CreateBulkService)error{
-	tx := r.db.Begin()
+func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, services []*model.CreateBulkService, tx *gorm.DB)error{
     if tx.Error != nil {
         return tx.Error
     }
@@ -48,9 +49,6 @@ func (r *ReceiptPDFGeneratorResolver) saveReceipt(receiptModel *model.Receipt, s
         }
 		receiptModel.Services = append(receiptModel.Services, serviceModel)
     }
-    if err := tx.Commit().Error; err != nil {
-        return  err
-    }
 
 	return nil
 }
@@ -75,4 +73,27 @@ func (r *ReceiptPDFGeneratorResolver) GetUserFromDB(ctx context.Context, id stri
         return nil, err
     }
     return user, nil
+}
+
+func (r *ReceiptPDFGeneratorResolver) MinusProductQuantity(services []*model.CreateBulkService, tx *gorm.DB) error {
+    for _, service := range services {
+    var product model.Product
+    if err := tx.First(&product, "id = ?", service.ID).Error; err != nil {
+        tx.Rollback()
+        return  err
+    }
+
+    if *product.Quantity < service.Quantity {
+        tx.Rollback()
+        return fmt.Errorf("not enough stock for product ID %s", product.ID)
+    }
+
+    *product.Quantity -= service.Quantity
+
+    if err := tx.Save(&product).Error; err != nil {
+        tx.Rollback()
+        return err
+    }
+    }
+    return nil
 }
