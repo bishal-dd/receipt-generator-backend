@@ -1,0 +1,72 @@
+type EncryptedReceipt {
+    id: UUID!
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    receipt_no: String!
+    user_id: ID!
+    date: Date!
+    total_amount: String
+    sub_total_amount: Float
+    tax_amount: Float
+    payment_method: String!
+    payment_note: String
+    is_receipt_send: Boolean!
+    aes_key_encrypted: String # Base64 encoded RSA-encrypted AES key
+    aes_iv: String
+    created_at: DateTime!
+    updated_at: DateTime
+    deleted_at: DateTime
+}
+
+input CreateEncryptedReceipt {
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    is_receipt_send: Boolean!
+    receipt_no: String!
+    payment_method: String!
+    payment_note: String
+    user_id: ID!
+    date: Date!
+    aes_key_encrypted: String # Required on create
+    aes_iv: String #
+    total_amount: String!
+}
+
+input UpdateEncryptedReceipt {
+    id: UUID!
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    receipt_no: String
+    payment_method: String
+    payment_note: String
+    is_receipt_send: Boolean
+    user_id: ID
+    date: Date
+    total_amount: Float
+}
+
+type EncryptedReceiptEdge {
+    cursor: String!
+    node: EncryptedReceipt!
+}
+
+type EncryptedReceiptConnection {
+    edges: [EncryptedReceiptEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type SearchEncryptedReceipt {
+    receipts: [EncryptedReceipt!]!
+    totalCount: Int!
+    foundCount: Int!
+}

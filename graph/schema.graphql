@@ -1,61 +1,70 @@
+scalar Date
+scalar DateTime
+scalar UUID
+
 type Query {
-  users(first: Int, after: String): UserConnection!
-  user(id: ID!): User
-  receipts(first: Int, after: String): ReceiptConnection!
-  receipt(id: ID!): Receipt
-  profileByUserId(userId: String!): Profile
-  profile(id: ID!): Profile
-  serviceByReceiptId(receiptId: String!): [Service]
-  service(id: ID!): Service
-  searchReceipts(
-    page: Int!
-    year: Int
-    date: String
-    dateRange: [String!]
-  ): SearchReceipt!
-  products: [Product!]
-  product(id: ID!): Product
-  searchProducts(query: String): [Product!]
+    users(first: Int, after: String): UserConnection!
+    user(id: ID!): User
+    receipts(first: Int, after: String): ReceiptConnection!
+    receipt(id: ID!): Receipt
+    encryptedReceipts(first: Int, after: String): EncryptedReceiptConnection!
+    encryptedReceipt(id: ID!): EncryptedReceipt
+    profileByUserId(userId: String!): Profile
+    profile(id: ID!): Profile
+    serviceByReceiptId(receiptId: String!): [Service]
+    service(id: ID!): Service
+    searchReceipts(
+        page: Int!
+        year: Int
+        date: String
+        dateRange: [String!]
+    ): SearchReceipt!
+    products: [Product!]
+    product(id: ID!): Product
+    searchProducts(query: String): [Product!]
 }
 
 type Mutation {
-  createUser(input: CreateUser!): User!
-  deleteUser(id: ID!): Boolean!
-  createReceipt(input: CreateReceipt!): Receipt!
-  updateReceipt(input: UpdateReceipt!): Receipt!
-  deleteReceipt(id: ID!): Boolean!
-  createProfile(input: CreateProfile!): Profile!
-  updateProfile(input: UpdateProfile!): Profile!
-  deleteProfile(id: ID!): Boolean!
-  createService(input: CreateService!): Service!
-  updateService(input: UpdateService!): Service!
-  deleteService(id: ID!): Boolean!
-  sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
-  sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
-  downloadReceiptPDF(input: DownloadPDF!): String!
-  saveReceipt(input: DownloadPDF!): Boolean!
-  sendReceiptPDFToWhatsAppWithReceiptId(
-    receiptId: String!
-    orginazationId: String!
-    phoneNumber: String!
-  ): Boolean!
-  sendReceiptPDFToEmailWithReceiptId(
-    receiptId: String!
-    orginazationId: String!
-    email: String!
-  ): Boolean!
-  downloadReceiptPDFWithReceiptId(
-    receiptId: String!
-    orginazationId: String!
-  ): String!
-  createProduct(input: CreateProduct!): Product!
-  updateProduct(input: UpdateProduct!): Product!
-  deleteProduct(id: ID!): Boolean!
+    createUser(input: CreateUser!): User!
+    deleteUser(id: ID!): Boolean!
+    createReceipt(input: CreateReceipt!): Receipt!
+    updateReceipt(input: UpdateReceipt!): Receipt!
+    deleteReceipt(id: ID!): Boolean!
+    createEncryptedReceipt(input: CreateEncryptedReceipt!): EncryptedReceipt!
+    updateEncryptedReceipt(input: UpdateEncryptedReceipt!): EncryptedReceipt!
+    deleteEncryptedReceipt(id: ID!): Boolean!
+    createProfile(input: CreateProfile!): Profile!
+    updateProfile(input: UpdateProfile!): Profile!
+    deleteProfile(id: ID!): Boolean!
+    createService(input: CreateService!): Service!
+    updateService(input: UpdateService!): Service!
+    deleteService(id: ID!): Boolean!
+    sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
+    sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
+    downloadReceiptPDF(input: DownloadPDF!): String!
+    saveReceipt(input: DownloadPDF!): Boolean!
+    sendReceiptPDFToWhatsAppWithReceiptId(
+        receiptId: String!
+        orginazationId: String!
+        phoneNumber: String!
+    ): Boolean!
+    sendReceiptPDFToEmailWithReceiptId(
+        receiptId: String!
+        orginazationId: String!
+        email: String!
+    ): Boolean!
+    downloadReceiptPDFWithReceiptId(
+        receiptId: String!
+        orginazationId: String!
+    ): String!
+    createProduct(input: CreateProduct!): Product!
+    updateProduct(input: UpdateProduct!): Product!
+    deleteProduct(id: ID!): Boolean!
 }
 
 type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
 }

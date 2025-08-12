@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/encryptedReceipt"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/product"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/profile"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/receipt"
@@ -18,19 +19,21 @@ import (
 type Resolver struct {
 	*user.UserResolver
 	*receipt.ReceiptResolver
+	*encryptedReceipt.EncryptedReceiptResolver
 	*profile.ProfileResolver
 	*service.ServiceResolver
 	*receiptPDFGenerator.ReceiptPDFGeneratorResolver
 	*product.ProductResolver
 }
 
-func InitializeResolver( db *gorm.DB, httpClient *resty.Client) *Resolver {
+func InitializeResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM string, privateKeyPEM string) *Resolver {
 	return &Resolver{
-		UserResolver:    user.InitializeUserResolver(db),
-		ReceiptResolver: receipt.InitializeReceiptResolver(db, httpClient),
-		ProfileResolver: profile.InitializeProfileResolver(db),
-		ServiceResolver: service.InitializeServiceResolver(db),
-		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient ),
-		ProductResolver: product.InitializeProductResolver(db, httpClient),
+		UserResolver:                user.InitializeUserResolver(db),
+		ReceiptResolver:             receipt.InitializeReceiptResolver(db, httpClient),
+		ProfileResolver:             profile.InitializeProfileResolver(db),
+		ServiceResolver:             service.InitializeServiceResolver(db),
+		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient),
+		ProductResolver:             product.InitializeProductResolver(db, httpClient),
+		EncryptedReceiptResolver:    encryptedReceipt.InitializeEncryptedReceiptResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
 	}
 }

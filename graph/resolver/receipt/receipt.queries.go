@@ -12,104 +12,102 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/helper/paginationUtil"
 )
 
-
 func (r *ReceiptResolver) Receipts(ctx context.Context, first *int, after *string) (*model.ReceiptConnection, error) {
-    userId, err := contextUtil.UserIdFromContext(ctx)
-    if err != nil {
-        return nil, err
-    }
-    
-    offset, limit, err := paginationUtil.CalculatePagination(first, after)
+	userId, err := contextUtil.UserIdFromContext(ctx)
 	if err != nil {
-		return nil, err 
-	} 
-    totalReceipts, err := r.CountTotalReceipts()
-    if err != nil {
-        return nil, err
-    }
-    receipts, err := r.FetchReceiptsFromDB(ctx, offset, limit, userId)
-    if err != nil {
-        return nil, err
-    }
-
-    connection := paginationUtil.CreateConnection(receipts, totalReceipts, offset)
-
-    return &model.ReceiptConnection{
-        Edges: convertEdges(connection.Edges),
-        PageInfo: (*model.PageInfo)(connection.PageInfo),
-        TotalCount: connection.TotalCount,
-    }, nil
-}
-
-
-func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
-	newReceipt, err := r.GetReceiptFromDB( ctx, id)
-    if err != nil {
 		return nil, err
 	}
-        
-    return newReceipt, nil
+
+	offset, limit, err := paginationUtil.CalculatePagination(first, after)
+	if err != nil {
+		return nil, err
+	}
+	totalReceipts, err := r.CountTotalReceipts()
+	if err != nil {
+		return nil, err
+	}
+	receipts, err := r.FetchReceiptsFromDB(ctx, offset, limit, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	connection := paginationUtil.CreateConnection(receipts, totalReceipts, offset)
+
+	return &model.ReceiptConnection{
+		Edges:      convertEdges(connection.Edges),
+		PageInfo:   (*model.PageInfo)(connection.PageInfo),
+		TotalCount: connection.TotalCount,
+	}, nil
+}
+
+func (r *ReceiptResolver) Receipt(ctx context.Context, id string) (*model.Receipt, error) {
+	newReceipt, err := r.GetReceiptFromDB(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return newReceipt, nil
 }
 
 func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error) {
-    userId, err := contextUtil.UserIdFromContext(ctx)
-    if err != nil {
-        return nil, err
-    }
+	userId, err := contextUtil.UserIdFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-    if err := searchDataRangeValidation(dateRange); err != nil {
-        return nil, err
-    }
+	if err := searchDataRangeValidation(dateRange); err != nil {
+		return nil, err
+	}
 
-    const pageSize = 10
-    offset := (page - 1) * pageSize
+	const pageSize = 10
+	offset := (page - 1) * pageSize
 
-    var (
-        receipts   []model.Receipt
-        totalCount int64
-        foundCount int64
-    )
+	var (
+		receipts   []model.Receipt
+		totalCount int64
+		foundCount int64
+	)
 
-    // 1. Count total receipts for user (no filters)
-    if err := r.db.Model(&model.Receipt{}).
-        Where("user_id = ?", userId).
-        Count(&totalCount).Error; err != nil {
-        return nil, err
-    }
+	// 1. Count total receipts for user (no filters)
+	if err := r.db.Model(&model.Receipt{}).
+		Where("user_id = ?", userId).
+		Count(&totalCount).Error; err != nil {
+		return nil, err
+	}
 
-    // 2. Build filtered query
-    query := r.db.Where("user_id = ?", userId)
+	// 2. Build filtered query
+	query := r.db.Where("user_id = ?", userId)
 
-    if year != nil {
-        query = query.Where("EXTRACT(YEAR FROM date) = ?", *year)
-    }
+	if year != nil {
+		query = query.Where("EXTRACT(YEAR FROM date) = ?", *year)
+	}
 
-    if date != nil {
-        query = query.Where("date = ?", *date)
-    }
+	if date != nil {
+		query = query.Where("date = ?", *date)
+	}
 
-    if len(dateRange) == 2 {
-        query = query.Where("date BETWEEN ? AND ?", dateRange[0], dateRange[1])
-    }
+	if len(dateRange) == 2 {
+		query = query.Where("date BETWEEN ? AND ?", dateRange[0], dateRange[1])
+	}
 
-    // 3. Count found receipts (after applying filters)
-    if err := query.Model(&model.Receipt{}).Count(&foundCount).Error; err != nil {
-        return nil, err
-    }
+	// 3. Count found receipts (after applying filters)
+	if err := query.Model(&model.Receipt{}).Count(&foundCount).Error; err != nil {
+		return nil, err
+	}
 
-    // 4. Fetch paginated receipts
-    if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&receipts).Error; err != nil {
-        return nil, err
-    }
+	// 4. Fetch paginated receipts
+	if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&receipts).Error; err != nil {
+		return nil, err
+	}
 
-    receiptsPtr := []*model.Receipt{}
-    for _, receipt := range receipts {
-        receiptsPtr = append(receiptsPtr, &receipt)
-    }
-    
-    return &model.SearchReceipt{
-        Receipts:  receiptsPtr,
-        TotalCount: int(totalCount),
-        FoundCount: int(foundCount),
-    }, nil
+	receiptsPtr := []*model.Receipt{}
+	for _, receipt := range receipts {
+		receiptsPtr = append(receiptsPtr, &receipt)
+	}
+
+	return &model.SearchReceipt{
+		Receipts:   receiptsPtr,
+		TotalCount: int(totalCount),
+		FoundCount: int(foundCount),
+	}, nil
 }

@@ -1,73 +1,69 @@
-scalar Date
-scalar DateTime
-scalar UUID
-
 type Receipt {
-  id: UUID!
-  receipt_name: String
-  recipient_name: String
-  recipient_phone: String
-  recipient_email: String
-  recipient_address: String
-  receipt_no: String!
-  user_id: ID!
-  date: Date!
-  total_amount: Float
-  sub_total_amount: Float
-  tax_amount: Float
-  payment_method: String!
-  payment_note: String
-  is_receipt_send: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime
-  deleted_at: DateTime
-  Services: [Service]
+    id: UUID!
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    receipt_no: String!
+    user_id: ID!
+    date: Date!
+    total_amount: Float
+    sub_total_amount: Float
+    tax_amount: Float
+    payment_method: String!
+    payment_note: String
+    is_receipt_send: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime
+    deleted_at: DateTime
+    Services: [Service]
 }
 
 input CreateReceipt {
-  receipt_name: String
-  recipient_name: String
-  recipient_phone: String
-  recipient_email: String
-  recipient_address: String
-  is_receipt_send: Boolean!
-  receipt_no: String!
-  payment_method: String!
-  payment_note: String
-  user_id: ID!
-  date: Date!
-  total_amount: Float
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    is_receipt_send: Boolean!
+    receipt_no: String!
+    payment_method: String!
+    payment_note: String
+    user_id: ID!
+    date: Date!
+    total_amount: Float
 }
 
 input UpdateReceipt {
-  id: UUID!
-  receipt_name: String
-  recipient_name: String
-  recipient_phone: String
-  recipient_email: String
-  recipient_address: String
-  receipt_no: String
-  payment_method: String
-  payment_note: String
-  is_receipt_send: Boolean
-  user_id: ID
-  date: Date
-  total_amount: Float
+    id: UUID!
+    receipt_name: String
+    recipient_name: String
+    recipient_phone: String
+    recipient_email: String
+    recipient_address: String
+    receipt_no: String
+    payment_method: String
+    payment_note: String
+    is_receipt_send: Boolean
+    user_id: ID
+    date: Date
+    total_amount: Float
 }
 
 type ReceiptEdge {
-  cursor: String!
-  node: Receipt!
+    cursor: String!
+    node: Receipt!
 }
 
 type ReceiptConnection {
-  edges: [ReceiptEdge!]!
-  pageInfo: PageInfo!
-  totalCount: Int!
+    edges: [ReceiptEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
 }
 
 type SearchReceipt {
-  receipts: [Receipt!]!
-  totalCount: Int!
-  foundCount: Int!
+    receipts: [Receipt!]!
+    totalCount: Int!
+    foundCount: Int!
 }

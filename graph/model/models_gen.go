@@ -10,6 +10,23 @@ type CreateBulkService struct {
 	ID          *string `json:"id,omitempty"`
 }
 
+type CreateEncryptedReceipt struct {
+	ReceiptName      *string `json:"receipt_name,omitempty"`
+	RecipientName    *string `json:"recipient_name,omitempty"`
+	RecipientPhone   *string `json:"recipient_phone,omitempty"`
+	RecipientEmail   *string `json:"recipient_email,omitempty"`
+	RecipientAddress *string `json:"recipient_address,omitempty"`
+	IsReceiptSend    bool    `json:"is_receipt_send"`
+	ReceiptNo        string  `json:"receipt_no"`
+	PaymentMethod    string  `json:"payment_method"`
+	PaymentNote      *string `json:"payment_note,omitempty"`
+	UserID           string  `json:"user_id"`
+	Date             string  `json:"date"`
+	AesKeyEncrypted  *string `json:"aes_key_encrypted,omitempty"`
+	AesIv            *string `json:"aes_iv,omitempty"`
+	TotalAmount      string  `json:"total_amount"`
+}
+
 type CreateProduct struct {
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
@@ -73,6 +90,40 @@ type DownloadPDF struct {
 	OrginazationID   string               `json:"orginazation_id"`
 	Date             string               `json:"date"`
 	Services         []*CreateBulkService `json:"Services,omitempty"`
+}
+
+type EncryptedReceipt struct {
+	ID               string   `json:"id"`
+	ReceiptName      *string  `json:"receipt_name,omitempty"`
+	RecipientName    *string  `json:"recipient_name,omitempty"`
+	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
+	RecipientEmail   *string  `json:"recipient_email,omitempty"`
+	RecipientAddress *string  `json:"recipient_address,omitempty"`
+	ReceiptNo        string   `json:"receipt_no"`
+	UserID           string   `json:"user_id"`
+	Date             string   `json:"date"`
+	TotalAmount      *string  `json:"total_amount,omitempty"`
+	SubTotalAmount   *float64 `json:"sub_total_amount,omitempty"`
+	TaxAmount        *float64 `json:"tax_amount,omitempty"`
+	PaymentMethod    string   `json:"payment_method"`
+	PaymentNote      *string  `json:"payment_note,omitempty"`
+	IsReceiptSend    bool     `json:"is_receipt_send"`
+	AesKeyEncrypted  *string  `json:"aes_key_encrypted,omitempty"`
+	AesIv            *string  `json:"aes_iv,omitempty"`
+	CreatedAt        string   `json:"created_at"`
+	UpdatedAt        *string  `json:"updated_at,omitempty"`
+	DeletedAt        *string  `json:"deleted_at,omitempty"`
+}
+
+type EncryptedReceiptConnection struct {
+	Edges      []*EncryptedReceiptEdge `json:"edges"`
+	PageInfo   *PageInfo               `json:"pageInfo"`
+	TotalCount int                     `json:"totalCount"`
+}
+
+type EncryptedReceiptEdge struct {
+	Cursor string            `json:"cursor"`
+	Node   *EncryptedReceipt `json:"node"`
 }
 
 type Mutation struct {
@@ -151,6 +202,12 @@ type ReceiptEdge struct {
 	Node   *Receipt `json:"node"`
 }
 
+type SearchEncryptedReceipt struct {
+	Receipts   []*EncryptedReceipt `json:"receipts"`
+	TotalCount int                 `json:"totalCount"`
+	FoundCount int                 `json:"foundCount"`
+}
+
 type SearchReceipt struct {
 	Receipts   []*Receipt `json:"receipts"`
 	TotalCount int        `json:"totalCount"`
@@ -199,6 +256,22 @@ type Service struct {
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	DeletedAt   *string `json:"deleted_at,omitempty"`
+}
+
+type UpdateEncryptedReceipt struct {
+	ID               string   `json:"id"`
+	ReceiptName      *string  `json:"receipt_name,omitempty"`
+	RecipientName    *string  `json:"recipient_name,omitempty"`
+	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
+	RecipientEmail   *string  `json:"recipient_email,omitempty"`
+	RecipientAddress *string  `json:"recipient_address,omitempty"`
+	ReceiptNo        *string  `json:"receipt_no,omitempty"`
+	PaymentMethod    *string  `json:"payment_method,omitempty"`
+	PaymentNote      *string  `json:"payment_note,omitempty"`
+	IsReceiptSend    *bool    `json:"is_receipt_send,omitempty"`
+	UserID           *string  `json:"user_id,omitempty"`
+	Date             *string  `json:"date,omitempty"`
+	TotalAmount      *float64 `json:"total_amount,omitempty"`
 }
 
 type UpdateProduct struct {

@@ -7,6 +7,8 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/loaders"
 	resolver "github.com/bishal-dd/receipt-generator-backend/graph/resolver"
+	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
+	"github.com/bishal-dd/receipt-generator-backend/pkg/crypto"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/db"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/redis"
 	"github.com/bishal-dd/receipt-generator-backend/pkg/rmq"
@@ -18,27 +20,48 @@ import (
 )
 
 func main() {
-	 err := godotenv.Load()
-	 env := os.Getenv("ENV")
-	 if env == "development" {
+	err := godotenv.Load()
+	env := os.Getenv("ENV")
+	if env == "development" {
 		if err != nil {
 			log.Fatal("Error loading .env file")
-		  }
-	 }
-	 InitializeApi()
-	 database := db.Init()
-	  queueRedis, err := redis.Init()
-	 if err != nil {
-		log.Fatal(err)
-	 }
-	 if err := rmq.InitEmailQueue(queueRedis); err != nil {
-		log.Fatal(err)
-	 }
-	 
-	 httpClient := resty.New()
+		}
+	}
+	privateKey, err := crypto.LoadPrivateKey()
+	if err != nil {
+		log.Fatalf("failed to load private key: %v", err)
+	}
 
-	 dependencyResolver := resolver.InitializeResolver( database, httpClient)
- 
+	publicKey, err := crypto.LoadPublicKey()
+	if err != nil {
+		log.Fatalf("failed to load public key: %v", err)
+	}
+	encryption.InitKeys(publicKey, privateKey)
+	log.Println("RSA keys loaded successfully")
+
+	publicKeyPEM, err := crypto.PublicKeyToPEM(publicKey)
+	if err != nil {
+		log.Fatalf("failed to convert public key to PEM: %v", err)
+	}
+	privateKeyPEM, err := crypto.PrivateKeyToPEM(privateKey)
+	if err != nil {
+		log.Fatalf("failed to convert private key to PEM: %v", err)
+	}
+
+	InitializeApi()
+	database := db.Init()
+	queueRedis, err := redis.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := rmq.InitEmailQueue(queueRedis); err != nil {
+		log.Fatal(err)
+	}
+
+	httpClient := resty.New()
+
+	dependencyResolver := resolver.InitializeResolver(database, httpClient, publicKeyPEM, privateKeyPEM)
+
 	log.Printf("connect to http://localhost:%d/graphql for GraphQL playground", 8080)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -61,5 +84,5 @@ func main() {
 	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", routes.GraphqlHandler(dependencyResolver))
 	r.Run()
-	
+
 }
