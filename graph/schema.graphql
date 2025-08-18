@@ -12,6 +12,7 @@ type Query {
     profileByUserId(userId: String!): Profile
     profile(id: ID!): Profile
     serviceByReceiptId(receiptId: String!): [Service]
+    encryptedServiceByReceiptId(receiptId: ID!): [EncryptedService]
     service(id: ID!): Service
     searchReceipts(
         page: Int!
@@ -39,6 +40,9 @@ type Mutation {
     createService(input: CreateService!): Service!
     updateService(input: UpdateService!): Service!
     deleteService(id: ID!): Boolean!
+    createEncryptedService(input: CreateEncryptedService!): EncryptedService!
+    updateEncryptedService(input: UpdateEncryptedService!): EncryptedService!
+    deleteEncryptedService(id: ID!): Boolean!
     sendReceiptPDFToWhatsApp(input: SendReceiptPDFToWhatsApp!): Boolean!
     sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
     downloadReceiptPDF(input: DownloadPDF!): String!

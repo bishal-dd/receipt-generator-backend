@@ -2,10 +2,10 @@ package encryptedReceipt
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
 )
 
 func (r *EncryptedReceiptResolver) CountTotalEncryptedReceipts() (int64, error) {
@@ -52,45 +52,20 @@ func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context
 }
 
 func (r *EncryptedReceiptResolver) decryptReceipt(receipt *model.EncryptedReceipt) error {
-	// 1. Decrypt AES key
-	aesKey, err := decryptRSAWithBase64([]byte(r.privateKeyPEM), []byte(*receipt.AesKeyEncrypted))
+	aesKey, iv, err := encryption.DecryptKeyAndIV(r.privateKeyPEM, *receipt.AesKeyEncrypted, *receipt.AesIv)
 	if err != nil {
 		return fmt.Errorf("decrypt AES key: %w", err)
 	}
-
-	// 2. Decode IV
-	iv, err := base64.StdEncoding.DecodeString(*receipt.AesIv)
-	if err != nil {
-		return fmt.Errorf("decode IV: %w", err)
-	}
-
-	// 3. Decrypt helper
-	decryptField := func(encryptedBase64 *string) *string {
-		if encryptedBase64 == nil {
-			return nil
-		}
-		encryptedBytes, err := base64.StdEncoding.DecodeString(*encryptedBase64)
-		if err != nil {
-			return nil
-		}
-		decrypted, err := decryptAES(aesKey, iv, encryptedBytes)
-		if err != nil {
-			return nil
-		}
-		str := string(decrypted)
-		return &str
-	}
-
 	// 4. Apply decryption
-	receipt.ReceiptName = decryptField(receipt.ReceiptName)
-	receipt.RecipientName = decryptField(receipt.RecipientName)
-	receipt.RecipientPhone = decryptField(receipt.RecipientPhone)
-	receipt.RecipientEmail = decryptField(receipt.RecipientEmail)
-	receipt.RecipientAddress = decryptField(receipt.RecipientAddress)
-	receipt.ReceiptNo = derefString(decryptField(strPtr(receipt.ReceiptNo)))
-	receipt.PaymentMethod = derefString(decryptField(strPtr(receipt.PaymentMethod)))
-	receipt.PaymentNote = decryptField(receipt.PaymentNote)
-	receipt.TotalAmount = decryptField(receipt.TotalAmount)
+	receipt.ReceiptName = encryption.DecryptField(receipt.ReceiptName, aesKey, iv)
+	receipt.RecipientName = encryption.DecryptField(receipt.RecipientName, aesKey, iv)
+	receipt.RecipientPhone = encryption.DecryptField(receipt.RecipientPhone, aesKey, iv)
+	receipt.RecipientEmail = encryption.DecryptField(receipt.RecipientEmail, aesKey, iv)
+	receipt.RecipientAddress = encryption.DecryptField(receipt.RecipientAddress, aesKey, iv)
+	receipt.ReceiptNo = derefString(encryption.DecryptField(strPtr(receipt.ReceiptNo), aesKey, iv))
+	receipt.PaymentMethod = derefString(encryption.DecryptField(strPtr(receipt.PaymentMethod), aesKey, iv))
+	receipt.PaymentNote = encryption.DecryptField(receipt.PaymentNote, aesKey, iv)
+	receipt.TotalAmount = encryption.DecryptField(receipt.TotalAmount, aesKey, iv)
 
 	return nil
 }

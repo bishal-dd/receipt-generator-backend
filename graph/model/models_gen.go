@@ -27,6 +27,14 @@ type CreateEncryptedReceipt struct {
 	TotalAmount      string  `json:"total_amount"`
 }
 
+type CreateEncryptedService struct {
+	Description        string `json:"description"`
+	Rate               string `json:"rate"`
+	Quantity           string `json:"quantity"`
+	Amount             string `json:"amount"`
+	EncryptedReceiptID string `json:"encrypted_receipt_id"`
+}
+
 type CreateProduct struct {
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
@@ -124,6 +132,20 @@ type EncryptedReceiptConnection struct {
 type EncryptedReceiptEdge struct {
 	Cursor string            `json:"cursor"`
 	Node   *EncryptedReceipt `json:"node"`
+}
+
+type EncryptedService struct {
+	ID                 string  `json:"id"`
+	Description        string  `json:"description"`
+	Rate               string  `json:"rate"`
+	Quantity           string  `json:"quantity"`
+	Amount             string  `json:"amount"`
+	EncryptedReceiptID string  `json:"encrypted_receipt_id"`
+	AesKeyEncrypted    *string `json:"aes_key_encrypted,omitempty"`
+	AesIv              *string `json:"aes_iv,omitempty"`
+	CreatedAt          string  `json:"created_at"`
+	UpdatedAt          *string `json:"updated_at,omitempty"`
+	DeletedAt          *string `json:"deleted_at,omitempty"`
 }
 
 type Mutation struct {
@@ -272,6 +294,14 @@ type UpdateEncryptedReceipt struct {
 	UserID           *string  `json:"user_id,omitempty"`
 	Date             *string  `json:"date,omitempty"`
 	TotalAmount      *float64 `json:"total_amount,omitempty"`
+}
+
+type UpdateEncryptedService struct {
+	ID          string  `json:"id"`
+	Description *string `json:"description,omitempty"`
+	Rate        *string `json:"rate,omitempty"`
+	Quantity    *string `json:"quantity,omitempty"`
+	Amount      *string `json:"amount,omitempty"`
 }
 
 type UpdateProduct struct {

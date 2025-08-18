@@ -81,14 +81,30 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	EncryptedService struct {
+		AesIv              func(childComplexity int) int
+		AesKeyEncrypted    func(childComplexity int) int
+		Amount             func(childComplexity int) int
+		CreatedAt          func(childComplexity int) int
+		DeletedAt          func(childComplexity int) int
+		Description        func(childComplexity int) int
+		EncryptedReceiptID func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		Quantity           func(childComplexity int) int
+		Rate               func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateEncryptedReceipt                func(childComplexity int, input model.CreateEncryptedReceipt) int
+		CreateEncryptedService                func(childComplexity int, input model.CreateEncryptedService) int
 		CreateProduct                         func(childComplexity int, input model.CreateProduct) int
 		CreateProfile                         func(childComplexity int, input model.CreateProfile) int
 		CreateReceipt                         func(childComplexity int, input model.CreateReceipt) int
 		CreateService                         func(childComplexity int, input model.CreateService) int
 		CreateUser                            func(childComplexity int, input model.CreateUser) int
 		DeleteEncryptedReceipt                func(childComplexity int, id string) int
+		DeleteEncryptedService                func(childComplexity int, id string) int
 		DeleteProduct                         func(childComplexity int, id string) int
 		DeleteProfile                         func(childComplexity int, id string) int
 		DeleteReceipt                         func(childComplexity int, id string) int
@@ -102,6 +118,7 @@ type ComplexityRoot struct {
 		SendReceiptPDFToWhatsApp              func(childComplexity int, input model.SendReceiptPDFToWhatsApp) int
 		SendReceiptPDFToWhatsAppWithReceiptID func(childComplexity int, receiptID string, orginazationID string, phoneNumber string) int
 		UpdateEncryptedReceipt                func(childComplexity int, input model.UpdateEncryptedReceipt) int
+		UpdateEncryptedService                func(childComplexity int, input model.UpdateEncryptedService) int
 		UpdateProduct                         func(childComplexity int, input model.UpdateProduct) int
 		UpdateProfile                         func(childComplexity int, input model.UpdateProfile) int
 		UpdateReceipt                         func(childComplexity int, input model.UpdateReceipt) int
@@ -146,20 +163,21 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		EncryptedReceipt   func(childComplexity int, id string) int
-		EncryptedReceipts  func(childComplexity int, first *int, after *string) int
-		Product            func(childComplexity int, id string) int
-		Products           func(childComplexity int) int
-		Profile            func(childComplexity int, id string) int
-		ProfileByUserID    func(childComplexity int, userID string) int
-		Receipt            func(childComplexity int, id string) int
-		Receipts           func(childComplexity int, first *int, after *string) int
-		SearchProducts     func(childComplexity int, query *string) int
-		SearchReceipts     func(childComplexity int, page int, year *int, date *string, dateRange []string) int
-		Service            func(childComplexity int, id string) int
-		ServiceByReceiptID func(childComplexity int, receiptID string) int
-		User               func(childComplexity int, id string) int
-		Users              func(childComplexity int, first *int, after *string) int
+		EncryptedReceipt            func(childComplexity int, id string) int
+		EncryptedReceipts           func(childComplexity int, first *int, after *string) int
+		EncryptedServiceByReceiptID func(childComplexity int, receiptID string) int
+		Product                     func(childComplexity int, id string) int
+		Products                    func(childComplexity int) int
+		Profile                     func(childComplexity int, id string) int
+		ProfileByUserID             func(childComplexity int, userID string) int
+		Receipt                     func(childComplexity int, id string) int
+		Receipts                    func(childComplexity int, first *int, after *string) int
+		SearchProducts              func(childComplexity int, query *string) int
+		SearchReceipts              func(childComplexity int, page int, year *int, date *string, dateRange []string) int
+		Service                     func(childComplexity int, id string) int
+		ServiceByReceiptID          func(childComplexity int, receiptID string) int
+		User                        func(childComplexity int, id string) int
+		Users                       func(childComplexity int, first *int, after *string) int
 	}
 
 	Receipt struct {
@@ -256,6 +274,9 @@ type MutationResolver interface {
 	CreateService(ctx context.Context, input model.CreateService) (*model.Service, error)
 	UpdateService(ctx context.Context, input model.UpdateService) (*model.Service, error)
 	DeleteService(ctx context.Context, id string) (bool, error)
+	CreateEncryptedService(ctx context.Context, input model.CreateEncryptedService) (*model.EncryptedService, error)
+	UpdateEncryptedService(ctx context.Context, input model.UpdateEncryptedService) (*model.EncryptedService, error)
+	DeleteEncryptedService(ctx context.Context, id string) (bool, error)
 	SendReceiptPDFToWhatsApp(ctx context.Context, input model.SendReceiptPDFToWhatsApp) (bool, error)
 	SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error)
 	DownloadReceiptPDF(ctx context.Context, input model.DownloadPDF) (string, error)
@@ -277,6 +298,7 @@ type QueryResolver interface {
 	ProfileByUserID(ctx context.Context, userID string) (*model.Profile, error)
 	Profile(ctx context.Context, id string) (*model.Profile, error)
 	ServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.Service, error)
+	EncryptedServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.EncryptedService, error)
 	Service(ctx context.Context, id string) (*model.Service, error)
 	SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error)
 	Products(ctx context.Context) ([]*model.Product, error)
@@ -478,6 +500,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EncryptedReceiptEdge.Node(childComplexity), true
 
+	case "EncryptedService.aes_iv":
+		if e.complexity.EncryptedService.AesIv == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.AesIv(childComplexity), true
+
+	case "EncryptedService.aes_key_encrypted":
+		if e.complexity.EncryptedService.AesKeyEncrypted == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.AesKeyEncrypted(childComplexity), true
+
+	case "EncryptedService.amount":
+		if e.complexity.EncryptedService.Amount == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.Amount(childComplexity), true
+
+	case "EncryptedService.created_at":
+		if e.complexity.EncryptedService.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.CreatedAt(childComplexity), true
+
+	case "EncryptedService.deleted_at":
+		if e.complexity.EncryptedService.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.DeletedAt(childComplexity), true
+
+	case "EncryptedService.description":
+		if e.complexity.EncryptedService.Description == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.Description(childComplexity), true
+
+	case "EncryptedService.encrypted_receipt_id":
+		if e.complexity.EncryptedService.EncryptedReceiptID == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.EncryptedReceiptID(childComplexity), true
+
+	case "EncryptedService.id":
+		if e.complexity.EncryptedService.ID == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.ID(childComplexity), true
+
+	case "EncryptedService.quantity":
+		if e.complexity.EncryptedService.Quantity == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.Quantity(childComplexity), true
+
+	case "EncryptedService.rate":
+		if e.complexity.EncryptedService.Rate == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.Rate(childComplexity), true
+
+	case "EncryptedService.updated_at":
+		if e.complexity.EncryptedService.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.EncryptedService.UpdatedAt(childComplexity), true
+
 	case "Mutation.createEncryptedReceipt":
 		if e.complexity.Mutation.CreateEncryptedReceipt == nil {
 			break
@@ -489,6 +588,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateEncryptedReceipt(childComplexity, args["input"].(model.CreateEncryptedReceipt)), true
+
+	case "Mutation.createEncryptedService":
+		if e.complexity.Mutation.CreateEncryptedService == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createEncryptedService_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateEncryptedService(childComplexity, args["input"].(model.CreateEncryptedService)), true
 
 	case "Mutation.createProduct":
 		if e.complexity.Mutation.CreateProduct == nil {
@@ -561,6 +672,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteEncryptedReceipt(childComplexity, args["id"].(string)), true
+
+	case "Mutation.deleteEncryptedService":
+		if e.complexity.Mutation.DeleteEncryptedService == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteEncryptedService_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteEncryptedService(childComplexity, args["id"].(string)), true
 
 	case "Mutation.deleteProduct":
 		if e.complexity.Mutation.DeleteProduct == nil {
@@ -717,6 +840,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEncryptedReceipt(childComplexity, args["input"].(model.UpdateEncryptedReceipt)), true
+
+	case "Mutation.updateEncryptedService":
+		if e.complexity.Mutation.UpdateEncryptedService == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEncryptedService_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEncryptedService(childComplexity, args["input"].(model.UpdateEncryptedService)), true
 
 	case "Mutation.updateProduct":
 		if e.complexity.Mutation.UpdateProduct == nil {
@@ -985,6 +1120,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.EncryptedReceipts(childComplexity, args["first"].(*int), args["after"].(*string)), true
+
+	case "Query.encryptedServiceByReceiptId":
+		if e.complexity.Query.EncryptedServiceByReceiptID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_encryptedServiceByReceiptId_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.EncryptedServiceByReceiptID(childComplexity, args["receiptId"].(string)), true
 
 	case "Query.product":
 		if e.complexity.Query.Product == nil {
@@ -1492,6 +1639,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateBulkService,
 		ec.unmarshalInputCreateEncryptedReceipt,
+		ec.unmarshalInputCreateEncryptedService,
 		ec.unmarshalInputCreateProduct,
 		ec.unmarshalInputCreateProfile,
 		ec.unmarshalInputCreateReceipt,
@@ -1501,6 +1649,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputSendReceiptPDFToEmail,
 		ec.unmarshalInputSendReceiptPDFToWhatsApp,
 		ec.unmarshalInputUpdateEncryptedReceipt,
+		ec.unmarshalInputUpdateEncryptedService,
 		ec.unmarshalInputUpdateProduct,
 		ec.unmarshalInputUpdateProfile,
 		ec.unmarshalInputUpdateReceipt,
@@ -1601,7 +1750,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "resolver/encryptedReceipt/schema.graphql" "resolver/product/schema.graphql" "resolver/profile/profile.graphql" "resolver/receipt/receipt.graphql" "resolver/receiptPDFGenerator/schema.graphql" "resolver/service/service.graphql" "resolver/user/user.graphql" "schema.graphql"
+//go:embed "resolver/encryptedReceipt/schema.graphql" "resolver/encryptedService/schema.graphql" "resolver/product/schema.graphql" "resolver/profile/profile.graphql" "resolver/receipt/receipt.graphql" "resolver/receiptPDFGenerator/schema.graphql" "resolver/service/service.graphql" "resolver/user/user.graphql" "schema.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1614,6 +1763,7 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "resolver/encryptedReceipt/schema.graphql", Input: sourceData("resolver/encryptedReceipt/schema.graphql"), BuiltIn: false},
+	{Name: "resolver/encryptedService/schema.graphql", Input: sourceData("resolver/encryptedService/schema.graphql"), BuiltIn: false},
 	{Name: "resolver/product/schema.graphql", Input: sourceData("resolver/product/schema.graphql"), BuiltIn: false},
 	{Name: "resolver/profile/profile.graphql", Input: sourceData("resolver/profile/profile.graphql"), BuiltIn: false},
 	{Name: "resolver/receipt/receipt.graphql", Input: sourceData("resolver/receipt/receipt.graphql"), BuiltIn: false},
@@ -1635,6 +1785,21 @@ func (ec *executionContext) field_Mutation_createEncryptedReceipt_args(ctx conte
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateEncryptedReceipt2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateEncryptedReceipt(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createEncryptedService_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateEncryptedService
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateEncryptedService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateEncryptedService(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1719,6 +1884,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 }
 
 func (ec *executionContext) field_Mutation_deleteEncryptedReceipt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteEncryptedService_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1973,6 +2153,21 @@ func (ec *executionContext) field_Mutation_updateEncryptedReceipt_args(ctx conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateEncryptedService_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateEncryptedService
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateEncryptedService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐUpdateEncryptedService(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2084,6 +2279,21 @@ func (ec *executionContext) field_Query_encryptedReceipts_args(ctx context.Conte
 		}
 	}
 	args["after"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_encryptedServiceByReceiptId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["receiptId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiptId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["receiptId"] = arg0
 	return args, nil
 }
 
@@ -3454,6 +3664,478 @@ func (ec *executionContext) fieldContext_EncryptedReceiptEdge_node(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _EncryptedService_id(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUUID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_description(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_rate(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_rate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_rate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_quantity(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_quantity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Quantity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_quantity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_amount(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_encrypted_receipt_id(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_encrypted_receipt_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EncryptedReceiptID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUUID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_encrypted_receipt_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_aes_key_encrypted(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_aes_key_encrypted(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AesKeyEncrypted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_aes_key_encrypted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_aes_iv(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_aes_iv(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AesIv, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_aes_iv(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_created_at(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_updated_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EncryptedService_deleted_at(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedService) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedService_deleted_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedService_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedService",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
 	if err != nil {
@@ -4506,6 +5188,219 @@ func (ec *executionContext) fieldContext_Mutation_deleteService(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteService_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEncryptedService(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEncryptedService(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateEncryptedService(rctx, fc.Args["input"].(model.CreateEncryptedService))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EncryptedService)
+	fc.Result = res
+	return ec.marshalNEncryptedService2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEncryptedService(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_EncryptedService_id(ctx, field)
+			case "description":
+				return ec.fieldContext_EncryptedService_description(ctx, field)
+			case "rate":
+				return ec.fieldContext_EncryptedService_rate(ctx, field)
+			case "quantity":
+				return ec.fieldContext_EncryptedService_quantity(ctx, field)
+			case "amount":
+				return ec.fieldContext_EncryptedService_amount(ctx, field)
+			case "encrypted_receipt_id":
+				return ec.fieldContext_EncryptedService_encrypted_receipt_id(ctx, field)
+			case "aes_key_encrypted":
+				return ec.fieldContext_EncryptedService_aes_key_encrypted(ctx, field)
+			case "aes_iv":
+				return ec.fieldContext_EncryptedService_aes_iv(ctx, field)
+			case "created_at":
+				return ec.fieldContext_EncryptedService_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_EncryptedService_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_EncryptedService_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EncryptedService", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEncryptedService_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateEncryptedService(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateEncryptedService(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEncryptedService(rctx, fc.Args["input"].(model.UpdateEncryptedService))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EncryptedService)
+	fc.Result = res
+	return ec.marshalNEncryptedService2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateEncryptedService(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_EncryptedService_id(ctx, field)
+			case "description":
+				return ec.fieldContext_EncryptedService_description(ctx, field)
+			case "rate":
+				return ec.fieldContext_EncryptedService_rate(ctx, field)
+			case "quantity":
+				return ec.fieldContext_EncryptedService_quantity(ctx, field)
+			case "amount":
+				return ec.fieldContext_EncryptedService_amount(ctx, field)
+			case "encrypted_receipt_id":
+				return ec.fieldContext_EncryptedService_encrypted_receipt_id(ctx, field)
+			case "aes_key_encrypted":
+				return ec.fieldContext_EncryptedService_aes_key_encrypted(ctx, field)
+			case "aes_iv":
+				return ec.fieldContext_EncryptedService_aes_iv(ctx, field)
+			case "created_at":
+				return ec.fieldContext_EncryptedService_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_EncryptedService_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_EncryptedService_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EncryptedService", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateEncryptedService_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteEncryptedService(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteEncryptedService(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEncryptedService(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteEncryptedService(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteEncryptedService_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6966,6 +7861,82 @@ func (ec *executionContext) fieldContext_Query_serviceByReceiptId(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_serviceByReceiptId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_encryptedServiceByReceiptId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_encryptedServiceByReceiptId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().EncryptedServiceByReceiptID(rctx, fc.Args["receiptId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EncryptedService)
+	fc.Result = res
+	return ec.marshalOEncryptedService2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_encryptedServiceByReceiptId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_EncryptedService_id(ctx, field)
+			case "description":
+				return ec.fieldContext_EncryptedService_description(ctx, field)
+			case "rate":
+				return ec.fieldContext_EncryptedService_rate(ctx, field)
+			case "quantity":
+				return ec.fieldContext_EncryptedService_quantity(ctx, field)
+			case "amount":
+				return ec.fieldContext_EncryptedService_amount(ctx, field)
+			case "encrypted_receipt_id":
+				return ec.fieldContext_EncryptedService_encrypted_receipt_id(ctx, field)
+			case "aes_key_encrypted":
+				return ec.fieldContext_EncryptedService_aes_key_encrypted(ctx, field)
+			case "aes_iv":
+				return ec.fieldContext_EncryptedService_aes_iv(ctx, field)
+			case "created_at":
+				return ec.fieldContext_EncryptedService_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_EncryptedService_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_EncryptedService_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EncryptedService", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_encryptedServiceByReceiptId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11798,6 +12769,61 @@ func (ec *executionContext) unmarshalInputCreateEncryptedReceipt(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateEncryptedService(ctx context.Context, obj interface{}) (model.CreateEncryptedService, error) {
+	var it model.CreateEncryptedService
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"description", "rate", "quantity", "amount", "encrypted_receipt_id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "rate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rate"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rate = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "amount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Amount = data
+		case "encrypted_receipt_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("encrypted_receipt_id"))
+			data, err := ec.unmarshalNUUID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EncryptedReceiptID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj interface{}) (model.CreateProduct, error) {
 	var it model.CreateProduct
 	asMap := map[string]interface{}{}
@@ -12580,6 +13606,61 @@ func (ec *executionContext) unmarshalInputUpdateEncryptedReceipt(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateEncryptedService(ctx context.Context, obj interface{}) (model.UpdateEncryptedService, error) {
+	var it model.UpdateEncryptedService
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "description", "rate", "quantity", "amount"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNUUID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "rate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rate = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "amount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Amount = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj interface{}) (model.UpdateProduct, error) {
 	var it model.UpdateProduct
 	asMap := map[string]interface{}{}
@@ -13094,6 +14175,83 @@ func (ec *executionContext) _EncryptedReceiptEdge(ctx context.Context, sel ast.S
 	return out
 }
 
+var encryptedServiceImplementors = []string{"EncryptedService"}
+
+func (ec *executionContext) _EncryptedService(ctx context.Context, sel ast.SelectionSet, obj *model.EncryptedService) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, encryptedServiceImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EncryptedService")
+		case "id":
+			out.Values[i] = ec._EncryptedService_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._EncryptedService_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "rate":
+			out.Values[i] = ec._EncryptedService_rate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "quantity":
+			out.Values[i] = ec._EncryptedService_quantity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._EncryptedService_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "encrypted_receipt_id":
+			out.Values[i] = ec._EncryptedService_encrypted_receipt_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "aes_key_encrypted":
+			out.Values[i] = ec._EncryptedService_aes_key_encrypted(ctx, field, obj)
+		case "aes_iv":
+			out.Values[i] = ec._EncryptedService_aes_iv(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._EncryptedService_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updated_at":
+			out.Values[i] = ec._EncryptedService_updated_at(ctx, field, obj)
+		case "deleted_at":
+			out.Values[i] = ec._EncryptedService_deleted_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -13207,6 +14365,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteService":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteService(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createEncryptedService":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEncryptedService(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateEncryptedService":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateEncryptedService(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteEncryptedService":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteEncryptedService(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -13691,6 +14870,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_serviceByReceiptId(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "encryptedServiceByReceiptId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_encryptedServiceByReceiptId(ctx, field)
 				return res
 			}
 
@@ -14690,6 +15888,11 @@ func (ec *executionContext) unmarshalNCreateEncryptedReceipt2githubᚗcomᚋbish
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateEncryptedService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateEncryptedService(ctx context.Context, v interface{}) (model.CreateEncryptedService, error) {
+	res, err := ec.unmarshalInputCreateEncryptedService(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateProduct2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐCreateProduct(ctx context.Context, v interface{}) (model.CreateProduct, error) {
 	res, err := ec.unmarshalInputCreateProduct(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -14874,6 +16077,20 @@ func (ec *executionContext) marshalNEncryptedReceiptEdge2ᚖgithubᚗcomᚋbisha
 		return graphql.Null
 	}
 	return ec._EncryptedReceiptEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEncryptedService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx context.Context, sel ast.SelectionSet, v model.EncryptedService) graphql.Marshaler {
+	return ec._EncryptedService(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEncryptedService2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx context.Context, sel ast.SelectionSet, v *model.EncryptedService) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EncryptedService(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
@@ -15155,6 +16372,11 @@ func (ec *executionContext) marshalNUUID2string(ctx context.Context, sel ast.Sel
 
 func (ec *executionContext) unmarshalNUpdateEncryptedReceipt2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐUpdateEncryptedReceipt(ctx context.Context, v interface{}) (model.UpdateEncryptedReceipt, error) {
 	res, err := ec.unmarshalInputUpdateEncryptedReceipt(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateEncryptedService2githubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐUpdateEncryptedService(ctx context.Context, v interface{}) (model.UpdateEncryptedService, error) {
+	res, err := ec.unmarshalInputUpdateEncryptedService(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -15596,6 +16818,54 @@ func (ec *executionContext) marshalOEncryptedReceipt2ᚖgithubᚗcomᚋbishalᚑ
 		return graphql.Null
 	}
 	return ec._EncryptedReceipt(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOEncryptedService2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx context.Context, sel ast.SelectionSet, v []*model.EncryptedService) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOEncryptedService2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOEncryptedService2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx context.Context, sel ast.SelectionSet, v *model.EncryptedService) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._EncryptedService(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {

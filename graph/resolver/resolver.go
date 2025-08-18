@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/encryptedReceipt"
+	encryptedservice "github.com/bishal-dd/receipt-generator-backend/graph/resolver/encryptedService"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/product"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/profile"
 	"github.com/bishal-dd/receipt-generator-backend/graph/resolver/receipt"
@@ -20,6 +21,7 @@ type Resolver struct {
 	*user.UserResolver
 	*receipt.ReceiptResolver
 	*encryptedReceipt.EncryptedReceiptResolver
+	*encryptedservice.EncryptedServiceResolver
 	*profile.ProfileResolver
 	*service.ServiceResolver
 	*receiptPDFGenerator.ReceiptPDFGeneratorResolver
@@ -35,5 +37,6 @@ func InitializeResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM stri
 		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient),
 		ProductResolver:             product.InitializeProductResolver(db, httpClient),
 		EncryptedReceiptResolver:    encryptedReceipt.InitializeEncryptedReceiptResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
+		EncryptedServiceResolver:    encryptedservice.InitializeEncryptedServiceResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
 	}
 }

@@ -1,0 +1,29 @@
+type EncryptedService {
+    id: UUID!
+    description: String!
+    rate: String!
+    quantity: String!
+    amount: String!
+    encrypted_receipt_id: UUID!
+    aes_key_encrypted: String # Base64 encoded RSA-encrypted AES key
+    aes_iv: String
+    created_at: DateTime!
+    updated_at: DateTime
+    deleted_at: DateTime
+}
+
+input CreateEncryptedService {
+    description: String!
+    rate: String!
+    quantity: String!
+    amount: String!
+    encrypted_receipt_id: UUID!
+}
+
+input UpdateEncryptedService {
+    id: UUID!
+    description: String
+    rate: String
+    quantity: String
+    amount: String
+}

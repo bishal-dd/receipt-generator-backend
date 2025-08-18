@@ -2,40 +2,24 @@ package encryptedReceipt
 
 import (
 	"context"
-	"crypto/aes"
-	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"time"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
+	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
 	"github.com/google/uuid"
 )
 
 func (r *EncryptedReceiptResolver) CreateEncryptedReceipt(ctx context.Context, input model.CreateEncryptedReceipt) (*model.EncryptedReceipt, error) {
-	// Step 1: Generate AES key and IV
-	aesKey := make([]byte, 32) // AES-256
-	iv := make([]byte, aes.BlockSize)
-	if _, err := rand.Read(aesKey); err != nil {
+	aesKey, iv, err := encryption.GenerateAESKeyAndIV()
+	if err != nil {
 		return nil, err
-	}
-	if _, err := rand.Read(iv); err != nil {
-		return nil, err
-	}
-
-	// Step 2: Encrypt each field
-	encryptField := func(value *string) *string {
-		if value == nil {
-			return nil
-		}
-		encrypted, _ := encryptAES(aesKey, iv, []byte(*value))
-		base64Str := base64.StdEncoding.EncodeToString(encrypted)
-		return &base64Str
 	}
 
 	totalAmount := ""
 	if input.TotalAmount != "" {
-		totalAmount = fmt.Sprintf("%s", *&input.TotalAmount)
+		totalAmount = fmt.Sprintf("%s", input.TotalAmount)
 	}
 
 	inputData := &model.EncryptedReceipt{
@@ -44,18 +28,17 @@ func (r *EncryptedReceiptResolver) CreateEncryptedReceipt(ctx context.Context, i
 		Date:             input.Date,
 		IsReceiptSend:    input.IsReceiptSend,
 		CreatedAt:        time.Now().Format(time.RFC3339),
-		ReceiptName:      encryptField(input.ReceiptName),
-		RecipientName:    encryptField(input.RecipientName),
-		RecipientPhone:   encryptField(input.RecipientPhone),
-		RecipientEmail:   encryptField(input.RecipientEmail),
-		RecipientAddress: encryptField(input.RecipientAddress),
-		ReceiptNo:        derefString(encryptField(&input.ReceiptNo)),
-		PaymentMethod:    derefString(encryptField(&input.PaymentMethod)),
-		PaymentNote:      encryptField(input.PaymentNote),
-		TotalAmount:      encryptField(&totalAmount),
+		ReceiptName:      encryption.EncryptField(input.ReceiptName, aesKey, iv),
+		RecipientName:    encryption.EncryptField(input.RecipientName, aesKey, iv),
+		RecipientPhone:   encryption.EncryptField(input.RecipientPhone, aesKey, iv),
+		RecipientEmail:   encryption.EncryptField(input.RecipientEmail, aesKey, iv),
+		RecipientAddress: encryption.EncryptField(input.RecipientAddress, aesKey, iv),
+		ReceiptNo:        derefString(encryption.EncryptField(&input.ReceiptNo, aesKey, iv)),
+		PaymentMethod:    derefString(encryption.EncryptField(&input.PaymentMethod, aesKey, iv)),
+		PaymentNote:      encryption.EncryptField(input.PaymentNote, aesKey, iv),
+		TotalAmount:      encryption.EncryptField(&totalAmount, aesKey, iv),
 		AesIv:            strPtr(base64.StdEncoding.EncodeToString(iv)),
-		AesKeyEncrypted:  strPtr(string(encryptRSAWithBase64(r.publicKeyPEM, aesKey))),
-		// already base64 encoded
+		AesKeyEncrypted:  strPtr(string(encryption.EncryptKey(r.publicKeyPEM, aesKey))),
 	}
 
 	// Step 3: Save to DB
