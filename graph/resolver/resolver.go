@@ -34,7 +34,7 @@ func InitializeResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM stri
 		ReceiptResolver:             receipt.InitializeReceiptResolver(db, httpClient),
 		ProfileResolver:             profile.InitializeProfileResolver(db),
 		ServiceResolver:             service.InitializeServiceResolver(db),
-		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient),
+		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
 		ProductResolver:             product.InitializeProductResolver(db, httpClient),
 		EncryptedReceiptResolver:    encryptedReceipt.InitializeEncryptedReceiptResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
 		EncryptedServiceResolver:    encryptedservice.InitializeEncryptedServiceResolver(db, httpClient, publicKeyPEM, privateKeyPEM),

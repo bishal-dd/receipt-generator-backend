@@ -8,7 +8,7 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
-	"github.com/google/uuid"
+	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
 )
 
 func (r *EncryptedReceiptResolver) CreateEncryptedReceipt(ctx context.Context, input model.CreateEncryptedReceipt) (*model.EncryptedReceipt, error) {
@@ -23,7 +23,7 @@ func (r *EncryptedReceiptResolver) CreateEncryptedReceipt(ctx context.Context, i
 	}
 
 	inputData := &model.EncryptedReceipt{
-		ID:               uuid.New().String(),
+		ID:               ids.UUID(),
 		UserID:           input.UserID,
 		Date:             input.Date,
 		IsReceiptSend:    input.IsReceiptSend,

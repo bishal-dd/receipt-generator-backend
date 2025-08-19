@@ -101,26 +101,27 @@ type DownloadPDF struct {
 }
 
 type EncryptedReceipt struct {
-	ID               string   `json:"id"`
-	ReceiptName      *string  `json:"receipt_name,omitempty"`
-	RecipientName    *string  `json:"recipient_name,omitempty"`
-	RecipientPhone   *string  `json:"recipient_phone,omitempty"`
-	RecipientEmail   *string  `json:"recipient_email,omitempty"`
-	RecipientAddress *string  `json:"recipient_address,omitempty"`
-	ReceiptNo        string   `json:"receipt_no"`
-	UserID           string   `json:"user_id"`
-	Date             string   `json:"date"`
-	TotalAmount      *string  `json:"total_amount,omitempty"`
-	SubTotalAmount   *float64 `json:"sub_total_amount,omitempty"`
-	TaxAmount        *float64 `json:"tax_amount,omitempty"`
-	PaymentMethod    string   `json:"payment_method"`
-	PaymentNote      *string  `json:"payment_note,omitempty"`
-	IsReceiptSend    bool     `json:"is_receipt_send"`
-	AesKeyEncrypted  *string  `json:"aes_key_encrypted,omitempty"`
-	AesIv            *string  `json:"aes_iv,omitempty"`
-	CreatedAt        string   `json:"created_at"`
-	UpdatedAt        *string  `json:"updated_at,omitempty"`
-	DeletedAt        *string  `json:"deleted_at,omitempty"`
+	ID                string              `json:"id"`
+	ReceiptName       *string             `json:"receipt_name,omitempty"`
+	RecipientName     *string             `json:"recipient_name,omitempty"`
+	RecipientPhone    *string             `json:"recipient_phone,omitempty"`
+	RecipientEmail    *string             `json:"recipient_email,omitempty"`
+	RecipientAddress  *string             `json:"recipient_address,omitempty"`
+	ReceiptNo         string              `json:"receipt_no"`
+	UserID            string              `json:"user_id"`
+	Date              string              `json:"date"`
+	TotalAmount       *string             `json:"total_amount,omitempty"`
+	SubTotalAmount    *string             `json:"sub_total_amount,omitempty"`
+	TaxAmount         *string             `json:"tax_amount,omitempty"`
+	PaymentMethod     string              `json:"payment_method"`
+	PaymentNote       *string             `json:"payment_note,omitempty"`
+	IsReceiptSend     bool                `json:"is_receipt_send"`
+	AesKeyEncrypted   *string             `json:"aes_key_encrypted,omitempty"`
+	AesIv             *string             `json:"aes_iv,omitempty"`
+	CreatedAt         string              `json:"created_at"`
+	UpdatedAt         *string             `json:"updated_at,omitempty"`
+	DeletedAt         *string             `json:"deleted_at,omitempty"`
+	EncryptedServices []*EncryptedService `json:"EncryptedServices,omitempty"`
 }
 
 type EncryptedReceiptConnection struct {

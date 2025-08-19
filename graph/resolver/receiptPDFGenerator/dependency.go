@@ -6,13 +6,17 @@ import (
 )
 
 type ReceiptPDFGeneratorResolver struct {
-	db *gorm.DB
-	httpClient *resty.Client
+	db            *gorm.DB
+	httpClient    *resty.Client
+	publicKeyPEM  string
+	privateKeyPEM string
 }
 
-func InitializeReceiptPDFGeneratorResolver( db *gorm.DB, httpClient *resty.Client) *ReceiptPDFGeneratorResolver {
+func InitializeReceiptPDFGeneratorResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM string, privateKeyPEM string) *ReceiptPDFGeneratorResolver {
 	return &ReceiptPDFGeneratorResolver{
-		db: db,
-		httpClient: httpClient,
+		db:            db,
+		httpClient:    httpClient,
+		publicKeyPEM:  publicKeyPEM,
+		privateKeyPEM: privateKeyPEM,
 	}
 }

@@ -9,8 +9,8 @@ type EncryptedReceipt {
     user_id: ID!
     date: Date!
     total_amount: String
-    sub_total_amount: Float
-    tax_amount: Float
+    sub_total_amount: String
+    tax_amount: String
     payment_method: String!
     payment_note: String
     is_receipt_send: Boolean!
@@ -19,6 +19,7 @@ type EncryptedReceipt {
     created_at: DateTime!
     updated_at: DateTime
     deleted_at: DateTime
+    EncryptedServices: [EncryptedService]
 }
 
 input CreateEncryptedReceipt {
