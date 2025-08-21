@@ -81,6 +81,10 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 	}
 	receipt.Date = parsedDate.Format("January 02 2006")
 	var htmlBuffer bytes.Buffer
+	for i, svc := range receipt.Services {
+		fmt.Printf("Service %d: %+v\n", i, *svc)
+	}
+
 	data := struct {
 		Receipt *model.Receipt
 		Profile *model.Profile

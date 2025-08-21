@@ -65,6 +65,8 @@ func (r *EncryptedReceiptResolver) decryptReceipt(receipt *model.EncryptedReceip
 	receipt.ReceiptNo = derefString(encryption.DecryptField(strPtr(receipt.ReceiptNo), aesKey, iv))
 	receipt.PaymentMethod = derefString(encryption.DecryptField(strPtr(receipt.PaymentMethod), aesKey, iv))
 	receipt.PaymentNote = encryption.DecryptField(receipt.PaymentNote, aesKey, iv)
+	receipt.SubTotalAmount = encryption.DecryptField(receipt.SubTotalAmount, aesKey, iv)
+	receipt.TaxAmount = encryption.DecryptField(receipt.TaxAmount, aesKey, iv)
 	receipt.TotalAmount = encryption.DecryptField(receipt.TotalAmount, aesKey, iv)
 
 	return nil
