@@ -6,6 +6,7 @@ package receipt
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
@@ -63,46 +64,54 @@ func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *in
 	offset := (page - 1) * pageSize
 
 	var (
-		receipts   []model.Receipt
-		totalCount int64
-		foundCount int64
+		encryptedReceipts []model.EncryptedReceipt
+		totalCount        int64
+		foundCount        int64
 	)
 
-	// 1. Count total receipts for user (no filters)
-	if err := r.db.Model(&model.Receipt{}).
+	// Count total receipts
+	if err := r.db.Model(&model.EncryptedReceipt{}).
 		Where("user_id = ?", userId).
 		Count(&totalCount).Error; err != nil {
 		return nil, err
 	}
 
-	// 2. Build filtered query
+	// Apply filters
 	query := r.db.Where("user_id = ?", userId)
 
 	if year != nil {
 		query = query.Where("EXTRACT(YEAR FROM date) = ?", *year)
 	}
-
 	if date != nil {
 		query = query.Where("date = ?", *date)
 	}
-
 	if len(dateRange) == 2 {
 		query = query.Where("date BETWEEN ? AND ?", dateRange[0], dateRange[1])
 	}
 
-	// 3. Count found receipts (after applying filters)
-	if err := query.Model(&model.Receipt{}).Count(&foundCount).Error; err != nil {
+	// Count found receipts after filters
+	if err := query.Model(&model.EncryptedReceipt{}).Count(&foundCount).Error; err != nil {
 		return nil, err
 	}
 
-	// 4. Fetch paginated receipts
-	if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&receipts).Error; err != nil {
+	// Fetch paginated encrypted receipts
+	if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&encryptedReceipts).Error; err != nil {
 		return nil, err
 	}
 
-	receiptsPtr := []*model.Receipt{}
-	for _, receipt := range receipts {
-		receiptsPtr = append(receiptsPtr, &receipt)
+	var receiptsPtr []*model.Receipt
+
+	for _, enc := range encryptedReceipts {
+		// Decrypt each encrypted receipt
+		if err := r.decryptReceipt(&enc); err != nil {
+			return nil, fmt.Errorf("failed to decrypt receipt %s: %w", enc.ID, err)
+		}
+
+		receipt, err := EncryptedReceiptToReceipt(&enc)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert encrypted receipt %s to receipt: %w", enc.ID, err)
+		}
+		receiptsPtr = append(receiptsPtr, receipt)
 	}
 
 	return &model.SearchReceipt{

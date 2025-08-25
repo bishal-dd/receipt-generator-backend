@@ -49,7 +49,7 @@ func (r *EncryptedReceiptResolver) CreateEncryptedReceipt(ctx context.Context, i
 	return inputData, nil
 }
 
-func (r *EncryptedReceiptResolver) UpdateEncryptedReceipt(ctx context.Context, input model.UpdateEncryptedReceipt) (*model.EncryptedReceipt, error) {
+func (r *EncryptedReceiptResolver) UpdateEncryptedReceipt(ctx context.Context, input model.UpdateEncryptedReceipt) (*model.Receipt, error) {
 	receipt := &model.EncryptedReceipt{
 		ID: input.ID,
 	}

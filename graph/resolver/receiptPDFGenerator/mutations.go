@@ -62,6 +62,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 	}
 
 	totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
+	fmt.Printf("Total Amount: %f\n", totalAmount)
+	fmt.Printf("Subtotal: %f\n", subtotal)
+	fmt.Printf("Tax Amount: %f\n", taxAmount)
 	receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
 	if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
 		tx.Rollback()

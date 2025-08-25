@@ -51,7 +51,7 @@ func (r *EncryptedReceiptResolver) EncryptedReceipts(ctx context.Context, first 
 	}, nil
 }
 
-func (r *EncryptedReceiptResolver) EncryptedReceipt(ctx context.Context, id string) (*model.EncryptedReceipt, error) {
+func (r *EncryptedReceiptResolver) EncryptedReceipt(ctx context.Context, id string) (*model.Receipt, error) {
 	newEncryptedReceipt, err := r.GetEncryptedReceiptFromDB(ctx, id)
 	if err != nil {
 		return nil, err

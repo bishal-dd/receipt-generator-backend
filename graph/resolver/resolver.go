@@ -31,7 +31,7 @@ type Resolver struct {
 func InitializeResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM string, privateKeyPEM string) *Resolver {
 	return &Resolver{
 		UserResolver:                user.InitializeUserResolver(db),
-		ReceiptResolver:             receipt.InitializeReceiptResolver(db, httpClient),
+		ReceiptResolver:             receipt.InitializeReceiptResolver(db, httpClient, publicKeyPEM, privateKeyPEM),
 		ProfileResolver:             profile.InitializeProfileResolver(db),
 		ServiceResolver:             service.InitializeServiceResolver(db),
 		ReceiptPDFGeneratorResolver: receiptPDFGenerator.InitializeReceiptPDFGeneratorResolver(db, httpClient, publicKeyPEM, privateKeyPEM),

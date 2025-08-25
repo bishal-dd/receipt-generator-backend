@@ -6,6 +6,7 @@ import (
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
+	"github.com/bishal-dd/receipt-generator-backend/helper/stringUtil"
 )
 
 func (r *EncryptedReceiptResolver) CountTotalEncryptedReceipts() (int64, error) {
@@ -38,16 +39,85 @@ func (r *EncryptedReceiptResolver) DeleteEncryptedReceiptFromDB(ctx context.Cont
 	return nil
 }
 
-func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context, id string) (*model.EncryptedReceipt, error) {
-	var receipt *model.EncryptedReceipt
-	if err := r.db.Where("id = ?", id).First(&receipt).Error; err != nil {
+func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context, id string) (*model.Receipt, error) {
+	var encryptedReceipt *model.EncryptedReceipt
+	if err := r.db.Where("id = ?", id).First(&encryptedReceipt).Error; err != nil {
+		fmt.Print(err)
 		return nil, err
 	}
 
-	// receipt, err := r.LoadServiceFromEncryptedReceipt(ctx, receipt)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	encryptedReceipt, err := r.LoadServiceFromEncryptedReceipt(ctx, encryptedReceipt)
+	if err != nil {
+		return nil, err
+	}
+	aesKey, iv, err := encryption.DecryptKeyAndIV(r.privateKeyPEM, *encryptedReceipt.AesKeyEncrypted, *encryptedReceipt.AesIv)
+	if err != nil {
+		return nil, fmt.Errorf("decrypt AES key: %w", err)
+	}
+
+	subTotalAmountStr := encryption.DecryptField(encryptedReceipt.SubTotalAmount, aesKey, iv)
+	taxAmountStr := encryption.DecryptField(encryptedReceipt.TaxAmount, aesKey, iv)
+	totalAmountStr := encryption.DecryptField(encryptedReceipt.TotalAmount, aesKey, iv)
+
+	subTotalAmount, err := stringUtil.ParseStringToFloat64Ptr(subTotalAmountStr)
+	if err != nil {
+		return nil, fmt.Errorf("parse SubTotalAmount: %w", err)
+	}
+	taxAmount, err := stringUtil.ParseStringToFloat64Ptr(taxAmountStr)
+	if err != nil {
+		return nil, fmt.Errorf("parse TaxAmount: %w", err)
+	}
+	totalAmount, err := stringUtil.ParseStringToFloat64Ptr(totalAmountStr)
+	if err != nil {
+		return nil, fmt.Errorf("parse TotalAmount: %w", err)
+	}
+
+	var services []*model.Service
+	for _, encryptedService := range encryptedReceipt.EncryptedServices {
+		rate, err := stringUtil.ParseStringToFloat64Ptr(&encryptedService.Rate)
+		if err != nil {
+			return nil, fmt.Errorf("parse service price: %w", err)
+		}
+
+		quantity, err := stringUtil.ParseStringToFloat64Ptr(&encryptedService.Quantity)
+		if err != nil {
+			return nil, fmt.Errorf("parse service quantity: %w", err)
+		}
+
+		amount, err := stringUtil.ParseStringToFloat64Ptr(&encryptedService.Amount)
+		if err != nil {
+			return nil, fmt.Errorf("parse service amount: %w", err)
+		}
+
+		services = append(services, &model.Service{
+			ID:          encryptedService.ID,
+			Description: encryptedService.Description,
+			Rate:        *rate,
+			Quantity:    int(*quantity),
+			Amount:      *amount,
+			ReceiptID:   encryptedService.EncryptedReceiptID,
+			CreatedAt:   encryptedService.CreatedAt,
+			DeletedAt:   encryptedService.DeletedAt,
+			UpdatedAt:   encryptedService.UpdatedAt,
+		})
+	}
+
+	receipt := &model.Receipt{
+		ID:               encryptedReceipt.ID,
+		RecipientPhone:   encryption.DecryptField(encryptedReceipt.RecipientPhone, aesKey, iv),
+		RecipientEmail:   encryption.DecryptField(encryptedReceipt.RecipientEmail, aesKey, iv),
+		RecipientAddress: encryption.DecryptField(encryptedReceipt.RecipientAddress, aesKey, iv),
+		ReceiptNo:        stringUtil.DerefString(encryption.DecryptField(stringUtil.StrPtr(encryptedReceipt.ReceiptNo), aesKey, iv)),
+		PaymentMethod:    stringUtil.DerefString(encryption.DecryptField(stringUtil.StrPtr(encryptedReceipt.PaymentMethod), aesKey, iv)),
+		PaymentNote:      encryption.DecryptField(encryptedReceipt.PaymentNote, aesKey, iv),
+		SubTotalAmount:   subTotalAmount,
+		Date:             encryptedReceipt.Date,
+		Services:         services,
+		TaxAmount:        taxAmount,
+		TotalAmount:      totalAmount,
+		CreatedAt:        encryptedReceipt.CreatedAt,
+	}
+
 	return receipt, nil
 }
 

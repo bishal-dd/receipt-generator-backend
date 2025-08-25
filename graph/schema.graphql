@@ -8,7 +8,7 @@ type Query {
     receipts(first: Int, after: String): ReceiptConnection!
     receipt(id: ID!): Receipt
     encryptedReceipts(first: Int, after: String): EncryptedReceiptConnection!
-    encryptedReceipt(id: ID!): EncryptedReceipt
+    encryptedReceipt(id: ID!): Receipt
     profileByUserId(userId: String!): Profile
     profile(id: ID!): Profile
     serviceByReceiptId(receiptId: String!): [Service]
@@ -32,7 +32,7 @@ type Mutation {
     updateReceipt(input: UpdateReceipt!): Receipt!
     deleteReceipt(id: ID!): Boolean!
     createEncryptedReceipt(input: CreateEncryptedReceipt!): EncryptedReceipt!
-    updateEncryptedReceipt(input: UpdateEncryptedReceipt!): EncryptedReceipt!
+    updateEncryptedReceipt(input: UpdateEncryptedReceipt!): Receipt!
     deleteEncryptedReceipt(id: ID!): Boolean!
     createProfile(input: CreateProfile!): Profile!
     updateProfile(input: UpdateProfile!): Profile!

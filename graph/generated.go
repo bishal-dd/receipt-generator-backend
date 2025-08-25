@@ -270,7 +270,7 @@ type MutationResolver interface {
 	UpdateReceipt(ctx context.Context, input model.UpdateReceipt) (*model.Receipt, error)
 	DeleteReceipt(ctx context.Context, id string) (bool, error)
 	CreateEncryptedReceipt(ctx context.Context, input model.CreateEncryptedReceipt) (*model.EncryptedReceipt, error)
-	UpdateEncryptedReceipt(ctx context.Context, input model.UpdateEncryptedReceipt) (*model.EncryptedReceipt, error)
+	UpdateEncryptedReceipt(ctx context.Context, input model.UpdateEncryptedReceipt) (*model.Receipt, error)
 	DeleteEncryptedReceipt(ctx context.Context, id string) (bool, error)
 	CreateProfile(ctx context.Context, input model.CreateProfile) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, input model.UpdateProfile) (*model.Profile, error)
@@ -301,7 +301,7 @@ type QueryResolver interface {
 	Receipts(ctx context.Context, first *int, after *string) (*model.ReceiptConnection, error)
 	Receipt(ctx context.Context, id string) (*model.Receipt, error)
 	EncryptedReceipts(ctx context.Context, first *int, after *string) (*model.EncryptedReceiptConnection, error)
-	EncryptedReceipt(ctx context.Context, id string) (*model.EncryptedReceipt, error)
+	EncryptedReceipt(ctx context.Context, id string) (*model.Receipt, error)
 	ProfileByUserID(ctx context.Context, userID string) (*model.Profile, error)
 	Profile(ctx context.Context, id string) (*model.Profile, error)
 	ServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.Service, error)
@@ -4839,9 +4839,9 @@ func (ec *executionContext) _Mutation_updateEncryptedReceipt(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EncryptedReceipt)
+	res := resTmp.(*model.Receipt)
 	fc.Result = res
-	return ec.marshalNEncryptedReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedReceipt(ctx, field.Selections, res)
+	return ec.marshalNReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateEncryptedReceipt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4853,49 +4853,45 @@ func (ec *executionContext) fieldContext_Mutation_updateEncryptedReceipt(ctx con
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_EncryptedReceipt_id(ctx, field)
+				return ec.fieldContext_Receipt_id(ctx, field)
 			case "receipt_name":
-				return ec.fieldContext_EncryptedReceipt_receipt_name(ctx, field)
+				return ec.fieldContext_Receipt_receipt_name(ctx, field)
 			case "recipient_name":
-				return ec.fieldContext_EncryptedReceipt_recipient_name(ctx, field)
+				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
-				return ec.fieldContext_EncryptedReceipt_recipient_phone(ctx, field)
+				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
 			case "recipient_email":
-				return ec.fieldContext_EncryptedReceipt_recipient_email(ctx, field)
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
 			case "recipient_address":
-				return ec.fieldContext_EncryptedReceipt_recipient_address(ctx, field)
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
 			case "receipt_no":
-				return ec.fieldContext_EncryptedReceipt_receipt_no(ctx, field)
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
-				return ec.fieldContext_EncryptedReceipt_user_id(ctx, field)
+				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
-				return ec.fieldContext_EncryptedReceipt_date(ctx, field)
+				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
-				return ec.fieldContext_EncryptedReceipt_total_amount(ctx, field)
+				return ec.fieldContext_Receipt_total_amount(ctx, field)
 			case "sub_total_amount":
-				return ec.fieldContext_EncryptedReceipt_sub_total_amount(ctx, field)
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
-				return ec.fieldContext_EncryptedReceipt_tax_amount(ctx, field)
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
 			case "payment_method":
-				return ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
-				return ec.fieldContext_EncryptedReceipt_payment_note(ctx, field)
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "is_receipt_send":
-				return ec.fieldContext_EncryptedReceipt_is_receipt_send(ctx, field)
-			case "aes_key_encrypted":
-				return ec.fieldContext_EncryptedReceipt_aes_key_encrypted(ctx, field)
-			case "aes_iv":
-				return ec.fieldContext_EncryptedReceipt_aes_iv(ctx, field)
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
-				return ec.fieldContext_EncryptedReceipt_created_at(ctx, field)
+				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
-				return ec.fieldContext_EncryptedReceipt_updated_at(ctx, field)
+				return ec.fieldContext_Receipt_updated_at(ctx, field)
 			case "deleted_at":
-				return ec.fieldContext_EncryptedReceipt_deleted_at(ctx, field)
-			case "EncryptedServices":
-				return ec.fieldContext_EncryptedReceipt_EncryptedServices(ctx, field)
+				return ec.fieldContext_Receipt_deleted_at(ctx, field)
+			case "Services":
+				return ec.fieldContext_Receipt_Services(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type EncryptedReceipt", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Receipt", field.Name)
 		},
 	}
 	defer func() {
@@ -7928,9 +7924,9 @@ func (ec *executionContext) _Query_encryptedReceipt(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.EncryptedReceipt)
+	res := resTmp.(*model.Receipt)
 	fc.Result = res
-	return ec.marshalOEncryptedReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedReceipt(ctx, field.Selections, res)
+	return ec.marshalOReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐReceipt(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_encryptedReceipt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7942,49 +7938,45 @@ func (ec *executionContext) fieldContext_Query_encryptedReceipt(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_EncryptedReceipt_id(ctx, field)
+				return ec.fieldContext_Receipt_id(ctx, field)
 			case "receipt_name":
-				return ec.fieldContext_EncryptedReceipt_receipt_name(ctx, field)
+				return ec.fieldContext_Receipt_receipt_name(ctx, field)
 			case "recipient_name":
-				return ec.fieldContext_EncryptedReceipt_recipient_name(ctx, field)
+				return ec.fieldContext_Receipt_recipient_name(ctx, field)
 			case "recipient_phone":
-				return ec.fieldContext_EncryptedReceipt_recipient_phone(ctx, field)
+				return ec.fieldContext_Receipt_recipient_phone(ctx, field)
 			case "recipient_email":
-				return ec.fieldContext_EncryptedReceipt_recipient_email(ctx, field)
+				return ec.fieldContext_Receipt_recipient_email(ctx, field)
 			case "recipient_address":
-				return ec.fieldContext_EncryptedReceipt_recipient_address(ctx, field)
+				return ec.fieldContext_Receipt_recipient_address(ctx, field)
 			case "receipt_no":
-				return ec.fieldContext_EncryptedReceipt_receipt_no(ctx, field)
+				return ec.fieldContext_Receipt_receipt_no(ctx, field)
 			case "user_id":
-				return ec.fieldContext_EncryptedReceipt_user_id(ctx, field)
+				return ec.fieldContext_Receipt_user_id(ctx, field)
 			case "date":
-				return ec.fieldContext_EncryptedReceipt_date(ctx, field)
+				return ec.fieldContext_Receipt_date(ctx, field)
 			case "total_amount":
-				return ec.fieldContext_EncryptedReceipt_total_amount(ctx, field)
+				return ec.fieldContext_Receipt_total_amount(ctx, field)
 			case "sub_total_amount":
-				return ec.fieldContext_EncryptedReceipt_sub_total_amount(ctx, field)
+				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
-				return ec.fieldContext_EncryptedReceipt_tax_amount(ctx, field)
+				return ec.fieldContext_Receipt_tax_amount(ctx, field)
 			case "payment_method":
-				return ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
+				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
-				return ec.fieldContext_EncryptedReceipt_payment_note(ctx, field)
+				return ec.fieldContext_Receipt_payment_note(ctx, field)
 			case "is_receipt_send":
-				return ec.fieldContext_EncryptedReceipt_is_receipt_send(ctx, field)
-			case "aes_key_encrypted":
-				return ec.fieldContext_EncryptedReceipt_aes_key_encrypted(ctx, field)
-			case "aes_iv":
-				return ec.fieldContext_EncryptedReceipt_aes_iv(ctx, field)
+				return ec.fieldContext_Receipt_is_receipt_send(ctx, field)
 			case "created_at":
-				return ec.fieldContext_EncryptedReceipt_created_at(ctx, field)
+				return ec.fieldContext_Receipt_created_at(ctx, field)
 			case "updated_at":
-				return ec.fieldContext_EncryptedReceipt_updated_at(ctx, field)
+				return ec.fieldContext_Receipt_updated_at(ctx, field)
 			case "deleted_at":
-				return ec.fieldContext_EncryptedReceipt_deleted_at(ctx, field)
-			case "EncryptedServices":
-				return ec.fieldContext_EncryptedReceipt_EncryptedServices(ctx, field)
+				return ec.fieldContext_Receipt_deleted_at(ctx, field)
+			case "Services":
+				return ec.fieldContext_Receipt_Services(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type EncryptedReceipt", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Receipt", field.Name)
 		},
 	}
 	defer func() {
@@ -17214,13 +17206,6 @@ func (ec *executionContext) marshalODateTime2ᚖstring(ctx context.Context, sel 
 	}
 	res := graphql.MarshalString(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOEncryptedReceipt2ᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedReceipt(ctx context.Context, sel ast.SelectionSet, v *model.EncryptedReceipt) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._EncryptedReceipt(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOEncryptedService2ᚕᚖgithubᚗcomᚋbishalᚑddᚋreceiptᚑgeneratorᚑbackendᚋgraphᚋmodelᚐEncryptedService(ctx context.Context, sel ast.SelectionSet, v []*model.EncryptedService) graphql.Marshaler {

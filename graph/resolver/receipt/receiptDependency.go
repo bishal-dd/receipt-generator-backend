@@ -6,15 +6,18 @@ import (
 )
 
 type ReceiptResolver struct {
-	db *gorm.DB
-	httpClient *resty.Client
-
+	db            *gorm.DB
+	httpClient    *resty.Client
+	publicKeyPEM  string
+	privateKeyPEM string
 }
 
-func InitializeReceiptResolver( db *gorm.DB,httpClient *resty.Client ) *ReceiptResolver {
+func InitializeReceiptResolver(db *gorm.DB, httpClient *resty.Client, publicKeyPEM string, privateKeyPEM string) *ReceiptResolver {
 	return &ReceiptResolver{
-		db: db,
-		httpClient: httpClient,
+		db:            db,
+		httpClient:    httpClient,
+		publicKeyPEM:  publicKeyPEM,
+		privateKeyPEM: privateKeyPEM,
 	}
 }
 
