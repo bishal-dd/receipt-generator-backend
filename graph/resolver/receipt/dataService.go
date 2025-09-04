@@ -56,7 +56,6 @@ func (r *ReceiptResolver) decryptReceipt(receipt *model.EncryptedReceipt) error 
 	receipt.RecipientPhone = encryption.DecryptField(receipt.RecipientPhone, aesKey, iv)
 	receipt.RecipientEmail = encryption.DecryptField(receipt.RecipientEmail, aesKey, iv)
 	receipt.RecipientAddress = encryption.DecryptField(receipt.RecipientAddress, aesKey, iv)
-	receipt.ReceiptNo = stringUtil.DerefString(encryption.DecryptField(stringUtil.StrPtr(receipt.ReceiptNo), aesKey, iv))
 	receipt.PaymentMethod = stringUtil.DerefString(encryption.DecryptField(stringUtil.StrPtr(receipt.PaymentMethod), aesKey, iv))
 	receipt.PaymentNote = encryption.DecryptField(receipt.PaymentNote, aesKey, iv)
 	receipt.SubTotalAmount = encryption.DecryptField(receipt.SubTotalAmount, aesKey, iv)

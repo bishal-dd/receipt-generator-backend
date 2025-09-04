@@ -163,20 +163,14 @@ func (r *ReceiptPDFGeneratorResolver) sendPDFToWhatsApp(url string, receiptName 
 			resp.StatusCode(),
 			string(resp.Body()))
 	}
-	receipt := &model.Receipt{
+	fmt.Printf("%s", receiptId)
+	encryptedReceipt := &model.EncryptedReceipt{
 		ID: receiptId,
 	}
-
-	// encryptedReceipt := &model.EncryptedReceipt{
-	// 	ID: encryptedReceiptId,
-	// }
 	isReceiptSend := true
-	if err := r.db.Model(receipt).Updates(model.UpdateReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
+	if err := r.db.Model(encryptedReceipt).Updates(model.UpdateEncryptedReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
 		return err
 	}
-	// if err := r.db.Model(encryptedReceipt).Updates(model.UpdateEncryptedReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
-	// 	return err
-	// }
 	// if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptId); err != nil {
 	//     return  err
 	// }

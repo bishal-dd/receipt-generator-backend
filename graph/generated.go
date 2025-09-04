@@ -113,14 +113,11 @@ type ComplexityRoot struct {
 		DeleteUser                                     func(childComplexity int, id string) int
 		DownloadEncryptedReceiptPDFWithReceiptID       func(childComplexity int, receiptID string, orginazationID string) int
 		DownloadReceiptPDF                             func(childComplexity int, input model.DownloadPDF) int
-		DownloadReceiptPDFWithReceiptID                func(childComplexity int, receiptID string, orginazationID string) int
 		SaveReceipt                                    func(childComplexity int, input model.DownloadPDF) int
 		SendEncryptedReceiptPDFToEmailWithReceiptID    func(childComplexity int, receiptID string, orginazationID string, email string) int
 		SendEncryptedReceiptPDFToWhatsAppWithReceiptID func(childComplexity int, receiptID string, orginazationID string, phoneNumber string) int
 		SendReceiptPDFToEmail                          func(childComplexity int, input model.SendReceiptPDFToEmail) int
-		SendReceiptPDFToEmailWithReceiptID             func(childComplexity int, receiptID string, orginazationID string, email string) int
 		SendReceiptPDFToWhatsApp                       func(childComplexity int, input model.SendReceiptPDFToWhatsApp) int
-		SendReceiptPDFToWhatsAppWithReceiptID          func(childComplexity int, receiptID string, orginazationID string, phoneNumber string) int
 		UpdateEncryptedReceipt                         func(childComplexity int, input model.UpdateEncryptedReceipt) int
 		UpdateEncryptedService                         func(childComplexity int, input model.UpdateEncryptedService) int
 		UpdateProduct                                  func(childComplexity int, input model.UpdateProduct) int
@@ -285,11 +282,8 @@ type MutationResolver interface {
 	SendReceiptPDFToEmail(ctx context.Context, input model.SendReceiptPDFToEmail) (bool, error)
 	DownloadReceiptPDF(ctx context.Context, input model.DownloadPDF) (string, error)
 	SaveReceipt(ctx context.Context, input model.DownloadPDF) (bool, error)
-	SendReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, receiptID string, orginazationID string, phoneNumber string) (bool, error)
 	SendEncryptedReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, receiptID string, orginazationID string, phoneNumber string) (bool, error)
-	SendReceiptPDFToEmailWithReceiptID(ctx context.Context, receiptID string, orginazationID string, email string) (bool, error)
 	SendEncryptedReceiptPDFToEmailWithReceiptID(ctx context.Context, receiptID string, orginazationID string, email string) (bool, error)
-	DownloadReceiptPDFWithReceiptID(ctx context.Context, receiptID string, orginazationID string) (string, error)
 	DownloadEncryptedReceiptPDFWithReceiptID(ctx context.Context, receiptID string, orginazationID string) (string, error)
 	CreateProduct(ctx context.Context, input model.CreateProduct) (*model.Product, error)
 	UpdateProduct(ctx context.Context, input model.UpdateProduct) (*model.Product, error)
@@ -783,18 +777,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DownloadReceiptPDF(childComplexity, args["input"].(model.DownloadPDF)), true
 
-	case "Mutation.downloadReceiptPDFWithReceiptId":
-		if e.complexity.Mutation.DownloadReceiptPDFWithReceiptID == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_downloadReceiptPDFWithReceiptId_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DownloadReceiptPDFWithReceiptID(childComplexity, args["receiptId"].(string), args["orginazationId"].(string)), true
-
 	case "Mutation.saveReceipt":
 		if e.complexity.Mutation.SaveReceipt == nil {
 			break
@@ -843,18 +825,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SendReceiptPDFToEmail(childComplexity, args["input"].(model.SendReceiptPDFToEmail)), true
 
-	case "Mutation.sendReceiptPDFToEmailWithReceiptId":
-		if e.complexity.Mutation.SendReceiptPDFToEmailWithReceiptID == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_sendReceiptPDFToEmailWithReceiptId_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SendReceiptPDFToEmailWithReceiptID(childComplexity, args["receiptId"].(string), args["orginazationId"].(string), args["email"].(string)), true
-
 	case "Mutation.sendReceiptPDFToWhatsApp":
 		if e.complexity.Mutation.SendReceiptPDFToWhatsApp == nil {
 			break
@@ -866,18 +836,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SendReceiptPDFToWhatsApp(childComplexity, args["input"].(model.SendReceiptPDFToWhatsApp)), true
-
-	case "Mutation.sendReceiptPDFToWhatsAppWithReceiptId":
-		if e.complexity.Mutation.SendReceiptPDFToWhatsAppWithReceiptID == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_sendReceiptPDFToWhatsAppWithReceiptId_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SendReceiptPDFToWhatsAppWithReceiptID(childComplexity, args["receiptId"].(string), args["orginazationId"].(string), args["phoneNumber"].(string)), true
 
 	case "Mutation.updateEncryptedReceipt":
 		if e.complexity.Mutation.UpdateEncryptedReceipt == nil {
@@ -2062,30 +2020,6 @@ func (ec *executionContext) field_Mutation_downloadEncryptedReceiptPDFWithReceip
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_downloadReceiptPDFWithReceiptId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["receiptId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiptId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["receiptId"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["orginazationId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazationId"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orginazationId"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_downloadReceiptPDF_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2182,39 +2116,6 @@ func (ec *executionContext) field_Mutation_sendEncryptedReceiptPDFToWhatsAppWith
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_sendReceiptPDFToEmailWithReceiptId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["receiptId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiptId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["receiptId"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["orginazationId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazationId"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orginazationId"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["email"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_sendReceiptPDFToEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2227,39 +2128,6 @@ func (ec *executionContext) field_Mutation_sendReceiptPDFToEmail_args(ctx contex
 		}
 	}
 	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_sendReceiptPDFToWhatsAppWithReceiptId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["receiptId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiptId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["receiptId"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["orginazationId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orginazationId"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orginazationId"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["phoneNumber"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phoneNumber"))
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["phoneNumber"] = arg2
 	return args, nil
 }
 
@@ -5834,61 +5702,6 @@ func (ec *executionContext) fieldContext_Mutation_saveReceipt(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_sendReceiptPDFToWhatsAppWithReceiptId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_sendReceiptPDFToWhatsAppWithReceiptId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SendReceiptPDFToWhatsAppWithReceiptID(rctx, fc.Args["receiptId"].(string), fc.Args["orginazationId"].(string), fc.Args["phoneNumber"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_sendReceiptPDFToWhatsAppWithReceiptId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_sendReceiptPDFToWhatsAppWithReceiptId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_sendEncryptedReceiptPDFToWhatsAppWithReceiptID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_sendEncryptedReceiptPDFToWhatsAppWithReceiptID(ctx, field)
 	if err != nil {
@@ -5944,61 +5757,6 @@ func (ec *executionContext) fieldContext_Mutation_sendEncryptedReceiptPDFToWhats
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_sendReceiptPDFToEmailWithReceiptId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_sendReceiptPDFToEmailWithReceiptId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SendReceiptPDFToEmailWithReceiptID(rctx, fc.Args["receiptId"].(string), fc.Args["orginazationId"].(string), fc.Args["email"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_sendReceiptPDFToEmailWithReceiptId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_sendReceiptPDFToEmailWithReceiptId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_sendEncryptedReceiptPDFToEmailWithReceiptID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_sendEncryptedReceiptPDFToEmailWithReceiptID(ctx, field)
 	if err != nil {
@@ -6048,61 +5806,6 @@ func (ec *executionContext) fieldContext_Mutation_sendEncryptedReceiptPDFToEmail
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_sendEncryptedReceiptPDFToEmailWithReceiptID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_downloadReceiptPDFWithReceiptId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_downloadReceiptPDFWithReceiptId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DownloadReceiptPDFWithReceiptID(rctx, fc.Args["receiptId"].(string), fc.Args["orginazationId"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_downloadReceiptPDFWithReceiptId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_downloadReceiptPDFWithReceiptId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14792,13 +14495,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "sendReceiptPDFToWhatsAppWithReceiptId":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_sendReceiptPDFToWhatsAppWithReceiptId(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "sendEncryptedReceiptPDFToWhatsAppWithReceiptID":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_sendEncryptedReceiptPDFToWhatsAppWithReceiptID(ctx, field)
@@ -14806,23 +14502,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "sendReceiptPDFToEmailWithReceiptId":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_sendReceiptPDFToEmailWithReceiptId(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "sendEncryptedReceiptPDFToEmailWithReceiptID":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_sendEncryptedReceiptPDFToEmailWithReceiptID(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "downloadReceiptPDFWithReceiptId":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_downloadReceiptPDFWithReceiptId(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

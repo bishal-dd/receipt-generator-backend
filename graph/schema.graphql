@@ -47,30 +47,16 @@ type Mutation {
     sendReceiptPDFToEmail(input: SendReceiptPDFToEmail!): Boolean!
     downloadReceiptPDF(input: DownloadPDF!): String!
     saveReceipt(input: DownloadPDF!): Boolean!
-    sendReceiptPDFToWhatsAppWithReceiptId(
-        receiptId: String!
-        orginazationId: String!
-        phoneNumber: String!
-    ): Boolean!
     sendEncryptedReceiptPDFToWhatsAppWithReceiptID(
         receiptId: String!
         orginazationId: String!
         phoneNumber: String!
-    ): Boolean!
-    sendReceiptPDFToEmailWithReceiptId(
-        receiptId: String!
-        orginazationId: String!
-        email: String!
     ): Boolean!
     sendEncryptedReceiptPDFToEmailWithReceiptID(
         receiptId: String!
         orginazationId: String!
         email: String!
     ): Boolean!
-    downloadReceiptPDFWithReceiptId(
-        receiptId: String!
-        orginazationId: String!
-    ): String!
     downloadEncryptedReceiptPDFWithReceiptId(
         receiptId: String!
         orginazationId: String!
