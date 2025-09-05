@@ -67,6 +67,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 	if err != nil {
 		return false, err
 	}
+	addServicesToReceipt(receiptModel, input.Services)
 	if err := r.saveEncryptedReceipt(encryptedReceiptModel, input.Services, tx); err != nil {
 		tx.Rollback()
 		return false, err
@@ -243,6 +244,7 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 	if err != nil {
 		return false, err
 	}
+	addServicesToReceipt(receiptModel, input.Services)
 	if err := r.saveEncryptedReceipt(encryptedReceiptModel, input.Services, tx); err != nil {
 		tx.Rollback()
 		return false, err
@@ -422,6 +424,7 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
 	if err != nil {
 		return "", err
 	}
+	addServicesToReceipt(receiptModel, input.Services)
 	if err := r.saveEncryptedReceipt(encryptedReceiptModel, input.Services, tx); err != nil {
 		tx.Rollback()
 		return "", err

@@ -203,6 +203,22 @@ func downlaodInputToEncryptedReceiptModel(input model.DownloadPDF, userId string
 	}, nil
 }
 
+func addServicesToReceipt(receiptModel *model.Receipt, services []*model.CreateBulkService) {
+	// Create Services
+	for _, serviceInput := range services {
+		serviceModel := &model.Service{
+			ID:          ids.UUID(),
+			ReceiptID:   receiptModel.ID,
+			CreatedAt:   time.Now().Format(time.RFC3339),
+			Description: serviceInput.Description,
+			Rate:        serviceInput.Rate,
+			Quantity:    serviceInput.Quantity,
+			Amount:      serviceInput.Amount,
+		}
+		receiptModel.Services = append(receiptModel.Services, serviceModel)
+	}
+}
+
 func checkUserMode(mode string, useCount int) error {
 	if mode == trial && useCount >= trialUseCountLimit {
 		return errors.New("trial limit exceeded")
