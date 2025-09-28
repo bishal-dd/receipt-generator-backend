@@ -1,9 +1,15 @@
 package receiptPDFGenerator
 
 import (
+	"bytes"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/base64"
+	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"time"
 
@@ -241,4 +247,49 @@ func ParseStringToFloat64Ptr(s *string) (*float64, error) {
 		return nil, err
 	}
 	return &f, nil
+}
+
+func parseRSAPrivateKeyFromPEM(pemStr string) (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(pemStr))
+	if block == nil {
+		return nil, errors.New("failed to decode PEM block")
+	}
+
+	parsedKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse PKCS#8 private key: %w", err)
+	}
+
+	rsaKey, ok := parsedKey.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("key is not an RSA private key")
+	}
+
+	return rsaKey, nil
+}
+
+func canonicalJSON(v any) ([]byte, error) {
+	m, ok := v.(map[string]any)
+	if !ok {
+		return json.Marshal(v)
+	}
+	buf := &bytes.Buffer{}
+	buf.WriteByte('{')
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i, k := range keys {
+		if i > 0 {
+			buf.WriteByte(',')
+		}
+		keyBytes, _ := json.Marshal(k)
+		buf.Write(keyBytes)
+		buf.WriteByte(':')
+		valBytes, _ := canonicalJSON(m[k])
+		buf.Write(valBytes)
+	}
+	buf.WriteByte('}')
+	return buf.Bytes(), nil
 }

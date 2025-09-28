@@ -1,0 +1,15 @@
+type ReceiptFile {
+    id: UUID!
+    receipt_no: String!
+    encrypted_receipt_id: UUID!
+    issued_at: DateTime!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type VerifyReceiptFile {
+    id: UUID!
+    receipt_no: String!
+    issued_at: DateTime!
+    encrypted_receipt_id: UUID!
+}

@@ -68,7 +68,7 @@ func (r *ReceiptPDFGeneratorResolver) getFileURL(organizationId, userId, fileNam
 	return signedURL, nil
 }
 
-func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile) (string, []byte, error) {
+func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profile *model.Profile, receiptFile *model.ReceiptFile) (string, []byte, error) {
 	templateOnce.Do(func() {
 		templateFile := "templates/receiptTemplate/index.html"
 		templateContent, _ := os.ReadFile(templateFile)
@@ -86,11 +86,13 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 	}
 
 	data := struct {
-		Receipt *model.Receipt
-		Profile *model.Profile
+		Receipt     *model.Receipt
+		Profile     *model.Profile
+		ReceiptFile *model.ReceiptFile
 	}{
-		Receipt: receipt,
-		Profile: profile,
+		Receipt:     receipt,
+		Profile:     profile,
+		ReceiptFile: receiptFile,
 	}
 
 	if err := cachedTemplate.Execute(&htmlBuffer, data); err != nil {
@@ -110,7 +112,7 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 	if resp.StatusCode() != http.StatusOK {
 		return "", nil, fmt.Errorf("gotenberg returned status %d: %s", resp.StatusCode(), resp.String())
 	}
-	outputFilename := fmt.Sprintf("receipt_of_%v_from_%s_%s.pdf", *receipt.TotalAmount, stringUtil.ReplaceSpaceWithUnderscore(*profile.CompanyName), receipt.ID)
+	outputFilename := fmt.Sprintf("receipt_of_%v_from_%s.pdf", *receipt.TotalAmount, stringUtil.ReplaceSpaceWithUnderscore(*profile.CompanyName))
 	return outputFilename, resp.Body(), nil
 }
 

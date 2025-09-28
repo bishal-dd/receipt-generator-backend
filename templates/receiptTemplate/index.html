@@ -1,154 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        color: #333;
-      }
-      .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 20px;
-        border-color: #333;
-        border-style: solid;
-        border-width: 1px;
-      }
-      .logo-image {
-        border-radius: 10%;
-      }
-      .row {
-        display: flex;
-        justify-content: space-between;
-      }
-      .header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center; /* Align the items vertically */
-      }
-      .center-header {
-        justify-content: center; /* Center the header when there's no logo */
-        text-align: center; /* Ensure text is centered */
-      }
-      .header-col {
-        justify-items: center;
-        margin-right: 70px;
-      }
-      .label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: block;
-      }
-      .value {
-        margin-bottom: 5px;
-      }
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      .table th,
-      .table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-      }
-      .table th {
-        background-color: #f2f2f2;
-      }
-      .totals {
-        text-align: right;
-        margin-top: 20px;
-      }
-      .logo img {
-        max-width: 100px;
-        margin-top: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div
-        class="header-row {{if .Profile.LogoImage}} {{else}}center-header{{end}}"
-      >
-        {{if .Profile.LogoImage}}
-        <div class="col">
-          <img
-            src="{{.Profile.LogoImage}}"
-            alt="Logo"
-            width="100"
-            class="logo-image"
-          />
+    <head>
+        <meta charset="UTF-8" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                color: #333;
+            }
+            .container {
+                max-width: 800px;
+                margin: auto;
+                padding: 20px;
+                border-color: #333;
+                border-style: solid;
+                border-width: 1px;
+            }
+            .logo-image {
+                border-radius: 10%;
+            }
+            .row {
+                display: flex;
+                justify-content: space-between;
+            }
+            .header-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center; /* Align the items vertically */
+            }
+            .center-header {
+                justify-content: center; /* Center the header when there's no logo */
+                text-align: center; /* Ensure text is centered */
+            }
+            .header-col {
+                justify-items: center;
+                margin-right: 70px;
+            }
+            .label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: block;
+            }
+            .value {
+                margin-bottom: 5px;
+            }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+            }
+            .table th {
+                background-color: #f2f2f2;
+            }
+            .totals {
+                text-align: right;
+                margin-top: 20px;
+            }
+            .logo img {
+                max-width: 100px;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div
+                class="header-row {{if .Profile.LogoImage}} {{else}}center-header{{end}}"
+            >
+                {{if .Profile.LogoImage}}
+                <div class="col">
+                    <img
+                        src="{{.Profile.LogoImage}}"
+                        alt="Logo"
+                        width="100"
+                        class="logo-image"
+                    />
+                </div>
+                <div class="header-col">
+                    <h2>{{.Profile.CompanyName}}</h2>
+                    <p>{{.Profile.Address}}</p>
+                    <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
+                </div>
+                {{else}}
+                <div class="header-col">
+                    <h2>{{.Profile.CompanyName}}</h2>
+                    <p>{{.Profile.Address}}</p>
+                    <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
+                </div>
+                {{end}}
+            </div>
+            <hr />
+            <div class="row" style="margin-top: 20px">
+                <div>
+                    <b>Bill to:</b>
+                    <div style="margin-left: 5px">
+                        <p>{{.Receipt.RecipientName}}</p>
+                        <p>{{.Receipt.RecipientPhone}}</p>
+                        <p>{{.Receipt.RecipientEmail}}</p>
+                        <p>{{.Receipt.RecipientAddress}}</p>
+                    </div>
+                </div>
+                <div>
+                    <p><b>Receipt No:</b> {{.Receipt.ReceiptNo}}</p>
+                    <p><b>Date:</b> {{.Receipt.Date}}</p>
+                    <p><b>Payment Method:</b> {{.Receipt.PaymentMethod}}</p>
+                    {{if eq .Receipt.PaymentMethod "Bank Transfer"}}
+                    <p><b>Payment Note:</b> {{.Receipt.PaymentNote}}</p>
+                    {{end}}
+                </div>
+            </div>
+            <hr />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Receipt.Services}}
+                    <tr>
+                        <td>{{.Description}}</td>
+                        <td>{{.Rate}}</td>
+                        <td>{{.Quantity}}</td>
+                        <td>{{.Amount}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+            <div class="totals">
+                <p>
+                    Subtotal: {{.Receipt.SubTotalAmount}} {{.Profile.Currency}}
+                </p>
+                <p>
+                    Tax ({{.Profile.Tax}}%): {{.Receipt.TaxAmount}}
+                    {{.Profile.Currency}}
+                </p>
+                <p>
+                    <strong
+                        >Total: {{.Receipt.TotalAmount}}
+                        {{.Profile.Currency}}</strong
+                    >
+                </p>
+            </div>
+            <div class="logo">
+                <img src="{{.Profile.SignatureImage}}" alt="Company Stamp" />
+                <h3>{{.Profile.Title}}</h3>
+            </div>
+            <div style="font-size: 1px; color: white; opacity: 1">
+                RECEIPT_ID: {{.ReceiptFile.ID}}
+            </div>
         </div>
-        <div class="header-col">
-          <h2>{{.Profile.CompanyName}}</h2>
-          <p>{{.Profile.Address}}</p>
-          <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
-        </div>
-        {{else}}
-        <div class="header-col">
-          <h2>{{.Profile.CompanyName}}</h2>
-          <p>{{.Profile.Address}}</p>
-          <p>{{.Profile.PhoneNo}} | {{.Profile.Email}}</p>
-        </div>
-        {{end}}
-      </div>
-      <hr />
-      <div class="row" style="margin-top: 20px">
-        <div>
-          <b>Bill to:</b>
-          <div style="margin-left: 5px">
-            <p>{{.Receipt.RecipientName}}</p>
-            <p>{{.Receipt.RecipientPhone}}</p>
-            <p>{{.Receipt.RecipientEmail}}</p>
-            <p>{{.Receipt.RecipientAddress}}</p>
-          </div>
-        </div>
-        <div>
-          <p><b>Receipt No:</b> {{.Receipt.ReceiptNo}}</p>
-          <p><b>Date:</b> {{.Receipt.Date}}</p>
-          <p><b>Payment Method:</b> {{.Receipt.PaymentMethod}}</p>
-          {{if eq .Receipt.PaymentMethod "Bank Transfer"}}
-          <p><b>Payment Note:</b> {{.Receipt.PaymentNote}}</p>
-          {{end}}
-        </div>
-      </div>
-      <hr />
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Rate</th>
-            <th>Quantity</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{range .Receipt.Services}}
-          <tr>
-            <td>{{.Description}}</td>
-            <td>{{.Rate}}</td>
-            <td>{{.Quantity}}</td>
-            <td>{{.Amount}}</td>
-          </tr>
-          {{end}}
-        </tbody>
-      </table>
-      <div class="totals">
-        <p>Subtotal: {{.Receipt.SubTotalAmount}} {{.Profile.Currency}}</p>
-        <p>
-          Tax ({{.Profile.Tax}}%): {{.Receipt.TaxAmount}} {{.Profile.Currency}}
-        </p>
-        <p>
-          <strong>Total: {{.Receipt.TotalAmount}} {{.Profile.Currency}}</strong>
-        </p>
-      </div>
-      <div class="logo">
-        <img src="{{.Profile.SignatureImage}}" alt="Company Stamp" />
-        <h3>{{.Profile.Title}}</h3>
-      </div>
-    </div>
-  </body>
+    </body>
 </html>

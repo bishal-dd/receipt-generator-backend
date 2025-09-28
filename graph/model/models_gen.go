@@ -225,6 +225,15 @@ type ReceiptEdge struct {
 	Node   *Receipt `json:"node"`
 }
 
+type ReceiptFile struct {
+	ID                 string `json:"id"`
+	ReceiptNo          string `json:"receipt_no"`
+	EncryptedReceiptID string `json:"encrypted_receipt_id"`
+	IssuedAt           string `json:"issued_at"`
+	CreatedAt          string `json:"created_at"`
+	UpdatedAt          string `json:"updated_at"`
+}
+
 type SearchEncryptedReceipt struct {
 	Receipts   []*EncryptedReceipt `json:"receipts"`
 	TotalCount int                 `json:"totalCount"`
@@ -370,4 +379,11 @@ type UserConnection struct {
 type UserEdge struct {
 	Cursor string `json:"cursor"`
 	Node   *User  `json:"node"`
+}
+
+type VerifyReceiptFile struct {
+	ID                 string `json:"id"`
+	ReceiptNo          string `json:"receipt_no"`
+	IssuedAt           string `json:"issued_at"`
+	EncryptedReceiptID string `json:"encrypted_receipt_id"`
 }

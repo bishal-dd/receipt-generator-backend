@@ -76,14 +76,17 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 		tx.Rollback()
 		return false, err
 	}
-	if err := tx.Commit().Error; err != nil {
+
+	receiptFile, err := r.saveReceiptFile(encryptedReceiptModel, tx)
+	if err != nil {
+		tx.Rollback()
 		return false, err
 	}
 
 	// Parallel PDF generation and storage upload
 	g.Go(func() error {
 		var err error
-		fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+		fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 		if err != nil {
 			return err
 		}
@@ -167,11 +170,14 @@ func (r *ReceiptPDFGeneratorResolver) SendEncryptedReceiptPDFToWhatsAppWithRecei
 	if err != nil {
 		return false, err
 	}
-
+	receiptFile, err := r.saveReceiptFileFromReceiptModel(receiptModel)
+	if err != nil {
+		return false, err
+	}
 	// Parallel PDF generation and storage upload
 	g.Go(func() error {
 		var err error
-		fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+		fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 		if err != nil {
 			return err
 		}
@@ -256,7 +262,12 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 	if err := tx.Commit().Error; err != nil {
 		return false, err
 	}
-	fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+	receiptFile, err := r.saveReceiptFile(encryptedReceiptModel, tx)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 	if err != nil {
 		return false, err
 	}
@@ -333,7 +344,11 @@ func (r *ReceiptPDFGeneratorResolver) SendEncryptedReceiptPDFToEmailWithReceiptI
 	if err != nil {
 		return false, err
 	}
-	fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+	receiptFile, err := r.saveReceiptFileFromReceiptModel(receiptModel)
+	if err != nil {
+		return false, err
+	}
+	fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 	if err != nil {
 		return false, err
 	}
@@ -436,11 +451,15 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
 	if err := tx.Commit().Error; err != nil {
 		return "", err
 	}
-
+	receiptFile, err := r.saveReceiptFile(encryptedReceiptModel, tx)
+	if err != nil {
+		tx.Rollback()
+		return "", err
+	}
 	// Parallel PDF generation and storage upload
 	g.Go(func() error {
 		var err error
-		fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+		fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 		if err != nil {
 			return err
 		}
@@ -513,10 +532,14 @@ func (r *ReceiptPDFGeneratorResolver) DownloadEncryptedReceiptPDFWithReceiptID(c
 	if err != nil {
 		return "", err
 	}
+	receiptFile, err := r.saveReceiptFileFromReceiptModel(receiptModel)
+	if err != nil {
+		return "", err
+	}
 	// Parallel PDF generation and storage upload
 	g.Go(func() error {
 		var err error
-		fileName, pdfFile, err = r.generatePDF(receiptModel, profile)
+		fileName, pdfFile, err = r.generatePDF(receiptModel, profile, receiptFile)
 		if err != nil {
 			return err
 		}

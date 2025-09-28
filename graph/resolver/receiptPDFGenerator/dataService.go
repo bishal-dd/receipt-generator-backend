@@ -227,3 +227,40 @@ func (r *ReceiptPDFGeneratorResolver) MinusProductQuantity(services []*model.Cre
 	}
 	return nil
 }
+
+func (r *ReceiptPDFGeneratorResolver) saveReceiptFile(encryptedReceiptModel *model.EncryptedReceipt, tx *gorm.DB) (*model.ReceiptFile, error) {
+	receiptFile := &model.ReceiptFile{
+		ID:                 ids.UUID(),
+		ReceiptNo:          encryptedReceiptModel.ReceiptNo,
+		EncryptedReceiptID: encryptedReceiptModel.ID,
+		IssuedAt:           time.Now().Format(time.RFC3339),
+		CreatedAt:          time.Now().Format(time.RFC3339),
+		UpdatedAt:          time.Now().Format(time.RFC3339),
+	}
+
+	if err := tx.Table("receipt_files").Create(receiptFile).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+	return receiptFile, nil
+}
+
+func (r *ReceiptPDFGeneratorResolver) saveReceiptFileFromReceiptModel(receiptModel *model.Receipt) (*model.ReceiptFile, error) {
+	receiptFile := &model.ReceiptFile{
+		ID:                 ids.UUID(),
+		ReceiptNo:          receiptModel.ReceiptNo,
+		EncryptedReceiptID: receiptModel.ID,
+		IssuedAt:           time.Now().Format(time.RFC3339),
+		CreatedAt:          time.Now().Format(time.RFC3339),
+		UpdatedAt:          time.Now().Format(time.RFC3339),
+	}
+
+	if err := r.db.Table("receipt_files").Create(receiptFile).Error; err != nil {
+		return nil, err
+	}
+
+	return receiptFile, nil
+}

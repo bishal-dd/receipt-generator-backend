@@ -1,6 +1,8 @@
 scalar Date
 scalar DateTime
 scalar UUID
+scalar JSON
+scalar Upload
 
 type Query {
     users(first: Int, after: String): UserConnection!
@@ -64,6 +66,7 @@ type Mutation {
     createProduct(input: CreateProduct!): Product!
     updateProduct(input: UpdateProduct!): Product!
     deleteProduct(id: ID!): Boolean!
+    verifyReceiptFile(file: Upload!): Boolean!
 }
 
 type PageInfo {

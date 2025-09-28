@@ -80,6 +80,9 @@ func main() {
 		routes.PaymentWebhook(c, database)
 	})
 	r.GET("/issuePresignedURL", routes.HandlePresignedURL)
+	r.POST("/verify-receipt-file", func(c *gin.Context) {
+		routes.VerifyReceiptFileHandler(c, database)
+	})
 	r.Use(AuthMiddleware())
 	r.Use(loaders.LoaderMiddleware(database))
 	r.POST("/query", routes.GraphqlHandler(dependencyResolver))
