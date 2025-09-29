@@ -242,9 +242,6 @@ func (r *ReceiptPDFGeneratorResolver) saveReceiptFile(encryptedReceiptModel *mod
 		tx.Rollback()
 		return nil, err
 	}
-	if err := tx.Commit().Error; err != nil {
-		return nil, err
-	}
 	return receiptFile, nil
 }
 
