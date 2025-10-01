@@ -117,22 +117,22 @@ func (r *ReceiptPDFGeneratorResolver) generatePDF(receipt *model.Receipt, profil
 }
 
 func (r *ReceiptPDFGeneratorResolver) sendPDFToWhatsApp(url string, receiptName string, orginaztionName string, recipientPhone string, receiptAmount float64, receiptId string) error {
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"messaging_product": "whatsapp",
 		"to":                recipientPhone,
 		"type":              "template",
-		"template": map[string]interface{}{
+		"template": map[string]any{
 			"name": "receipt_template", // Replace with your approved template name
 			"language": map[string]string{
 				"code": "en_US", // Adjust as necessary
 			},
-			"components": []map[string]interface{}{
+			"components": []map[string]any{
 				{
 					"type": "header",
-					"parameters": []map[string]interface{}{
+					"parameters": []map[string]any{
 						{
 							"type": "document",
-							"document": map[string]interface{}{
+							"document": map[string]any{
 								"link":     url, // URL to the document (PDF)
 								"filename": receiptName,
 							},
@@ -141,7 +141,7 @@ func (r *ReceiptPDFGeneratorResolver) sendPDFToWhatsApp(url string, receiptName 
 				},
 				{
 					"type": "body",
-					"parameters": []map[string]interface{}{
+					"parameters": []map[string]any{
 						{"type": "text", "text": receiptAmount},
 						{"type": "text", "text": orginaztionName},
 						{"type": "text", "text": "receipt"},
@@ -173,7 +173,7 @@ func (r *ReceiptPDFGeneratorResolver) sendPDFToWhatsApp(url string, receiptName 
 	if err := r.db.Model(encryptedReceipt).Updates(model.UpdateEncryptedReceipt{IsReceiptSend: &isReceiptSend}).Error; err != nil {
 		return err
 	}
-	// if err := search.UpdateReceiptDocument(r.httpClient, map[string]interface{}{"is_receipt_send": true}, receiptId); err != nil {
+	// if err := search.UpdateReceiptDocument(r.httpClient, map[string]any{"is_receipt_send": true}, receiptId); err != nil {
 	//     return  err
 	// }
 

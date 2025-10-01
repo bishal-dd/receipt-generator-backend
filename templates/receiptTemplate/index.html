@@ -15,6 +15,7 @@
                 border-color: #333;
                 border-style: solid;
                 border-width: 1px;
+                border-radius: 10px;
             }
             .logo-image {
                 border-radius: 10%;
@@ -65,6 +66,20 @@
             .logo img {
                 max-width: 100px;
                 margin-top: 20px;
+            }
+            /* ===== Footer Branding ===== */
+            .footer {
+                margin-top: 30px;
+                text-align: center;
+                font-size: 13px;
+                background: #18a448;
+                color: #fff;
+                padding: 15px;
+                border-radius: 0 0 8px 8px;
+            }
+            .footer a {
+                color: #fff;
+                text-decoration: underline;
             }
         </style>
     </head>
@@ -154,6 +169,23 @@
             <div class="logo">
                 <img src="{{.Profile.SignatureImage}}" alt="Company Stamp" />
                 <h3>{{.Profile.Title}}</h3>
+            </div>
+            <!-- Footer Branding -->
+            <div class="footer">
+                <p>
+                    This receipt was generated and sent via
+                    <strong>BillsToTrack</strong>. Visit us at
+                    <a href="https://billstotrack.com">billstotrack.com</a>
+                </p>
+                <p>
+                    You can validate this receipt at
+                    <a
+                        href="https://billstotrack.com/validate"
+                        style="color: #fff; text-decoration: underline"
+                    >
+                        billstotrack.com/validate
+                    </a>
+                </p>
             </div>
             <div style="font-size: 1px; color: white; opacity: 1">
                 RECEIPT_ID: {{.ReceiptFile.ID}}
