@@ -7,6 +7,7 @@ package receipt
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"github.com/bishal-dd/receipt-generator-backend/graph/model"
 	"github.com/bishal-dd/receipt-generator-backend/helper/contextUtil"
@@ -93,6 +94,30 @@ func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *in
 	if err := query.Model(&model.EncryptedReceipt{}).Count(&foundCount).Error; err != nil {
 		return nil, err
 	}
+	var totalAmount float64
+
+	// Fetch *all* filtered receipts (no pagination) to calculate totalAmount
+	if err := query.Find(&encryptedReceipts).Error; err != nil {
+		return nil, err
+	}
+
+	for _, enc := range encryptedReceipts {
+		if err := r.decryptReceiptTotalAmount(&enc); err != nil {
+			return nil, fmt.Errorf("failed to decrypt receipt %s: %w", enc.ID, err)
+		}
+
+		amtPtr, err := EncryptedReceiptTotalAmountToTotalAmount(&enc)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert encrypted receipt %s to receipt: %w", enc.ID, err)
+		}
+
+		if amtPtr != nil {
+			totalAmount += *amtPtr
+		}
+	}
+
+	// Round to two decimal places
+	totalAmount = math.Round(totalAmount*100) / 100
 
 	// Fetch paginated encrypted receipts
 	if err := query.Order("date DESC").Offset(offset).Limit(pageSize).Find(&encryptedReceipts).Error; err != nil {
@@ -113,10 +138,10 @@ func (r *ReceiptResolver) SearchReceipts(ctx context.Context, page int, year *in
 		}
 		receiptsPtr = append(receiptsPtr, receipt)
 	}
-
 	return &model.SearchReceipt{
-		Receipts:   receiptsPtr,
-		TotalCount: int(totalCount),
-		FoundCount: int(foundCount),
+		Receipts:    receiptsPtr,
+		TotalCount:  int(totalCount),
+		FoundCount:  int(foundCount),
+		TotalAmount: totalAmount,
 	}, nil
 }

@@ -104,3 +104,11 @@ func EncryptedReceiptToReceipt(encryptedReceipt *model.EncryptedReceipt) (*model
 
 	return receipt, nil
 }
+
+func EncryptedReceiptTotalAmountToTotalAmount(encryptedReceipt *model.EncryptedReceipt) (*float64, error) {
+	totalAmount, err := ParseStringToFloat64Ptr(encryptedReceipt.TotalAmount)
+	if err != nil {
+		return nil, fmt.Errorf("parse total amount: %w", err)
+	}
+	return totalAmount, nil
+}

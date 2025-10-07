@@ -241,9 +241,10 @@ type SearchEncryptedReceipt struct {
 }
 
 type SearchReceipt struct {
-	Receipts   []*Receipt `json:"receipts"`
-	TotalCount int        `json:"totalCount"`
-	FoundCount int        `json:"foundCount"`
+	Receipts    []*Receipt `json:"receipts"`
+	TotalCount  int        `json:"totalCount"`
+	FoundCount  int        `json:"foundCount"`
+	TotalAmount float64    `json:"totalAmount"`
 }
 
 type SendReceiptPDFToEmail struct {

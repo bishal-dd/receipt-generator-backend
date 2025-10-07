@@ -231,9 +231,10 @@ type ComplexityRoot struct {
 	}
 
 	SearchReceipt struct {
-		FoundCount func(childComplexity int) int
-		Receipts   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
+		FoundCount  func(childComplexity int) int
+		Receipts    func(childComplexity int) int
+		TotalAmount func(childComplexity int) int
+		TotalCount  func(childComplexity int) int
 	}
 
 	Service struct {
@@ -1554,6 +1555,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SearchReceipt.Receipts(childComplexity), true
+
+	case "SearchReceipt.totalAmount":
+		if e.complexity.SearchReceipt.TotalAmount == nil {
+			break
+		}
+
+		return e.complexity.SearchReceipt.TotalAmount(childComplexity), true
 
 	case "SearchReceipt.totalCount":
 		if e.complexity.SearchReceipt.TotalCount == nil {
@@ -8304,6 +8312,8 @@ func (ec *executionContext) fieldContext_Query_searchReceipts(ctx context.Contex
 				return ec.fieldContext_SearchReceipt_totalCount(ctx, field)
 			case "foundCount":
 				return ec.fieldContext_SearchReceipt_foundCount(ctx, field)
+			case "totalAmount":
+				return ec.fieldContext_SearchReceipt_totalAmount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SearchReceipt", field.Name)
 		},
@@ -10353,6 +10363,50 @@ func (ec *executionContext) fieldContext_SearchReceipt_foundCount(ctx context.Co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SearchReceipt_totalAmount(ctx context.Context, field graphql.CollectedField, obj *model.SearchReceipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SearchReceipt_totalAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SearchReceipt_totalAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SearchReceipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16044,6 +16098,11 @@ func (ec *executionContext) _SearchReceipt(ctx context.Context, sel ast.Selectio
 			}
 		case "foundCount":
 			out.Values[i] = ec._SearchReceipt_foundCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalAmount":
+			out.Values[i] = ec._SearchReceipt_totalAmount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

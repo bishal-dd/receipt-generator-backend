@@ -66,4 +66,5 @@ type SearchReceipt {
     receipts: [Receipt!]!
     totalCount: Int!
     foundCount: Int!
+    totalAmount: Float!
 }

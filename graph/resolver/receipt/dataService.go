@@ -65,6 +65,17 @@ func (r *ReceiptResolver) decryptReceipt(receipt *model.EncryptedReceipt) error 
 	return nil
 }
 
+func (r *ReceiptResolver) decryptReceiptTotalAmount(receipt *model.EncryptedReceipt) error {
+	aesKey, iv, err := encryption.DecryptKeyAndIV(r.privateKeyPEM, *receipt.AesKeyEncrypted, *receipt.AesIv)
+	if err != nil {
+		return fmt.Errorf("decrypt AES key: %w", err)
+	}
+
+	receipt.TotalAmount = encryption.DecryptField(receipt.TotalAmount, aesKey, iv)
+
+	return nil
+}
+
 func (r *ReceiptResolver) DeleteReceiptFromDB(ctx context.Context, id string) error {
 	receipt := &model.Receipt{
 		ID: id,
