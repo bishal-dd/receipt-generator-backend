@@ -11,6 +11,7 @@ type EncryptedReceipt {
     total_amount: String
     sub_total_amount: String
     tax_amount: String
+    discount_amount: String
     payment_method: String!
     payment_note: String
     is_receipt_send: Boolean!

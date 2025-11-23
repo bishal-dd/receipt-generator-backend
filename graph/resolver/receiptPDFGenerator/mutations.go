@@ -61,9 +61,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToWhatsApp(ctx context.Conte
 		return false, err
 	}
 
-	totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
-	receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-	encryptedReceiptModel, err := whatsAppInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, r.publicKeyPEM)
+	totalAmount, subtotal, taxAmount, discountAmount := calculateTotalAmount(input.Services, profile.Tax, profile.DiscountPercentage)
+	receiptModel = whatsAppInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount)
+	encryptedReceiptModel, err := whatsAppInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount, r.publicKeyPEM)
 	if err != nil {
 		return false, err
 	}
@@ -246,9 +246,9 @@ func (r *ReceiptPDFGeneratorResolver) SendReceiptPDFToEmail(ctx context.Context,
 		return false, err
 	}
 
-	totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
-	receiptModel = emailInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-	encryptedReceiptModel, err := emailInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, r.publicKeyPEM)
+	totalAmount, subtotal, taxAmount, discountAmount := calculateTotalAmount(input.Services, profile.Tax, profile.DiscountPercentage)
+	receiptModel = emailInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount)
+	encryptedReceiptModel, err := emailInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount, r.publicKeyPEM)
 	if err != nil {
 		return false, err
 	}
@@ -436,9 +436,9 @@ func (r *ReceiptPDFGeneratorResolver) DownloadReceiptPDF(ctx context.Context, in
 		return "", err
 	}
 
-	totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
-	receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
-	encryptedReceiptModel, err := downlaodInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, r.publicKeyPEM)
+	totalAmount, subtotal, taxAmount, discountAmount := calculateTotalAmount(input.Services, profile.Tax, profile.DiscountPercentage)
+	receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount)
+	encryptedReceiptModel, err := downlaodInputToEncryptedReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount, r.publicKeyPEM)
 	if err != nil {
 		return "", err
 	}
@@ -578,8 +578,8 @@ func (r *ReceiptPDFGeneratorResolver) SaveReceipt(ctx context.Context, input mod
 		fmt.Println("Could not fetch profile:", err)
 	}
 
-	totalAmount, subtotal, taxAmount := calculateTotalAmount(input.Services, profile.Tax)
-	receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount)
+	totalAmount, subtotal, taxAmount, discountAmount := calculateTotalAmount(input.Services, profile.Tax, profile.DiscountPercentage)
+	receiptModel = downloadInputToReceiptModel(input, userId, totalAmount, subtotal, taxAmount, discountAmount)
 	if err := r.saveReceipt(receiptModel, input.Services, tx); err != nil {
 		tx.Rollback()
 		return false, err

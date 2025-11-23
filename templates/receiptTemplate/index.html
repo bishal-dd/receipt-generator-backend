@@ -156,6 +156,10 @@
                     Subtotal: {{.Receipt.SubTotalAmount}} {{.Profile.Currency}}
                 </p>
                 <p>
+                    Discount({{.Profile.DiscountPercentage}}%):
+                    {{.Receipt.DiscountAmount}} {{.Profile.Currency}}
+                </p>
+                <p>
                     GST ({{.Profile.Tax}}%): {{.Receipt.TaxAmount}}
                     {{.Profile.Currency}}
                 </p>

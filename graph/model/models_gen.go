@@ -50,6 +50,7 @@ type CreateProfile struct {
 	Address                *string  `json:"address,omitempty"`
 	Currency               *string  `json:"currency,omitempty"`
 	Tax                    *float64 `json:"tax,omitempty"`
+	DiscountPercentage     *float64 `json:"discount_percentage,omitempty"`
 	PhoneNumberCountryCode string   `json:"phone_number_country_code"`
 	City                   *string  `json:"city,omitempty"`
 	Title                  *string  `json:"title,omitempty"`
@@ -113,6 +114,7 @@ type EncryptedReceipt struct {
 	TotalAmount       *string             `json:"total_amount,omitempty"`
 	SubTotalAmount    *string             `json:"sub_total_amount,omitempty"`
 	TaxAmount         *string             `json:"tax_amount,omitempty"`
+	DiscountAmount    *string             `json:"discount_amount,omitempty"`
 	PaymentMethod     string              `json:"payment_method"`
 	PaymentNote       *string             `json:"payment_note,omitempty"`
 	IsReceiptSend     bool                `json:"is_receipt_send"`
@@ -182,6 +184,7 @@ type Profile struct {
 	SignatureImage         *string `json:"signature_image,omitempty"`
 	Currency               string  `json:"currency"`
 	Tax                    float64 `json:"tax"`
+	DiscountPercentage     float64 `json:"discount_percentage"`
 	PhoneNumberCountryCode string  `json:"phone_number_country_code"`
 	UserID                 string  `json:"user_id"`
 	CreatedAt              string  `json:"created_at"`
@@ -205,6 +208,7 @@ type Receipt struct {
 	TotalAmount      *float64   `json:"total_amount,omitempty"`
 	SubTotalAmount   *float64   `json:"sub_total_amount,omitempty"`
 	TaxAmount        *float64   `json:"tax_amount,omitempty"`
+	DiscountAmount   *float64   `json:"DiscountAmount,omitempty"`
 	PaymentMethod    string     `json:"payment_method"`
 	PaymentNote      *string    `json:"payment_note,omitempty"`
 	IsReceiptSend    bool       `json:"is_receipt_send"`
@@ -331,6 +335,7 @@ type UpdateProfile struct {
 	Address                *string  `json:"address,omitempty"`
 	Currency               *string  `json:"currency,omitempty"`
 	PhoneNumberCountryCode *string  `json:"phone_number_country_code,omitempty"`
+	DiscountPercentage     *float64 `json:"discount_percentage,omitempty"`
 	Tax                    *float64 `json:"tax,omitempty"`
 	City                   *string  `json:"city,omitempty"`
 	Title                  *string  `json:"title,omitempty"`

@@ -53,6 +53,7 @@ type ComplexityRoot struct {
 		CreatedAt         func(childComplexity int) int
 		Date              func(childComplexity int) int
 		DeletedAt         func(childComplexity int) int
+		DiscountAmount    func(childComplexity int) int
 		EncryptedServices func(childComplexity int) int
 		ID                func(childComplexity int) int
 		IsReceiptSend     func(childComplexity int) int
@@ -152,6 +153,7 @@ type ComplexityRoot struct {
 		CreatedAt              func(childComplexity int) int
 		Currency               func(childComplexity int) int
 		DeletedAt              func(childComplexity int) int
+		DiscountPercentage     func(childComplexity int) int
 		Email                  func(childComplexity int) int
 		ID                     func(childComplexity int) int
 		LogoImage              func(childComplexity int) int
@@ -186,6 +188,7 @@ type ComplexityRoot struct {
 		CreatedAt        func(childComplexity int) int
 		Date             func(childComplexity int) int
 		DeletedAt        func(childComplexity int) int
+		DiscountAmount   func(childComplexity int) int
 		ID               func(childComplexity int) int
 		IsReceiptSend    func(childComplexity int) int
 		PaymentMethod    func(childComplexity int) int
@@ -379,6 +382,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EncryptedReceipt.DeletedAt(childComplexity), true
+
+	case "EncryptedReceipt.discount_amount":
+		if e.complexity.EncryptedReceipt.DiscountAmount == nil {
+			break
+		}
+
+		return e.complexity.EncryptedReceipt.DiscountAmount(childComplexity), true
 
 	case "EncryptedReceipt.EncryptedServices":
 		if e.complexity.EncryptedReceipt.EncryptedServices == nil {
@@ -1066,6 +1076,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Profile.DeletedAt(childComplexity), true
 
+	case "Profile.discount_percentage":
+		if e.complexity.Profile.DiscountPercentage == nil {
+			break
+		}
+
+		return e.complexity.Profile.DiscountPercentage(childComplexity), true
+
 	case "Profile.email":
 		if e.complexity.Profile.Email == nil {
 			break
@@ -1331,6 +1348,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Receipt.DeletedAt(childComplexity), true
+
+	case "Receipt.DiscountAmount":
+		if e.complexity.Receipt.DiscountAmount == nil {
+			break
+		}
+
+		return e.complexity.Receipt.DiscountAmount(childComplexity), true
 
 	case "Receipt.id":
 		if e.complexity.Receipt.ID == nil {
@@ -3181,6 +3205,47 @@ func (ec *executionContext) fieldContext_EncryptedReceipt_tax_amount(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _EncryptedReceipt_discount_amount(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedReceipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EncryptedReceipt_discount_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DiscountAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EncryptedReceipt_discount_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EncryptedReceipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _EncryptedReceipt_payment_method(ctx context.Context, field graphql.CollectedField, obj *model.EncryptedReceipt) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
 	if err != nil {
@@ -3838,6 +3903,8 @@ func (ec *executionContext) fieldContext_EncryptedReceiptEdge_node(ctx context.C
 				return ec.fieldContext_EncryptedReceipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_EncryptedReceipt_tax_amount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_EncryptedReceipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4524,6 +4591,8 @@ func (ec *executionContext) fieldContext_Mutation_createReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4619,6 +4688,8 @@ func (ec *executionContext) fieldContext_Mutation_updateReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4769,6 +4840,8 @@ func (ec *executionContext) fieldContext_Mutation_createEncryptedReceipt(ctx con
 				return ec.fieldContext_EncryptedReceipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_EncryptedReceipt_tax_amount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_EncryptedReceipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4868,6 +4941,8 @@ func (ec *executionContext) fieldContext_Mutation_updateEncryptedReceipt(ctx con
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -5016,6 +5091,8 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "discount_percentage":
+				return ec.fieldContext_Profile_discount_percentage(ctx, field)
 			case "phone_number_country_code":
 				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
@@ -5105,6 +5182,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProfile(ctx context.Cont
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "discount_percentage":
+				return ec.fieldContext_Profile_discount_percentage(ctx, field)
 			case "phone_number_country_code":
 				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
@@ -7220,6 +7299,50 @@ func (ec *executionContext) fieldContext_Profile_tax(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Profile_discount_percentage(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Profile_discount_percentage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DiscountPercentage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Profile_discount_percentage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Profile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Profile_phone_number_country_code(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 	if err != nil {
@@ -7688,6 +7811,8 @@ func (ec *executionContext) fieldContext_Query_receipt(ctx context.Context, fiel
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -7843,6 +7968,8 @@ func (ec *executionContext) fieldContext_Query_encryptedReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -7933,6 +8060,8 @@ func (ec *executionContext) fieldContext_Query_profileByUserId(ctx context.Conte
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "discount_percentage":
+				return ec.fieldContext_Profile_discount_percentage(ctx, field)
 			case "phone_number_country_code":
 				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
@@ -8019,6 +8148,8 @@ func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, fiel
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "discount_percentage":
+				return ec.fieldContext_Profile_discount_percentage(ctx, field)
 			case "phone_number_country_code":
 				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
@@ -9164,6 +9295,47 @@ func (ec *executionContext) fieldContext_Receipt_tax_amount(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Receipt_DiscountAmount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DiscountAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receipt_DiscountAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receipt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Receipt_payment_method(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Receipt_payment_method(ctx, field)
 	if err != nil {
@@ -9735,6 +9907,8 @@ func (ec *executionContext) fieldContext_ReceiptEdge_node(ctx context.Context, f
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -10083,6 +10257,8 @@ func (ec *executionContext) fieldContext_SearchEncryptedReceipt_receipts(ctx con
 				return ec.fieldContext_EncryptedReceipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_EncryptedReceipt_tax_amount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_EncryptedReceipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_EncryptedReceipt_payment_method(ctx, field)
 			case "payment_note":
@@ -10259,6 +10435,8 @@ func (ec *executionContext) fieldContext_SearchReceipt_receipts(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
+			case "DiscountAmount":
+				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -11118,6 +11296,8 @@ func (ec *executionContext) fieldContext_User_Profile(ctx context.Context, field
 				return ec.fieldContext_Profile_currency(ctx, field)
 			case "tax":
 				return ec.fieldContext_Profile_tax(ctx, field)
+			case "discount_percentage":
+				return ec.fieldContext_Profile_discount_percentage(ctx, field)
 			case "phone_number_country_code":
 				return ec.fieldContext_Profile_phone_number_country_code(ctx, field)
 			case "user_id":
@@ -13619,7 +13799,7 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "phone_number_country_code", "city", "title", "signature_image", "user_id"}
+	fieldsInOrder := [...]string{"company_name", "logo_image", "phone_no", "email", "address", "currency", "tax", "discount_percentage", "phone_number_country_code", "city", "title", "signature_image", "user_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13675,6 +13855,13 @@ func (ec *executionContext) unmarshalInputCreateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.Tax = data
+		case "discount_percentage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_percentage"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountPercentage = data
 		case "phone_number_country_code":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_number_country_code"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -14456,7 +14643,7 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "currency", "phone_number_country_code", "tax", "city", "title", "signature_image"}
+	fieldsInOrder := [...]string{"id", "company_name", "logo_image", "phone_no", "email", "address", "currency", "phone_number_country_code", "discount_percentage", "tax", "city", "title", "signature_image"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14519,6 +14706,13 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 				return it, err
 			}
 			it.PhoneNumberCountryCode = data
+		case "discount_percentage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_percentage"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountPercentage = data
 		case "tax":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
 			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -14774,6 +14968,8 @@ func (ec *executionContext) _EncryptedReceipt(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._EncryptedReceipt_sub_total_amount(ctx, field, obj)
 		case "tax_amount":
 			out.Values[i] = ec._EncryptedReceipt_tax_amount(ctx, field, obj)
+		case "discount_amount":
+			out.Values[i] = ec._EncryptedReceipt_discount_amount(ctx, field, obj)
 		case "payment_method":
 			out.Values[i] = ec._EncryptedReceipt_payment_method(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15387,6 +15583,11 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "discount_percentage":
+			out.Values[i] = ec._Profile_discount_percentage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "phone_number_country_code":
 			out.Values[i] = ec._Profile_phone_number_country_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15823,6 +16024,8 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Receipt_sub_total_amount(ctx, field, obj)
 		case "tax_amount":
 			out.Values[i] = ec._Receipt_tax_amount(ctx, field, obj)
+		case "DiscountAmount":
+			out.Values[i] = ec._Receipt_DiscountAmount(ctx, field, obj)
 		case "payment_method":
 			out.Values[i] = ec._Receipt_payment_method(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

@@ -17,21 +17,34 @@ import (
 	"github.com/bishal-dd/receipt-generator-backend/helper/cloudFront"
 	"github.com/bishal-dd/receipt-generator-backend/helper/encryption"
 	"github.com/bishal-dd/receipt-generator-backend/helper/ids"
+	"github.com/bishal-dd/receipt-generator-backend/helper/mathUtil"
 	"github.com/bishal-dd/receipt-generator-backend/helper/stringUtil"
 	"github.com/clerk/clerk-sdk-go/v2"
 )
 
-func calculateTotalAmount(services []*model.CreateBulkService, tax float64) (float64, float64, float64) {
-	subtotal := 0.0
+func calculateTotalAmount(
+	services []*model.CreateBulkService,
+	tax float64,
+	discountPercentage float64,
+) (total float64, subtotal float64, taxAmount float64, discountAmount float64) {
+
+	// 1. Subtotal
 	for _, serviceInput := range services {
 		subtotal += serviceInput.Amount
 	}
 
-	taxRate := tax / 100
-	taxAmount := subtotal * taxRate
-	totalAmount := subtotal + taxAmount
+	// 2. Discount
+	discountAmount = subtotal * (discountPercentage / 100)
+	discountedSubtotal := subtotal - discountAmount
 
-	return totalAmount, subtotal, taxAmount
+	// 3. Tax
+	taxRate := tax / 100
+	taxAmount = discountedSubtotal * taxRate
+
+	// 4. Final total
+	total = discountedSubtotal + taxAmount
+
+	return mathUtil.Round(total), mathUtil.Round(subtotal), mathUtil.Round(taxAmount), mathUtil.Round(discountAmount)
 }
 
 func updateProfileImages(profile *model.Profile, organization *clerk.Organization) error {
@@ -50,7 +63,7 @@ func updateProfileImages(profile *model.Profile, organization *clerk.Organizatio
 	return nil
 }
 
-func emailInputToReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
+func emailInputToReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64, discountAmount float64) *model.Receipt {
 	receiptInput := input
 
 	return &model.Receipt{
@@ -69,11 +82,12 @@ func emailInputToReceiptModel(input model.SendReceiptPDFToEmail, userId string, 
 		TotalAmount:      &totalAmount,
 		SubTotalAmount:   &subtotal,
 		TaxAmount:        &taxAmount,
+		DiscountAmount:   &discountAmount,
 		Services:         make([]*model.Service, 0),
 	}
 }
 
-func emailInputToEncryptedReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
+func emailInputToEncryptedReceiptModel(input model.SendReceiptPDFToEmail, userId string, totalAmount, subtotal, taxAmount float64, discountAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
 	receiptInput := input
 
 	aesKey, iv, err := encryption.GenerateAESKeyAndIV()
@@ -97,13 +111,14 @@ func emailInputToEncryptedReceiptModel(input model.SendReceiptPDFToEmail, userId
 		TotalAmount:       encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", totalAmount)), aesKey, iv),
 		SubTotalAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", subtotal)), aesKey, iv),
 		TaxAmount:         encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", taxAmount)), aesKey, iv),
+		DiscountAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", discountAmount)), aesKey, iv),
 		EncryptedServices: make([]*model.EncryptedService, 0),
 		AesIv:             stringUtil.StrPtr(base64.StdEncoding.EncodeToString(iv)),
 		AesKeyEncrypted:   stringUtil.StrPtr(string(encryption.EncryptKey(publicKeyPEM, aesKey))),
 	}, nil
 }
 
-func whatsAppInputToReceiptModel(input model.SendReceiptPDFToWhatsApp, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
+func whatsAppInputToReceiptModel(input model.SendReceiptPDFToWhatsApp, userId string, totalAmount, subtotal, taxAmount float64, discountAmount float64) *model.Receipt {
 	receiptInput := input
 
 	return &model.Receipt{
@@ -122,11 +137,12 @@ func whatsAppInputToReceiptModel(input model.SendReceiptPDFToWhatsApp, userId st
 		TotalAmount:      &totalAmount,
 		SubTotalAmount:   &subtotal,
 		TaxAmount:        &taxAmount,
+		DiscountAmount:   &discountAmount,
 		Services:         make([]*model.Service, 0),
 	}
 }
 
-func whatsAppInputToEncryptedReceiptModel(input model.SendReceiptPDFToWhatsApp, userId string, totalAmount, subtotal, taxAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
+func whatsAppInputToEncryptedReceiptModel(input model.SendReceiptPDFToWhatsApp, userId string, totalAmount, subtotal, taxAmount float64, discountAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
 	receiptInput := input
 
 	aesKey, iv, err := encryption.GenerateAESKeyAndIV()
@@ -150,13 +166,14 @@ func whatsAppInputToEncryptedReceiptModel(input model.SendReceiptPDFToWhatsApp, 
 		TotalAmount:       encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", totalAmount)), aesKey, iv),
 		SubTotalAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", subtotal)), aesKey, iv),
 		TaxAmount:         encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", taxAmount)), aesKey, iv),
+		DiscountAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", discountAmount)), aesKey, iv),
 		EncryptedServices: make([]*model.EncryptedService, 0),
 		AesIv:             stringUtil.StrPtr(base64.StdEncoding.EncodeToString(iv)),
 		AesKeyEncrypted:   stringUtil.StrPtr(string(encryption.EncryptKey(publicKeyPEM, aesKey))),
 	}, nil
 }
 
-func downloadInputToReceiptModel(input model.DownloadPDF, userId string, totalAmount, subtotal, taxAmount float64) *model.Receipt {
+func downloadInputToReceiptModel(input model.DownloadPDF, userId string, totalAmount, subtotal, taxAmount, discountAmount float64) *model.Receipt {
 	receiptInput := input
 
 	return &model.Receipt{
@@ -175,11 +192,12 @@ func downloadInputToReceiptModel(input model.DownloadPDF, userId string, totalAm
 		TotalAmount:      &totalAmount,
 		SubTotalAmount:   &subtotal,
 		TaxAmount:        &taxAmount,
+		DiscountAmount:   &discountAmount,
 		Services:         make([]*model.Service, 0),
 	}
 }
 
-func downlaodInputToEncryptedReceiptModel(input model.DownloadPDF, userId string, totalAmount, subtotal, taxAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
+func downlaodInputToEncryptedReceiptModel(input model.DownloadPDF, userId string, totalAmount, subtotal, taxAmount, discountAmount float64, publicKeyPEM string) (*model.EncryptedReceipt, error) {
 	receiptInput := input
 
 	aesKey, iv, err := encryption.GenerateAESKeyAndIV()
@@ -203,6 +221,7 @@ func downlaodInputToEncryptedReceiptModel(input model.DownloadPDF, userId string
 		TotalAmount:       encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", totalAmount)), aesKey, iv),
 		SubTotalAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", subtotal)), aesKey, iv),
 		TaxAmount:         encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", taxAmount)), aesKey, iv),
+		DiscountAmount:    encryption.EncryptField(stringUtil.StrPtr(fmt.Sprintf("%.2f", discountAmount)), aesKey, iv),
 		EncryptedServices: make([]*model.EncryptedService, 0),
 		AesIv:             stringUtil.StrPtr(base64.StdEncoding.EncodeToString(iv)),
 		AesKeyEncrypted:   stringUtil.StrPtr(string(encryption.EncryptKey(publicKeyPEM, aesKey))),
