@@ -1349,7 +1349,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Receipt.DeletedAt(childComplexity), true
 
-	case "Receipt.DiscountAmount":
+	case "Receipt.discount_amount":
 		if e.complexity.Receipt.DiscountAmount == nil {
 			break
 		}
@@ -4591,8 +4591,8 @@ func (ec *executionContext) fieldContext_Mutation_createReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4688,8 +4688,8 @@ func (ec *executionContext) fieldContext_Mutation_updateReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -4941,8 +4941,8 @@ func (ec *executionContext) fieldContext_Mutation_updateEncryptedReceipt(ctx con
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -7811,8 +7811,8 @@ func (ec *executionContext) fieldContext_Query_receipt(ctx context.Context, fiel
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -7968,8 +7968,8 @@ func (ec *executionContext) fieldContext_Query_encryptedReceipt(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -9295,8 +9295,8 @@ func (ec *executionContext) fieldContext_Receipt_tax_amount(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Receipt_DiscountAmount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+func (ec *executionContext) _Receipt_discount_amount(ctx context.Context, field graphql.CollectedField, obj *model.Receipt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receipt_discount_amount(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9323,7 +9323,7 @@ func (ec *executionContext) _Receipt_DiscountAmount(ctx context.Context, field g
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Receipt_DiscountAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Receipt_discount_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Receipt",
 		Field:      field,
@@ -9907,8 +9907,8 @@ func (ec *executionContext) fieldContext_ReceiptEdge_node(ctx context.Context, f
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -10435,8 +10435,8 @@ func (ec *executionContext) fieldContext_SearchReceipt_receipts(ctx context.Cont
 				return ec.fieldContext_Receipt_sub_total_amount(ctx, field)
 			case "tax_amount":
 				return ec.fieldContext_Receipt_tax_amount(ctx, field)
-			case "DiscountAmount":
-				return ec.fieldContext_Receipt_DiscountAmount(ctx, field)
+			case "discount_amount":
+				return ec.fieldContext_Receipt_discount_amount(ctx, field)
 			case "payment_method":
 				return ec.fieldContext_Receipt_payment_method(ctx, field)
 			case "payment_note":
@@ -16024,8 +16024,8 @@ func (ec *executionContext) _Receipt(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Receipt_sub_total_amount(ctx, field, obj)
 		case "tax_amount":
 			out.Values[i] = ec._Receipt_tax_amount(ctx, field, obj)
-		case "DiscountAmount":
-			out.Values[i] = ec._Receipt_DiscountAmount(ctx, field, obj)
+		case "discount_amount":
+			out.Values[i] = ec._Receipt_discount_amount(ctx, field, obj)
 		case "payment_method":
 			out.Values[i] = ec._Receipt_payment_method(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

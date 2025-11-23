@@ -11,7 +11,7 @@ type Receipt {
     total_amount: Float
     sub_total_amount: Float
     tax_amount: Float
-    DiscountAmount: Float
+    discount_amount: Float
     payment_method: String!
     payment_note: String
     is_receipt_send: Boolean!

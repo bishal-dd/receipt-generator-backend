@@ -208,7 +208,7 @@ type Receipt struct {
 	TotalAmount      *float64   `json:"total_amount,omitempty"`
 	SubTotalAmount   *float64   `json:"sub_total_amount,omitempty"`
 	TaxAmount        *float64   `json:"tax_amount,omitempty"`
-	DiscountAmount   *float64   `json:"DiscountAmount,omitempty"`
+	DiscountAmount   *float64   `json:"discount_amount,omitempty"`
 	PaymentMethod    string     `json:"payment_method"`
 	PaymentNote      *string    `json:"payment_note,omitempty"`
 	IsReceiptSend    bool       `json:"is_receipt_send"`
