@@ -57,6 +57,7 @@ func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context
 
 	subTotalAmountStr := encryption.DecryptField(encryptedReceipt.SubTotalAmount, aesKey, iv)
 	taxAmountStr := encryption.DecryptField(encryptedReceipt.TaxAmount, aesKey, iv)
+	discountAmountStr := encryption.DecryptField(encryptedReceipt.DiscountAmount, aesKey, iv)
 	totalAmountStr := encryption.DecryptField(encryptedReceipt.TotalAmount, aesKey, iv)
 
 	subTotalAmount, err := stringUtil.ParseStringToFloat64Ptr(subTotalAmountStr)
@@ -66,6 +67,10 @@ func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context
 	taxAmount, err := stringUtil.ParseStringToFloat64Ptr(taxAmountStr)
 	if err != nil {
 		return nil, fmt.Errorf("parse TaxAmount: %w", err)
+	}
+	discountAmount, err := stringUtil.ParseStringToFloat64Ptr(discountAmountStr)
+	if err != nil {
+		return nil, fmt.Errorf("parse DiscountAmount: %w", err)
 	}
 	totalAmount, err := stringUtil.ParseStringToFloat64Ptr(totalAmountStr)
 	if err != nil {
@@ -115,6 +120,7 @@ func (r *EncryptedReceiptResolver) GetEncryptedReceiptFromDB(ctx context.Context
 		Services:         services,
 		TaxAmount:        taxAmount,
 		TotalAmount:      totalAmount,
+		DiscountAmount:   discountAmount,
 		CreatedAt:        encryptedReceipt.CreatedAt,
 	}
 
@@ -137,6 +143,7 @@ func (r *EncryptedReceiptResolver) decryptReceipt(receipt *model.EncryptedReceip
 	receipt.PaymentNote = encryption.DecryptField(receipt.PaymentNote, aesKey, iv)
 	receipt.SubTotalAmount = encryption.DecryptField(receipt.SubTotalAmount, aesKey, iv)
 	receipt.TaxAmount = encryption.DecryptField(receipt.TaxAmount, aesKey, iv)
+	receipt.DiscountAmount = encryption.DecryptField(receipt.DiscountAmount, aesKey, iv)
 	receipt.TotalAmount = encryption.DecryptField(receipt.TotalAmount, aesKey, iv)
 
 	return nil
