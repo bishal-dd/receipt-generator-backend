@@ -38,6 +38,7 @@ type CreateEncryptedService struct {
 type CreateProduct struct {
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
+	Type      string  `json:"type"`
 	Quantity  *int    `json:"quantity,omitempty"`
 	UserID    string  `json:"user_id"`
 }
@@ -166,6 +167,7 @@ type Product struct {
 	Name      string  `json:"name"`
 	UnitPrice float64 `json:"unit_price"`
 	Quantity  *int    `json:"quantity,omitempty"`
+	Type      string  `json:"type"`
 	UserID    string  `json:"user_id"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt *string `json:"updated_at,omitempty"`

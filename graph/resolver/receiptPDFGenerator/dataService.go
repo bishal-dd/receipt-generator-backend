@@ -212,7 +212,9 @@ func (r *ReceiptPDFGeneratorResolver) MinusProductQuantity(services []*model.Cre
 			tx.Rollback()
 			return err
 		}
-
+		if product.Type != "" && product.Type == "service" {
+			continue // Skip stock deduction for services
+		}
 		if *product.Quantity < service.Quantity {
 			tx.Rollback()
 			return fmt.Errorf("not enough stock for product ID %s", product.ID)

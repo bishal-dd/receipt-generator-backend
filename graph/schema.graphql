@@ -22,7 +22,7 @@ type Query {
         date: String
         dateRange: [String!]
     ): SearchReceipt!
-    products: [Product!]
+    products(productType: String!): [Product!]
     product(id: ID!): Product
     searchProducts(query: String): [Product!]
 }

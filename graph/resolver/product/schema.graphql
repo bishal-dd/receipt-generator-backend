@@ -1,24 +1,26 @@
 type Product {
-  id: UUID!
-  name: String!
-  unit_price: Float!
-  quantity: Int
-  user_id: ID!
-  created_at: DateTime!
-  updated_at: DateTime
-  deleted_at: DateTime
+    id: UUID!
+    name: String!
+    unit_price: Float!
+    quantity: Int
+    type: String!
+    user_id: ID!
+    created_at: DateTime!
+    updated_at: DateTime
+    deleted_at: DateTime
 }
 
 input CreateProduct {
-  name: String!
-  unit_price: Float!
-  quantity: Int
-  user_id: ID!
+    name: String!
+    unit_price: Float!
+    type: String!
+    quantity: Int
+    user_id: ID!
 }
 
 input UpdateProduct {
-  id: UUID!
-  name: String
-  unit_price: Float
-  quantity: Int
+    id: UUID!
+    name: String
+    unit_price: Float
+    quantity: Int
 }

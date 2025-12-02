@@ -141,6 +141,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Quantity  func(childComplexity int) int
+		Type      func(childComplexity int) int
 		UnitPrice func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UserID    func(childComplexity int) int
@@ -171,7 +172,7 @@ type ComplexityRoot struct {
 		EncryptedReceipts           func(childComplexity int, first *int, after *string) int
 		EncryptedServiceByReceiptID func(childComplexity int, receiptID string) int
 		Product                     func(childComplexity int, id string) int
-		Products                    func(childComplexity int) int
+		Products                    func(childComplexity int, productType string) int
 		Profile                     func(childComplexity int, id string) int
 		ProfileByUserID             func(childComplexity int, userID string) int
 		Receipt                     func(childComplexity int, id string) int
@@ -324,7 +325,7 @@ type QueryResolver interface {
 	EncryptedServiceByReceiptID(ctx context.Context, receiptID string) ([]*model.EncryptedService, error)
 	Service(ctx context.Context, id string) (*model.Service, error)
 	SearchReceipts(ctx context.Context, page int, year *int, date *string, dateRange []string) (*model.SearchReceipt, error)
-	Products(ctx context.Context) ([]*model.Product, error)
+	Products(ctx context.Context, productType string) ([]*model.Product, error)
 	Product(ctx context.Context, id string) (*model.Product, error)
 	SearchProducts(ctx context.Context, query *string) ([]*model.Product, error)
 }
@@ -1013,6 +1014,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Quantity(childComplexity), true
 
+	case "Product.type":
+		if e.complexity.Product.Type == nil {
+			break
+		}
+
+		return e.complexity.Product.Type(childComplexity), true
+
 	case "Product.unit_price":
 		if e.complexity.Product.UnitPrice == nil {
 			break
@@ -1206,7 +1214,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Products(childComplexity), true
+		args, err := ec.field_Query_products_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Products(childComplexity, args["productType"].(string)), true
 
 	case "Query.profile":
 		if e.complexity.Query.Profile == nil {
@@ -2465,6 +2478,21 @@ func (ec *executionContext) field_Query_product_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_products_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["productType"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productType"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["productType"] = arg0
 	return args, nil
 }
 
@@ -6117,6 +6145,8 @@ func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Cont
 				return ec.fieldContext_Product_unit_price(ctx, field)
 			case "quantity":
 				return ec.fieldContext_Product_quantity(ctx, field)
+			case "type":
+				return ec.fieldContext_Product_type(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -6190,6 +6220,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Cont
 				return ec.fieldContext_Product_unit_price(ctx, field)
 			case "quantity":
 				return ec.fieldContext_Product_quantity(ctx, field)
+			case "type":
+				return ec.fieldContext_Product_type(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -6664,6 +6696,50 @@ func (ec *executionContext) fieldContext_Product_quantity(ctx context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Product_type(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Product_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Product_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8477,7 +8553,7 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Products(rctx)
+		return ec.resolvers.Query().Products(rctx, fc.Args["productType"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8507,6 +8583,8 @@ func (ec *executionContext) fieldContext_Query_products(ctx context.Context, fie
 				return ec.fieldContext_Product_unit_price(ctx, field)
 			case "quantity":
 				return ec.fieldContext_Product_quantity(ctx, field)
+			case "type":
+				return ec.fieldContext_Product_type(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -8518,6 +8596,17 @@ func (ec *executionContext) fieldContext_Query_products(ctx context.Context, fie
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_products_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -8566,6 +8655,8 @@ func (ec *executionContext) fieldContext_Query_product(ctx context.Context, fiel
 				return ec.fieldContext_Product_unit_price(ctx, field)
 			case "quantity":
 				return ec.fieldContext_Product_quantity(ctx, field)
+			case "type":
+				return ec.fieldContext_Product_type(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -8636,6 +8727,8 @@ func (ec *executionContext) fieldContext_Query_searchProducts(ctx context.Contex
 				return ec.fieldContext_Product_unit_price(ctx, field)
 			case "quantity":
 				return ec.fieldContext_Product_quantity(ctx, field)
+			case "type":
+				return ec.fieldContext_Product_type(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Product_user_id(ctx, field)
 			case "created_at":
@@ -13751,7 +13844,7 @@ func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit_price", "quantity", "user_id"}
+	fieldsInOrder := [...]string{"name", "unit_price", "type", "quantity", "user_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13772,6 +13865,13 @@ func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj
 				return it, err
 			}
 			it.UnitPrice = data
+		case "type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
 		case "quantity":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -15504,6 +15604,11 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "quantity":
 			out.Values[i] = ec._Product_quantity(ctx, field, obj)
+		case "type":
+			out.Values[i] = ec._Product_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "user_id":
 			out.Values[i] = ec._Product_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
